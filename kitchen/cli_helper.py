@@ -12,6 +12,14 @@ CONFIG_DIR_PATH = Path(typer.get_app_dir(__app_name__))
 CONFIG_FILE_PATH = CONFIG_DIR_PATH / "config.ini"
 
 def init_app(cfg_path: str) -> int:
+    """Initialises the application by creating its configuration file and CFG path.
+
+    Args:
+        cfg_path (str): CFG path.
+
+    Returns:
+        int: Status code.
+    """    
     """Initialize the application configuration file."""
     config_code = _init_config_file()
     if config_code != SUCCESS:
@@ -22,6 +30,11 @@ def init_app(cfg_path: str) -> int:
     return SUCCESS
 
 def _init_config_file() -> int:
+    """Initialises the configuration file directory and file. 
+
+    Returns:
+        int: Status code.
+    """    
     try:
         CONFIG_DIR_PATH.mkdir(exist_ok=True)
     except OSError:
@@ -33,6 +46,17 @@ def _init_config_file() -> int:
     return SUCCESS
 
 def _create_cfg_path(cfg: str) -> int:
+    """Creates a path to the CFG in the configuration of the application.
+
+    Args:
+        cfg (str): Path to the CFG file.
+
+    Raises:
+        typer.Exit: Exits when CFG path could not be written to the configuration.
+
+    Returns:
+        int: Status code.
+    """    
     # check that the cfg file exists
     cfg_path = Path(cfg)
     path_error = _validate_path([cfg_path])
@@ -56,7 +80,11 @@ def _create_cfg_path(cfg: str) -> int:
 
 # Helper function to validate that the given cfg path is valid
 def _validate_path(paths):
-    # check for valid paths
+    """Checks the validity of paths.
+
+    Args:
+        paths (List): List of paths to be validated.
+    """    
     for path in paths:
         if path is None:
            return FILE_LOADING_NONE_ERROR
@@ -68,8 +96,9 @@ def _validate_path(paths):
 
 """ Functions for the Kitchen environment """
 
-# Helper function to print the welcome
 def print_welcome():
+    """Helper function to print the welcome screen.
+    """    
     typer.echo(
         "\n -----------------------------------------------------------------------\n" +
         "\t\t\tWelcome to Kitchen\n" +
@@ -77,8 +106,9 @@ def print_welcome():
         "type \\m for the menu\n\n")
 
 
-# Helper function to print the app menu
 def _print_menu():
+    """Helper function to print the application menu.
+    """    
     typer.echo(
         " -----------------------------------------------------------------------")
     typer.echo(
@@ -105,6 +135,14 @@ def _print_menu():
         " ------------------------------------------------------------------------")
 
 def load_app(path):
+    """Loads the application given a CFG path.
+
+    Args:
+        path (String): Path to the CFG file.
+
+    Raises:
+        typer.Exit: When CFG loading is unsuccesful. 
+    """    
     app_init_error = init_app(path)
     if app_init_error:
         typer.secho(
@@ -113,16 +151,31 @@ def load_app(path):
         )
         raise typer.Exit(1)
     else:
-        typer.secho(f"Re-initialisation successful! The new cfg path is " + path, 
+        typer.secho(f"Initialisation successful! The cfg path is " + path, 
                     fg=typer.colors.GREEN)
 
 def handle_input(inp, cfg):
+    """Handles user input.
+
+    Args:
+      inp (String): User input. 
+      cfg (ContextFreeGrammar): ContextFreeGrammar Object based on loaded CFG.     
+    """    
     if inp.strip()[0] == "\\":
         _process_command(inp, cfg)
     else:
         pass
 
 def _process_command(inp, cfg):
+    """Helper function to process a command from the user.
+
+    Args:
+        inp (String): User input.
+        cfg (ContextFreeGrammar): ContextFreeGrammar Object based on loaded CFG.
+
+    Raises:
+        typer.Exit: Exits the application when the user requests this. 
+    """    
     if inp == "\\m":
         _print_menu()
     elif inp == "\\q":
