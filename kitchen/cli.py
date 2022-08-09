@@ -3,7 +3,16 @@
 import typer
 from pathlib import Path
 from typing import Optional
-from kitchen import __app_name__, __version__, ERRORS, cli_helper, context_free_grammar as cfg, driver, manim_driver
+from kitchen import (
+    __app_name__,
+     __version__, 
+     ERRORS, 
+     cli_helper, 
+     context_free_grammar as cfg, 
+     driver, 
+     manim_driver,
+     display_helper)
+
 app = typer.Typer()
 
 @app.command()
@@ -36,19 +45,15 @@ def get_cfg() -> cfg.ContextFreeGrammar:
     if cli_helper.CONFIG_FILE_PATH.exists():
         cfg_path = cfg.get_cfg_path(cli_helper.CONFIG_FILE_PATH)
     else:
-        typer.secho(
+        display_helper.fail_secho(
             'Config file not found. Please run "kitchen init"',
-            fg=typer.colors.RED,
         )
         raise typer.Exit(1)
 
     if cfg_path.exists():
         return cfg.ContextFreeGrammar(cfg_path)
     else:
-        typer.secho(
-            'CFG not found. Please run "kitchen init" first',
-            fg=typer.colors.RED,
-        )
+        display_helper.fail_secho('CFG not found. Please run "kitchen init" first')
         raise typer.Exit(1)
 
 @app.command(name="show-cfg")
@@ -69,10 +74,7 @@ def _check_cfg(cfg) -> None:
         typer.Abort: Aborts when CFG is invalid.
     """    
     if cfg.prods in ERRORS:
-        typer.secho(
-            f'"CFG file invalid with "{ERRORS[cfg.prods]}"',
-            fg=typer.colors.RED,
-        )
+        display_helper.fail_secho('"CFG file invalid with "{ERRORS[cfg.prods]}"')
         raise typer.Abort()
 
 @app.command(name="run")
@@ -117,5 +119,4 @@ def main(
         version (Optional[bool], optional): Version option. Defaults to typer.Option( None, "--version", "-v", help="Show the application's version and exit.", callback=_version_callback, is_eager=True, ).
     """
     return
-        
 

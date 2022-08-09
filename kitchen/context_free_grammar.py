@@ -15,7 +15,9 @@ from kitchen import (
     SUCCESS, RE_TERMINAL, 
     RE_NONTERMINAL, 
     RE_PRODUCTION,
+    display_helper,
     error,
+    cli, 
     animation
 )
 
@@ -204,7 +206,7 @@ class ContextFreeGrammar:
         self.fstack = []
 
         # structures for follow set
-        self.followset = {}
+        self.follow_set = {}
         self.manim_followset_contents = {}
         self.manim_followset_lead = {}
         self.vis_has_epsilon = False
@@ -226,7 +228,7 @@ class ContextFreeGrammar:
             self.manim_firstset_contents[p_seq[0]] = VGroup()
             self.firstset_index[p_seq[0]] = []
 
-            self.followset[p_seq[0]] = []
+            self.follow_set[p_seq[0]] = []
             self.manim_followset_contents[p_seq[0]] = VGroup()
             self.manim_followset_lead[p_seq[0]] = None
             self.nonterminals.append(p_seq[0])
@@ -242,7 +244,7 @@ class ContextFreeGrammar:
         for t in set(list(chain(*tmp))):
             if re.match(RE_TERMINAL, t) and t != "#":
                 self.terminals.append(t)
-                self.followset[t] = []
+                self.follow_set[t] = []
                 self.manim_followset_contents[t] = VGroup()
             elif t == "#":
                 self.terminals.append(t)
@@ -258,10 +260,7 @@ class ContextFreeGrammar:
         start_symbol = list(self.cfg_dict.keys())[0]
         self._calculate_first_set(start_symbol, [])
         self._clean_first_set()
-        typer.secho(
-            f'Showing first set...',
-            fg= typer.colors.GREEN
-        )
+        display_helper.info_secho("Showing first set:")
         pprint.pprint(self.first_set)
 
     def _calculate_first_set(self, production, pstack) -> None:
@@ -344,4 +343,102 @@ class ContextFreeGrammar:
                     self.first_set[key].remove(i)
                     self.first_set[key].append(i)
 
-    
+    def show_follow_set(self) -> None:
+        """Displays the calculated follow set. 
+        """        
+        self._calculate_follow_set(True)
+        display_helper.info_secho('Showing followset')
+        pprint.pprint(self.follow_set)
+
+    def _calculate_follow_set(self, is_start_symbol):
+        """Algorithm for calculating the follow set of a given CFG.
+
+        Args:
+            is_start_symbol (bool): Whether or not we begin with the start symbol.
+        """
+        for production in self.cfg_dict.keys():
+            # Rule 1
+            if is_start_symbol:
+                self.follow_set[production].append("$")
+                is_start_symbol = False
+
+            # inspect each element in the production
+            for p in self.cfg_dict[production]:
+
+                # split up the productions which are contained within this list
+                pps = list(filter(None, re.findall(RE_PRODUCTION, p)))
+
+                # examine each production and obtain follow sets
+                for index, item in enumerate(pps, start=0):
+                    if index == len(pps) - 1 and item != "#" and item != production:
+                        # temporarily append production to let us then iterate over and replace it
+                        self.follow_set[item].append(production)
+
+                    elif index < len(pps) - 1:
+                        next_item = pps[index + 1]
+                        # if an item is directly followed by a terminal, it is appended to its follow set
+                        if re.match(RE_TERMINAL, next_item):
+                            self.follow_set[item].append(next_item)
+                        else:
+                            # we add the first of the non-terminal at this next index
+                            tmp_follow = self.first_set[next_item]
+                            for t in tmp_follow:
+                                if t != "#":
+                                    self.follow_set[item].append(t)
+                                else:
+                                    # we found an epsilon, so this non-terminal
+                                    self.follow_set[item].append(next_item)
+
+        # clean the follow set
+        start_symbol = list(self.cfg_dict.keys())[0]
+        self.is_cleaned = []
+        self.is_cleaned = self.get_reset_cleaned_set()
+        self.clean_follow_set(start_symbol, [])
+
+    def get_reset_cleaned_set(self):
+        """Helper function to obtain a dictionary which holds whether or not the follow sets have been cleaned.
+
+        Returns:
+            Dictionary: Contains {NT: False} for each non-terminal NT.
+        """        
+        tmp_c = {}
+        for fc in self.follow_set.keys():
+            tmp_c[fc] = False
+        return tmp_c
+
+    def clean_follow_set(self, start, pstack):
+        """Cleans the follow set after the calculation: Replaces non-terminals with their respective follow sets and removes epsilon elements. 
+
+        Args:
+            start (String): The start symbol.
+            pstack (List): Production stack. 
+        """        
+        pstack.append(start)
+
+        # clean up the sets
+        items = self.follow_set[start]
+
+        # loop through the items in a given follow set and replace non-terminals with
+        # their associated follow sets
+        for index, item in enumerate(items, start=0):
+            # we have an item in the set
+            if re.match(RE_NONTERMINAL, item):
+                self.clean_follow_set(item, pstack)
+                items.remove(item)
+            else:
+                # we append the descended terminals to the upwards stacks
+                for p in pstack:
+                    if p != start and item not in self.follow_set[p]:
+                        self.follow_set[p].append(item)
+
+        self.is_cleaned[start] = True
+
+        if len(pstack) == 1:
+            pstack = []
+            # gets the next not cleaned set
+            for c in self.is_cleaned.keys():
+                if self.is_cleaned[c] == False:
+                    self.clean_follow_set(c, pstack)
+        else:
+            pstack.pop()
+

@@ -191,7 +191,8 @@ def _process_command(inp, cfg):
         pass
       
     elif inp == "\\show follow" or inp == "\\fw":
-        pass     
+        cfg.show_follow_set()
+        
     elif inp == "\\show parse table" or inp == "\pt":
         pass
     elif inp == "\\parsetable" or inp == "\\vpt":
