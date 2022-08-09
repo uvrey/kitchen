@@ -15,12 +15,24 @@ def init(
             prompt="Please provide the path to your CFG",
             ),
 ) -> None:
-    """Initialize the configuration files."""
+    """Initializes the configuration files.
+
+    Args:
+        cfg_path (str): Path to the CFG file.
+    """
     cli_helper.load_app(cfg_path)
 
 
-""" helper function to obtain the created cfg from the config path """
 def get_cfg() -> cfg.ContextFreeGrammar:
+    """Helper function to obtain the created cfg from the config path
+
+    Raises:
+        typer.Exit: Closes the app session if the configuration file is not found.
+        typer.Exit: Closes the app session if the CFG file path is not found. 
+
+    Returns:
+        cfg.ContextFreeGrammar: ContextFreeGrammar object associated with the given CFG.
+    """    
     if cli_helper.CONFIG_FILE_PATH.exists():
         cfg_path = cfg.get_cfg_path(cli_helper.CONFIG_FILE_PATH)
     else:
@@ -41,11 +53,21 @@ def get_cfg() -> cfg.ContextFreeGrammar:
 
 @app.command(name="show-cfg")
 def show_cfg() -> None:
+    """Displays the contents of the given CFG file.
+    """    
     cfg = get_cfg()
     _check_cfg(cfg)
+    typer.echo(cfg.cfg_contents)
 
-# helper function to report issues with the CFG contents
 def _check_cfg(cfg) -> None:
+    """Helper function to report issues with the CFG contents.
+
+    Args:
+        cfg (ContextFreeGrammar): CFG Object.
+
+    Raises:
+        typer.Abort: Aborts when CFG is invalid.
+    """    
     if cfg.prods in ERRORS:
         typer.secho(
             f'"CFG file invalid with "{ERRORS[cfg.prods]}"',
@@ -53,17 +75,26 @@ def _check_cfg(cfg) -> None:
         )
         raise typer.Abort()
 
-# driver function for the application
 @app.command(name="run")
 def run() -> None:
+    """Application driver.
+    """    
     cli_helper.print_welcome()
     cfg = get_cfg()
     while (True):
         input = typer.prompt("Input")
         cli_helper.handle_input(input, cfg)
 
-# callback to display the version of the application
+
 def _version_callback(value: bool) -> None:
+    """Callback to display the version of the application
+
+    Args:
+        value (bool): Version setting.
+
+    Raises:
+        typer.Exit: Exits the app once version has been displayed.
+    """    
     if value:
         typer.echo(f"{__app_name__} v{__version__}")
         raise typer.Exit()
@@ -80,6 +111,11 @@ def main(
         is_eager=True,
     )
 ) -> None:
+    """Displays application options.
+
+    Args:
+        version (Optional[bool], optional): Version option. Defaults to typer.Option( None, "--version", "-v", help="Show the application's version and exit.", callback=_version_callback, is_eager=True, ).
+    """
     return
         
 
