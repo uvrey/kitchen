@@ -174,24 +174,21 @@ class ContextFreeGrammar:
         # set up the cfg information
         self._cfg_path = cfg_path
         self.cfg_contents = cfg_path.read_text()
-        prods = get_prods(self.cfg_contents)
+        self.prods = get_prods(self.cfg_contents)
 
         # initialise the stuctures of the cfg
-        if prods != None:
-            self._init_structures(prods)
+        if self.prods != None:
+            self._init_structures()
             self.manim_cfg = populate_manim_cfg(self.cfg_dict, self.lead_to)
         else:
-            prods = ERROR
+            self.prods = ERROR
         typer.secho(
             f'CFG loaded :)',
             fg = typer.colors.GREEN
         )
 
-    def _init_structures(self, prods) -> None:
+    def _init_structures(self) -> None:
         """ Creates the structures to be used in the algorithms.
-
-        Args:
-            prods (List): List of productions as scraped from the CFG contents.
         """        
         self.nonterminals = []
         self.terminals = []
@@ -212,16 +209,16 @@ class ContextFreeGrammar:
         self.vis_has_epsilon = False
         
         # assigns initial values to these structures
-        self._assign_structures(prods)
+        self._assign_structures()
 
-    def _assign_structures(self, prods) -> None:
+    def _assign_structures(self) -> None:
         """ Initialises the structures to be used in the CFG. 
 
         Args:
             prods (List): List of productions.
         """
         # initialise base structures
-        for p_seq in prods:
+        for p_seq in self.prods:
             self.cfg_dict[p_seq[0]] = p_seq[1]
 
             self.first_set[p_seq[0]] = []
@@ -248,6 +245,9 @@ class ContextFreeGrammar:
                 self.manim_followset_contents[t] = VGroup()
             elif t == "#":
                 self.terminals.append(t)
+
+        # set start symbol
+        self.start_symbol = list(self.cfg_dict.keys())[0]
     
     def show_contents(self) -> None:
         """Helper function to display the CFG contents.
@@ -257,11 +257,48 @@ class ContextFreeGrammar:
     def show_first_set(self) -> None:
         """Helper function to display the first set. 
         """        
-        start_symbol = list(self.cfg_dict.keys())[0]
-        self._calculate_first_set(start_symbol, [])
+        
+        self._calculate_first_set(self.start_symbol, [])
         self._clean_first_set()
         display_helper.info_secho("Showing first set:")
         display_helper.pretty_print_dict(self.first_set)
+
+    def reset_first_set(self) -> None:
+        """Resets the first sets in preparation for another calculation
+        """        
+        self.first_set = {}
+
+        # reset structures
+        for p_seq in self.prods:
+            self.first_set[p_seq[0]] = []
+            self.firstset_index[p_seq[0]] = []
+
+        # calculate first set
+        self._calculate_first_set(self.start_symbol, [])
+
+    
+    def reset_follow_set(self) -> None:
+        """Resets the first sets in preparation for another calculation
+        """        
+        # reset the follow set structure and set non-terminal sets to empty
+        self.follow_set = {}
+        for p_seq in self.prods:
+            self.follow_set[p_seq[0]] = []
+
+        # obtain the productions
+        tmp = []
+        for t in list(chain(*self.lead_to)):
+            splitp = list(filter(None, re.findall(RE_PRODUCTION, t)))
+            tmp.append(splitp)
+
+        # create an empty follow set for the terminals
+        for t in set(list(chain(*tmp))):
+            if re.match(RE_TERMINAL, t) and t != "#":
+                self.follow_set[t] = []
+
+        # calculate the follow set
+        self._calculate_follow_set(True)
+
 
     def _calculate_first_set(self, production, pstack) -> None:
         """Recursively calculates the first set and stores it to the internal first set structure
@@ -347,8 +384,11 @@ class ContextFreeGrammar:
         """Displays the calculated follow set. 
         """        
         self._calculate_follow_set(True)
-        display_helper.info_secho('Showing followset')
+        display_helper.info_secho('Showing follow set:')
         display_helper.pretty_print_dict(self.follow_set)
+
+    def get_fs_index(self):
+        return self.firstset_index
 
     def _calculate_follow_set(self, is_start_symbol):
         """Algorithm for calculating the follow set of a given CFG.

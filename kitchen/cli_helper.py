@@ -5,7 +5,17 @@ from pathlib import Path
 import typer
 
 from kitchen import (
-    CFG_WRITE_ERROR, DIR_ERROR, ERRORS, FILE_LOADING_ERROR, FILE_LOADING_EXISTS_ERROR, FILE_LOADING_NONE_ERROR, FILE_LOADING_DIR_ERROR, SUCCESS, __app_name__
+    CFG_WRITE_ERROR, 
+    DIR_ERROR, 
+    ERRORS, 
+    FILE_LOADING_ERROR, 
+    FILE_LOADING_EXISTS_ERROR, 
+    FILE_LOADING_NONE_ERROR, 
+    FILE_LOADING_DIR_ERROR, 
+    SUCCESS, 
+    __app_name__,
+    parse_table,
+    animation
 )
 
 CONFIG_DIR_PATH = Path(typer.get_app_dir(__app_name__))
@@ -176,6 +186,7 @@ def _process_command(inp, cfg):
     Raises:
         typer.Exit: Exits the application when the user requests this. 
     """    
+
     if inp == "\\m":
         _print_menu()
     elif inp == "\\q":
@@ -192,11 +203,28 @@ def _process_command(inp, cfg):
       
     elif inp == "\\show follow" or inp == "\\fw":
         cfg.show_follow_set()
-        
+
     elif inp == "\\show parse table" or inp == "\pt":
-        pass
+        # reset cfg structures before we begin
+        cfg.reset_follow_set()
+        cfg.reset_first_set()
+
+        # initialise parse table
+        pt = parse_table.ParsingTable(cfg.terminals, cfg.nonterminals, cfg.cfg_dict)
+        
+        # set pt internals
+        pt.set_internals(
+                cfg.first_set, cfg.follow_set, cfg.get_fs_index())
+        # print the parse table
+        pt.print_parse_table()
+
+
     elif inp == "\\parsetable" or inp == "\\vpt":
-        pass
+        a = animation.Animation()
+        a.setup_manim("", [], [], None, None,
+                      False, False, True, False)
+        a.render()
+        
     elif inp == "\\show parse structures" or inp == "\ptss":
         pass
     elif inp == "\\l":
