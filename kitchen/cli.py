@@ -14,21 +14,12 @@ def init(
             "-cfg",
             prompt="Please provide the path to your CFG",
             ),
-
 ) -> None:
     """Initialize the configuration files."""
-    app_init_error = cli_helper.init_app(cfg_path)
-    if app_init_error:
-        typer.secho(
-            f'Loading files failed with "{ERRORS[app_init_error]}"',
-            fg=typer.colors.RED,
-        )
-        raise typer.Exit(1)
-    else:
-        typer.secho(f"Initialisation successful! The cfg path is " + cfg_path, 
-                    fg=typer.colors.GREEN)
+    cli_helper.load_app(cfg_path)
 
 
+""" helper function to obtain the created cfg from the config path """
 def get_cfg() -> cfg.ContextFreeGrammar:
     if cli_helper.CONFIG_FILE_PATH.exists():
         cfg_path = cfg.get_cfg_path(cli_helper.CONFIG_FILE_PATH)
@@ -40,7 +31,6 @@ def get_cfg() -> cfg.ContextFreeGrammar:
         raise typer.Exit(1)
 
     if cfg_path.exists():
-        typer.echo("cfg path found: " + str(cfg_path))
         return cfg.ContextFreeGrammar(cfg_path)
     else:
         typer.secho(
@@ -52,20 +42,33 @@ def get_cfg() -> cfg.ContextFreeGrammar:
 @app.command(name="show-cfg")
 def show_cfg() -> None:
     cfg = get_cfg()
+    _check_cfg(cfg)
+
+# helper function to report issues with the CFG contents
+def _check_cfg(cfg) -> None:
     if cfg.prods in ERRORS:
         typer.secho(
             f'"CFG file invalid with "{ERRORS[cfg.prods]}"',
             fg=typer.colors.RED,
         )
-    else:
-        typer.echo(cfg.cfg_contents)
+        raise typer.Abort()
 
-# set up app
+# driver function for the application
+@app.command(name="run")
+def run() -> None:
+    cli_helper.print_welcome()
+    cfg = get_cfg()
+    while (True):
+        input = typer.prompt("Input")
+        cli_helper.handle_input(input, cfg)
+
+# callback to display the version of the application
 def _version_callback(value: bool) -> None:
     if value:
         typer.echo(f"{__app_name__} v{__version__}")
         raise typer.Exit()
 
+# helper menu to start the application
 @app.callback()
 def main(
     version: Optional[bool] = typer.Option(
