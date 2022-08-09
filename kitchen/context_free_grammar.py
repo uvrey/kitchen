@@ -27,12 +27,24 @@ DEFAULT_REGEX_PATH = Path.home().joinpath(
 )
 
 def get_cfg_path(config_file: Path) -> Path:
-    """Return the current path to the cfg file."""
+    """Obtains the path to the currently-loaded CFG file.
+
+    Returns:
+        Path: Path to the CFG file.
+    """    
     config_parser = configparser.ConfigParser()
     config_parser.read(config_file)
     return Path(config_parser["General"]["cfg"])
 
 def get_prods(cfg_contents):
+    """Obtains a list of productions given the contents of a CFG.
+
+    Args:
+        cfg_contents (String): Contents of the CFG as obtained at the provided path.
+
+    Returns:
+        List: Productions in a given CFG.
+    """    
     line = 0
 
     # store productions
@@ -90,10 +102,20 @@ def generate_parse_ll1(self, input):
     a.render()
 
 
-"""
-Returns an equivalent cfg in manim where each cfg item has an associated MObject
-"""
+
 def populate_manim_cfg(cfg_dict, lead_to):
+    """_summary_Returns an equivalent cfg in manim where each non-terminal has an associated set of MObject
+
+    Args:
+        cfg_dict (Dictionary): Dictionary of the CFG productions.
+        lead_to (Dictionary): Dictionary holding the Mobjects for each CFG element.
+
+    Raises:
+        typer.Abort: If Left Recursion is detected, the app session is terminated.
+
+    Returns:
+        Dictionary: A dictionary of the Mobjects which a non-terminal leads to.
+    """    
     manim_cfg = {}
     try:
         for index, key in enumerate(cfg_dict.keys(), start=0):
@@ -124,8 +146,15 @@ def populate_manim_cfg(cfg_dict, lead_to):
         raise typer.Abort()
 
 
-# Helper function to get the index of the first empty first set index
-def get_empty_index_first_set(first_set):
+def get_next_production(first_set):
+    """Helper function to get the index of the first-encountered production with an empty first set.
+
+    Args:
+        first_set (Dictionary): The first set of a given CFG.
+
+    String: The production which requires a first set to be calculated. 
+        Integer: 
+    """    
     for item in first_set.items():
         if item[1] == []:
             return item[0]
@@ -133,15 +162,20 @@ def get_empty_index_first_set(first_set):
 
 
 class ContextFreeGrammar:
+
     def __init__(self, cfg_path: Path) -> None:
+        """Initialises the ContextFreeGrammar object.
+
+        Args:
+            cfg_path (Path): Path to the provided CFG file
+        """
         # set up the cfg information
-        _cfg_path = cfg_path
+        self._cfg_path = cfg_path
         self.cfg_contents = cfg_path.read_text()
         prods = get_prods(self.cfg_contents)
 
         # initialise the stuctures of the cfg
         if prods != None:
-            pass
             self._init_structures(prods)
             self.manim_cfg = populate_manim_cfg(self.cfg_dict, self.lead_to)
         else:
@@ -151,8 +185,12 @@ class ContextFreeGrammar:
             fg = typer.colors.GREEN
         )
 
-    # creates the structures to be used in the algorithms
-    def _init_structures(self, prods):
+    def _init_structures(self, prods) -> None:
+        """ Creates the structures to be used in the algorithms.
+
+        Args:
+            prods (List): List of productions as scraped from the CFG contents.
+        """        
         self.nonterminals = []
         self.terminals = []
         self.lead_to = []
@@ -174,9 +212,12 @@ class ContextFreeGrammar:
         # assigns initial values to these structures
         self._assign_structures(prods)
 
-    # initialises the structures to be used
-    def _assign_structures(self, prods):
+    def _assign_structures(self, prods) -> None:
+        """ Initialises the structures to be used in the CFG. 
 
+        Args:
+            prods (List): List of productions.
+        """
         # initialise base structures
         for p_seq in prods:
             self.cfg_dict[p_seq[0]] = p_seq[1]
@@ -205,9 +246,15 @@ class ContextFreeGrammar:
                 self.manim_followset_contents[t] = VGroup()
             elif t == "#":
                 self.terminals.append(t)
-
     
-    def show_first_set(self):
+    def show_contents(self) -> None:
+        """Helper function to display the CFG contents.
+        """        
+        typer.echo(self.cfg_contents)
+
+    def show_first_set(self) -> None:
+        """Helper function to display the first set. 
+        """        
         start_symbol = list(self.cfg_dict.keys())[0]
         self._calculate_first_set(start_symbol, [])
         self._clean_first_set()
@@ -217,8 +264,13 @@ class ContextFreeGrammar:
         )
         pprint.pprint(self.first_set)
 
-    """ calculates the first set and stores it to the internal first set structure """
-    def _calculate_first_set(self, production, pstack):
+    def _calculate_first_set(self, production, pstack) -> None:
+        """Recursively calculates the first set and stores it to the internal first set structure
+
+        Args:
+            production (String): The production being examined. Initially it is the start symbol.
+            pstack (List): The production stack. 
+        """        
         global has_epsilon
         pstack.append(production)
 
@@ -274,7 +326,7 @@ class ContextFreeGrammar:
             # so let's find those that are still empty
             if len(pstack) == 1:
                 pstack = []
-                empty_set_nt = get_empty_index_first_set(self.first_set)
+                empty_set_nt = get_next_production(self.first_set)
                 if empty_set_nt != -1:
                     self._calculate_first_set(empty_set_nt, [])
             else:
@@ -283,47 +335,13 @@ class ContextFreeGrammar:
         except KeyError:
             error.ERR_key_not_given_in_CFG(production)
 
-    def _clean_first_set(self):
+    def _clean_first_set(self) -> None:
+        """Helper function to standardise the appearance of the first set by placing epsilons at the end of the list.
+        """        
         for key in self.first_set.keys():
             for i in self.first_set[key]:
                 if i == "#":
                     self.first_set[key].remove(i)
                     self.first_set[key].append(i)
 
-    # helper function to show the cfg contents
-    def show_contents(self):
-        typer.echo(self.cfg_contents)
-
-
-
-
-
-""" helper functions """
-
-    # def show_first_set(self):
-    #     pprint.pprint(self.firstset)
-
-    # def show_follow_set(self):
-    #     pprint.pprint(self.followset)
-
-    # # sets up input
-    # def set_input(self, inp):
-    #     # set up the input
-    #     self.inp = inp
-    #     self.inp_list = list(filter(None, inp.split(" ")))
-
-    #     if len(self.inp_list) > 10:
-    #         error.ERR_input_too_long()
-    #         return False
-
-    #     # make fake token list
-    #     tmp_tokens = []
-    #     for index in range(len(self.inp_list)):
-    #         tmp_tokens.append("TOK_" + str(index))
-
-    #     # start animation
-    #     a = animation.Animation()
-    #     a.setup_manim(self.inp, self.inp_list, tmp_tokens,
-    #                   self.parser, self.parsetable, False, False)
-    #     a.render()
-    #     return True
+    
