@@ -32,3 +32,12 @@ def fail_secho(msg):
         f'{msg}',
         fg = typer.colors.RED
     ) 
+
+
+def pretty_print_dict(dict):
+    """Prints a nicely-formatted dictionary.
+
+    Args:
+        dict (Dictionary): Dictionary to be formatted.
+    """    
+    typer.secho("\n".join("{}\t{}".format(k, v) for k, v in dict.items()), fg=typer.colors.YELLOW)

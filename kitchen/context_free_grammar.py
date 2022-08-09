@@ -261,7 +261,7 @@ class ContextFreeGrammar:
         self._calculate_first_set(start_symbol, [])
         self._clean_first_set()
         display_helper.info_secho("Showing first set:")
-        pprint.pprint(self.first_set)
+        display_helper.pretty_print_dict(self.first_set)
 
     def _calculate_first_set(self, production, pstack) -> None:
         """Recursively calculates the first set and stores it to the internal first set structure
@@ -348,7 +348,7 @@ class ContextFreeGrammar:
         """        
         self._calculate_follow_set(True)
         display_helper.info_secho('Showing followset')
-        pprint.pprint(self.follow_set)
+        display_helper.pretty_print_dict(self.follow_set)
 
     def _calculate_follow_set(self, is_start_symbol):
         """Algorithm for calculating the follow set of a given CFG.
