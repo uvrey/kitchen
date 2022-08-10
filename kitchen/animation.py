@@ -1,20 +1,27 @@
 """ Creates Kitchen animations """
 # kitchen/animation.py
 
-from re import S
+from pathlib import Path
+from pickle import TRUE
+from tkinter.tix import TEXT
 import manim as m
 import re
+import typer
+import os
 
 from kitchen import (
+    RE_NONTERMINAL,
     RE_PRODUCTION, 
     RE_TERMINAL,
     display_helper,
     TEXT_SCALE,
     COLOURS,
-    error
+    error,
 )
 
-
+# set global configs
+# m.config.background_color = m.WHITE
+m.config.include_sound = True
 
     # Helper function to put a message on the screen
 def notify(self, message, next_to_this):
@@ -157,7 +164,6 @@ class ManimFirstSet(m.Scene):
         display_helper.info_secho("Visualising first set calculation:")
         self.vis_first_set(keys, self.cfg.start_symbol, self.cfg.start_symbol, [])
 
-
     # animates a visualisation of the first set
     def vis_first_set(self, keys, start, production, pstack):
 
@@ -290,6 +296,9 @@ class ManimFirstSet(m.Scene):
 
                             # fade in new terminal and corresponding element of the cfg
                             cfg_element = self.manim_prod_dict[production][i][0]
+
+                            self.add_sound("click.wav")
+
                             self.play(
                                 m.Write(msg),
                                 m.FadeIn(new_element),
@@ -333,7 +342,245 @@ class ManimFollowSet(m.Scene):
     def setup(self):
         self.frame_width = m.config["frame_width"]
         self.frame_height = m.config["frame_height"]
-    pass
+    
+    def setup_manim(self, cfg):        
+        self.cfg = cfg
+
+    def construct(self):     
+        keys = get_manim_cfg_group(self).scale(TEXT_SCALE)
+        display_helper.info_secho("Visualising follow set calculation:")
+        self.vis_follow_set(keys, True)
+
+    def vis_follow_set(self, keys, is_start_symbol):
+            for production in self.cfg.cfg_dict.keys():
+                keys.fade_to(color=m.WHITE, alpha=1).to_edge(m.LEFT)
+                self.prepare_cfg_line(self, production)
+
+                # Rule 1
+                if is_start_symbol:
+                    self.cfg.follow_set[production].append("$")
+                    self.add_to_follow_vis(
+                        self, production, "$", production + " is the start symbol,\nso we append $\nto Follow(" +
+                        production + ")")
+                    is_start_symbol = False
+
+                # inspect each element in the production
+                for i, p in enumerate(self.cfg.cfg_dict[production]):
+
+                    # split up the productions which are contained within this list
+                    pps = list(filter(None, re.findall(RE_PRODUCTION, p)))
+
+                    for index, item in enumerate(pps, start=0):
+                        # highlight the element we are inspecting
+                        cfg_element = self.manim_prod_dict[production][i][index]
+
+                        # highlight items as we inspect them
+                        if re.match(RE_TERMINAL, item):
+                            if item == "#":
+                                ti = "ε"
+                            else:
+                                ti = item
+
+                            # observe that the follow of a standalone terminal is ε
+                            if index == len(pps) - 1:
+                                msg = m.Text("Follow (" + ti + ")\nmay not exist", weight=m.BOLD, color=m.YELLOW).scale(
+                                    0.5).align_to(self.manim_production_groups[production], m.UP).shift(m.RIGHT*4)
+                                self.play(
+                                    m.FadeIn(msg),
+                                    m.Circumscribe(cfg_element, color=m.TEAL),
+                                    m.FadeToColor(cfg_element, color=m.TEAL),
+                                )
+                                self.wait()
+                                self.play(m.FadeOut(msg))
+                            else:
+                                # normally highlight the terminal
+                                self.play(
+                                    m.Circumscribe(cfg_element, color=m.TEAL),
+                                    m.FadeToColor(cfg_element, color=m.TEAL),
+                                )
+
+                        else:
+                            self.play(
+                                m.Circumscribe(cfg_element, color=m.RED),
+                                m.FadeToColor(cfg_element, color=m.RED),
+                            )
+
+                        # start processing
+                        if index == len(pps) - 1 and item != "#" and item != production:
+                            # temporarily append production to let us then iterate over and replace it
+                            self.cfg.follow_set[item].append(production)
+                            self.add_to_follow_vis(
+                                self, item, production, "Follow (" + production + ") ⊆ Follow (" + item + ")")
+
+                        elif index < len(pps) - 1:
+                            next_item = pps[index + 1]
+                            # if an item is directly followed by a terminal, it is appended to its follow set
+                            if re.match(RE_TERMINAL, next_item):
+                                self.cfg.follow_set[item].append(next_item)
+                                self.add_to_follow_vis(
+                                    self, item, next_item, "")
+                            else:
+                                # we add the first of the non-terminal at this next index
+                                tmp_follow = self.cfg.first_set[next_item]
+                                next_cfg_element = self.manim_prod_dict[production][i][index + 1]
+
+                                # highlight the next element we are looking at
+                                if re.match(RE_TERMINAL, next_item):
+                                    self.play(
+                                        m.Circumscribe(
+                                            next_cfg_element, color=m.TEAL),
+                                        m.FadeToColor(next_cfg_element, color=m.TEAL),
+                                    )
+                                else:
+                                    self.play(
+                                        m.Circumscribe(
+                                            next_cfg_element, color=m.RED),
+                                        m.FadeToColor(next_cfg_element, color=m.RED),
+                                    )
+
+                                msg = m.Text("{First ("+next_item+") - ε}\n⊆ Follow (" + item + ")", weight=m.BOLD, color=m.YELLOW).scale(
+                                    0.5).align_to(self.manim_production_groups[production], m.UP).shift(m.RIGHT*5)
+                                self.play(
+                                    m.FadeIn(msg),
+                                )
+                                self.wait()
+                                self.play(m.FadeOut(msg))
+
+                                for t in tmp_follow:
+                                    if t != "#":
+                                        self.cfg.follow_set[item].append(t)
+                                        self.add_to_follow_vis(
+                                            self, item, t, t + " ⊆ {First ("+next_item+") - ε}")
+                                    else:
+                                        # we found an epsilon, so this non-terminal
+                                        self.cfg.follow_set[item].append(next_item)
+                                        self.add_to_follow_vis(
+                                            self, item, next_item, "ε ⊆ First ("+next_item+"),\nso "+next_item+" may not\nactually appear after "+item)
+
+            # start cleaning the follow set
+            self.is_cleaned = []
+            self.is_cleaned = self.cfg.get_reset_cleaned_set()
+            self.clean_follow_set(self.cfg.start_symbol, [])
+
+            # transform current follow sets to cleaned versions
+            for key in reversed(self.cfg.follow_set.keys()):
+                if not re.match(RE_TERMINAL, key):
+                    new_fs_group = m.VGroup()
+                    has_eos = False
+                    for item in self.cfg.follow_set[key]:
+                        if item == "$":
+                            has_eos = True
+                        else:
+                            new_fs_group.add(
+                                m.Text(item, weight=m.BOLD, slant=m.ITALIC, color=m.TEAL).scale(TEXT_SCALE))
+                    # puts $ at end of list for consistency
+                    if has_eos:
+                        new_fs_group.add(
+                            m.Text("$", weight=m.BOLD, slant=m.ITALIC, color=m.TEAL).scale(TEXT_SCALE))
+                    new_fs_group.arrange(m.RIGHT).next_to(
+                        self.cfg.manim_followset_lead[key], m.RIGHT)
+
+                    self.play(
+                        m.Transform(
+                            self.cfg.manim_followset_contents[key], new_fs_group),
+                    )
+
+# cleans the follow set up after everything is found, so that we don't miss elements
+    def clean_follow_set(self, start, pstack):
+        pstack.append(start)
+
+        # clean up the sets
+        items = self.cfg.follow_set[start]
+
+        # loop through the items in a given follow set and replace non-terminals with
+        # their associated follow sets
+        for index, item in enumerate(items, start=0):
+            # typer.echo("looking at " + item)
+            # we have an item in the set
+            if re.match(RE_NONTERMINAL, item):
+                self.clean_follow_set(item, pstack)
+                items.remove(item)
+            else:
+                # we append the descended terminals to the upwards stacks
+                for p in pstack:
+                    if p != start and item not in self.cfg.follow_set[p]:
+                        self.cfg.follow_set[p].append(item)
+
+        self.is_cleaned[start] = True
+
+        if len(pstack) == 1:
+            pstack = []
+            # gets the next not cleaned set
+            for c in self.is_cleaned.keys():
+                if self.is_cleaned[c] == False:
+                    self.clean_follow_set(c, pstack)
+        else:
+            pstack.pop()
+
+    def add_to_follow_vis(self, scene, production, item, msg):
+        new_element = None
+
+        if not re.match(RE_TERMINAL, production) and item != production:
+            # display adding to the non-terminal followsets
+            self.prepare_cfg_line(scene, production)
+
+            # check if item to be added is a non-terminal
+            if re.match(RE_NONTERMINAL, item):
+                # non terminal
+                new_element = m.Text(
+                    "Follow(" + item + ")", color=m.BLUE, slant=m.ITALIC, weight=m.BOLD).scale(0.5)
+
+            else:
+                # append it directly as a terminal
+                new_element = m.Text(
+                    item, color=m.TEAL, slant=m.ITALIC, weight=m.BOLD).scale(TEXT_SCALE)
+
+            # add to the content group
+            self.cfg.manim_followset_contents[production].add(
+                new_element)
+            self.cfg.manim_followset_contents[production].arrange(
+                m.RIGHT)
+            self.cfg.manim_followset_contents[production].next_to(
+                self.cfg.manim_followset_lead[production], m.RIGHT)
+
+            # Play the addition of the item to the followset and message, if given
+            if msg != "":
+                msg_txt = m.Text(msg, weight=m.BOLD, color=m.YELLOW).scale(0.45).align_to(
+                    self.manim_production_groups[production], m.UP).shift(m.RIGHT*5)
+                # TODO add sound, narration here
+                self.play(
+                    m.FadeIn(new_element),
+                    m.Write(msg_txt)
+                )
+                self.wait()
+                self.play(
+                    m.FadeOut(msg_txt)
+                )
+            else:
+                self.play(
+                    m.FadeIn(new_element)
+                )
+
+    def prepare_cfg_line(self, scene, production):
+        # only prepare a follow set for non-terminals
+        if not re.match(RE_TERMINAL, production):
+
+            # highlight manim production
+            cfg_line = scene.manim_production_groups[production][:]
+
+            # add the follow set titles to the canvas
+            if self.cfg.manim_followset_lead[production] == None:
+                self.cfg.manim_followset_lead[production] = m.Text("Follow(" + production + "):",
+                                                             weight=m.BOLD).align_to(cfg_line, m.UP).scale(0.6).shift(m.LEFT)
+                # prepare content group
+                self.cfg.manim_followset_contents[production].next_to(
+                    self.cfg.manim_followset_lead[production], m.RIGHT)
+                self.cfg.manim_followset_contents[production].arrange(m.RIGHT)
+
+                # show the new follow area
+                self.play(
+                    m.FadeIn(self.cfg.manim_followset_lead[production]),
+                )
 
 class ManimParsingTable(m.Scene):
     def setup(self):

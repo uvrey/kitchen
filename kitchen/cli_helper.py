@@ -23,6 +23,7 @@ from kitchen import (
 
 CONFIG_DIR_PATH = Path(typer.get_app_dir(__app_name__))
 CONFIG_FILE_PATH = CONFIG_DIR_PATH / "config.ini"
+CONFIG_SOUND_PATH = CONFIG_DIR_PATH / "add_to_set.wav"
 
 def init_app(cfg_path: str) -> int:
     """Initialises the application by creating its configuration file and CFG path.
@@ -271,9 +272,14 @@ def _process_command(inp, cfg) -> None:
       
     elif inp == "\\show follow" or inp == "\\fw":
         cfg.show_follow_set()
+        
 
     elif inp == "\\vis follow" or inp == "\\vfw":
-        pass
+        if not cfg.first_set_calculated:
+            cfg.reset_first_set()
+        animation = anim.ManimFollowSet()
+        animation.setup_manim(cfg)
+        animation.render()
 
     elif inp == "\\show parsetable" or inp == "\pt":
         _show_parsetable(cfg)
