@@ -141,7 +141,7 @@ def _set_parsetable(cfg) -> int:
 
         # calculate parsetable
         code = cfg.calculate_parsetable()
-        cfg.parsetable.print_parse_table()
+        return code
     
 def _show_parsetable(cfg) -> None:
     """Displays the calculated parse table. 
@@ -165,6 +165,15 @@ def handle_input(inp, cfg) -> None:
         _init_parsing_ll1(inp.strip(), cfg)
 
 def _init_parsing_ll1_via_cmd(inp, cfg) -> int:
+    """Initialises LL(1) parsing via the command \\ll1 <input>
+
+    Args:
+        inp (str): Input string to be parsed
+        cfg (ContextFreeGrammar): ContextFreeGrammar object
+
+    Returns:
+        int: _description_
+    """    
     config = inp.strip()[4:7].strip()
     if config == "\\v":
         to_parse = inp.strip()[7:].strip()
@@ -177,12 +186,15 @@ def _init_parsing_ll1_via_cmd(inp, cfg) -> int:
         _init_parsing_ll1(inp[4:].strip(), cfg)
     return SUCCESS
 
-def _init_parsing_ll1(inp, cfg):
+def _init_parsing_ll1(inp, cfg) -> int:
     """Initialise parsing using LL(1) by associating the CFG with its own LL(1) Parser object.
 
     Args:
-        inp (_type_): _description_
-        cfg (_type_): _description_
+        inp (str): Input string to be parsed
+        cfg (ContextFreeGrammar): ContextFreeGrammar object
+    
+    Returns:
+        int: Status code
     """    
     # calculate the parse table if it has not yet been done so
     if not cfg.parsetable_calculated:
@@ -196,16 +208,32 @@ def _init_parsing_ll1(inp, cfg):
         if inp == cfg.parser_ll1.inp:
             inp = ""
         cfg.parser_ll1.parse_ll1(cfg.start_symbol, inp)
+    return SUCCESS
             
-
 def _set_cfg_parser_ll1(inp, cfg) -> int:
+    """Initialises a new ParserLL1 object if it has not been initialised in this app session yet.
+
+    Args:
+        inp (str): Input string to be parsed
+        cfg (ContextFreeGrammar): ContextFreeGrammar object    Args:
+
+    Returns:
+        int: Status code
+    """    
     code = SUCCESS
-    # initialise a new parser if it is not set up already
     if not cfg.is_parser_ll1_set_up:
         code = cfg.set_parser_ll1(p.ParserLL1(inp, cfg))
     return code
 
-def _init_parsing_vis_shortcut(inp, cfg):
+def _init_parsing_vis_shortcut(inp) -> int:
+    """Initialises the visualisation of LL(1) parsing on some input, via the app shortcut '\\v <input>'.
+
+    Args:
+        inp (str): Input string
+
+    Returns:
+        int: Status code
+    """    
     to_parse = inp.strip()[2:].strip()
     if to_parse == "":
         error.ERR_no_input_given()
@@ -214,7 +242,7 @@ def _init_parsing_vis_shortcut(inp, cfg):
         pass
     return SUCCESS
 
-def _process_command(inp, cfg):
+def _process_command(inp, cfg) -> None:
     """Helper function to process a command from the user.
 
     Args:

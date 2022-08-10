@@ -1,4 +1,5 @@
 # Program for printing error messages
+from kitchen import display_helper
 from manim import *
 import typer
 
@@ -54,13 +55,15 @@ def ERR_too_many_productions_ll1(nt, t):
     raise typer.Abort()
 
 
-def ERR_parsing_error(detail=""):
+def ERR_parsing_error(root, detail=""):
     if detail != "":
-        detail_msg = " ~ " + detail
+        detail_msg = "." + detail
     else:
         detail_msg = detail
-    err = typer.style("Error:", fg=typer.colors.WHITE, bg=typer.colors.RED)
-    typer.echo(err + " Parsing failed" + detail_msg)
+    err = typer.style("Error:", fg= typer.colors.WHITE, bg=typer.colors.RED)
+    pt_state = typer.style("\nCurrent state of parse tree:", fg=typer.colors.RED)
+    typer.echo(err + " Parsing failed. " + detail_msg + pt_state)
+    display_helper.print_parsetree(root)
 
 
 def ERR_no_input_given():

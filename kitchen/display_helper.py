@@ -2,6 +2,7 @@
 # kitchen/display_helper.py
 
 import typer
+import anytree
 
 def info_secho(msg):
     """Helper function to echo an informative message. 
@@ -13,6 +14,7 @@ def info_secho(msg):
         f'{msg}',
         fg = typer.colors.BLUE
     ) 
+
 
 def general_secho(msg):
     """Helper function to echo an informative message. 
@@ -95,3 +97,12 @@ def print_menu():
         " \\ll1 <input> \t\t\t\t [Default] Parse input with LL(1)\n\n" +
         " \\lalr <input> \t\t\t\t Parse input with LALR\n\n"
     )
+
+def print_parsetree(root):
+        """Helper function to print the parse tree
+
+        Args:
+            root (_type_): _description_
+        """        
+        for pre, fill, node in anytree.RenderTree(root):
+            structure_secho("%s%s" % (pre, node.name))

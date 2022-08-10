@@ -36,20 +36,12 @@ def _get_tokens_from_input(inp) -> list:
     """    
     return list(filter(None, inp.split(" ")))
 
+
 class ParserLL1:
     def __init__(self, inp, cfg):
         init_input(self, inp)
         self.cfg = cfg
         self.pt_dict = cfg.parsetable.pt_dict
-
-    def print_parsetree(self, root):
-        """Helper function to print the parse tree
-
-        Args:
-            root (_type_): _description_
-        """        
-        for pre, fill, node in anytree.RenderTree(root):
-            display_helper.structure_secho("%s%s" % (pre, node.name))
 
     def parse_ll1(self, start_symbol, inp="") -> int:
         """LL(1) Parser, which generates a parse tree and stores this to self.root
@@ -81,9 +73,9 @@ class ParserLL1:
             # in case we run out of input before the stack is empty
             if tokens == []:
                 if re.match(RE_TERMINAL, self.stack[-1]):
-                    error.ERR_parsing_error("Expected " + self.stack[-1])
+                    error.ERR_parsing_error(self.root, "Expected " + self.stack[-1])
                 else:
-                    error.ERR_parsing_error("1")
+                    error.ERR_parsing_error(self.root)
                 return PARSING_ERROR
 
             top = self.stack[-1]
@@ -134,7 +126,7 @@ class ParserLL1:
                                     break
 
                 else:
-                    error.ERR_parsing_error(
+                    error.ERR_parsing_error(self.root,
                         "Unexpected token [" + top + "]")
                     return PARSING_ERROR
 
@@ -168,17 +160,17 @@ class ParserLL1:
                             self.parents.append(new_node)
 
                 except KeyError:
-                    error.ERR_parsing_error(
+                    error.ERR_parsing_error(self.root,
                         "ParseTable[" + top + ", " + next + "] is empty.")
                     return PARSING_ERROR
 
         # in case parsing finishes but there are still tokens left in the stack
         if len(tokens) > 0:
-            error.ERR_parsing_error("a")
+            error.ERR_parsing_error(self.root, "Unexpected end of input.")
             return PARSING_ERROR
 
         # display the parse tree
         # TODO change to parsing input specifically rather than tokens
-        display_helper.success_secho("Successfully parsed token stream'" + " ".join(original_tokens) +
+        display_helper.success_secho("Successfully parsed token stream '" + " ".join(original_tokens) +
                               "'!")
         return SUCCESS
