@@ -70,8 +70,8 @@ def print_welcome():
     """Helper function to print the welcome screen.
     """    
     info_secho(
-        "Welcome to Kitchen\n" +
-        "type \\m for the menu\n\n")
+        "Welcome to Kitchen\n"+
+        "type \\m for the menu\n")
 
 def print_menu():
     """Helper function to print the application menu.
@@ -95,5 +95,3 @@ def print_menu():
         " \\ll1 <input> \t\t\t\t [Default] Parse input with LL(1)\n\n" +
         " \\lalr <input> \t\t\t\t Parse input with LALR\n\n"
     )
-    info_secho(
-        " ------------------------------------------------------------------------")
