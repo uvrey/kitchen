@@ -11,6 +11,7 @@ import anytree
 from kitchen import (
     RE_NONTERMINAL,
     RE_PRODUCTION, 
+    SUCCESS,
     RE_TERMINAL,
     display_helper,
     TEXT_SCALE,
@@ -24,6 +25,7 @@ VCONFIG_TEMP = {"radius": 0.25, "color": m.GRAY}
 LCONFIG = {"vertex_spacing": (0.5, 1)}
 ECONFIG = {"color": m.WHITE}
 ECONFIG_TEMP = {"color": m.GRAY, "fill_opacity": 0.7}
+V_LABELS = {}
 
 # set global configs
 # m.config.background_color = m.WHITE
@@ -859,6 +861,73 @@ class ManimParseTable(m.Scene):
         self.table.get_vertical_lines()[2].set_stroke(
             width=8, color=m.LIGHT_GRAY)
 
+
+
+
+def create_tokens(tokens):
+    # Write equations
+    token_gp = []
+    for t in tokens:
+        token_gp.append(m.MathTex("\\text{"+t+"}"))
+    return token_gp
+
+
+def get_parent_id(parent, start_symbol):
+    if parent.parent != None:
+        return get_vertex_id(parent.id, parent.parent.id, start_symbol)
+    else:
+        return parent.id
+
+
+def create_v_if_exists(scene, g, start_symbol, vertex_id, v_name, parent_id):
+    try:
+        vertex = g[vertex_id]
+
+    except KeyError:
+        # create the new vertex only if it doesn't exist already
+        v = create_vertex(
+            g, vertex_id, parent_id, v_name)
+        reset_g(scene, g, start_symbol)
+
+
+def get_vertex_id(vertex, parent, start_symbol):
+    if vertex == start_symbol:
+        return vertex
+    else:
+        if parent == start_symbol:
+            return start_symbol + "_" + vertex
+        else:
+            return parent + "_" + vertex
+
+
+def create_vertex(g, vertex_id, parent_id, label, color=m.GRAY,  link=True):
+    global m
+    V_LABELS[vertex_id] = label
+    # BUG Should be + DOWN
+    pos = g[parent_id].get_center()+m.DOWN
+    v = g._add_vertex(
+        vertex_id, vertex_config={"color": color}, position=pos)
+    v.fill_colour = color
+
+    if link:
+        g._add_edge(
+            [parent_id, vertex_id], edge_config={"color": m.WHITE})
+    return v
+
+
+def reset_g(self, g, root, anim=[]):
+    for a in anim:
+        self.play(a)
+
+    self.play(
+        g.animate.change_layout(
+            "tree",
+            root_vertex=root,
+        ),
+    )
+
+
+
 class ManimParseTree(m.Scene):
     # Parse LL(1) in the CLI
     def setup(self):
@@ -931,31 +1000,26 @@ class ManimParseTree(m.Scene):
             row_vals.append(row)
         return row_vals
 
-    def _set_up_stack_and_table(self, start_symbol):
-        # init mtable structure
-        self.init_m_ll1_parsetable()
+# Parse LL(1) in the CLI
 
-        # create then add start symbol to the stack
-        self.s = stack.Stack(self, m.RIGHT+m.DOWN, 5)
+    def vis_parse_ll1(self, input, tokens):
+        global V_LABELS
+        global VCONFIG
+        global m
+
+        # set up the stack and the parsing table
+        self.s = stack.Stack(self, m.DR, 5)
+        self.init_m_ll1_parsetable()
+        V_LABELS = {}
+
+        # add start symbol to the stack
+        start_symbol = self.cfg.start_symbol
         self.s.stack.append(start_symbol)
         self.root = anytree.Node(start_symbol, id=start_symbol,
                          manim=m.MathTex(start_symbol))
 
-
-    def vis_parse_ll1(self, input, ts):
-        # prelimenary set up
-        V_LABELS = {}
-        start_symbol = self.cfg.start_symbol
-        self._set_up_stack_and_table(start_symbol)
-
         # copy the tokens
-        original_tokens = ts[:]
-        tokens = ts[:]
-
-        self.cfg.parsetable.print_parse_table()
-        typer.echo("parsing" + input)
-        typer.echo("tokens:")
-        typer.echo(tokens)
+        original_tokens = tokens[:]
 
         # initialise a way to track the parent nodes
         self.parents = []
@@ -977,9 +1041,9 @@ class ManimParseTree(m.Scene):
         # set the stage
         self.play(
             ll1_title.animate.to_edge(m.UP),
-            m_tok_gp.animate.to_edge(m.UR).shift(m.DL),
+            m_tok_gp.animate.to_edge(m.UR).shift(m.DOWN+m.LEFT),
             self.s.mstack.animate.to_edge(m.LEFT).shift(
-                m.DR).align_to(self.mtable.get_center),
+                m.DOWN+m.RIGHT).align_to(self.mtable.get_center),
         )
 
         # TODO custom colour for terminals!
@@ -995,29 +1059,7 @@ class ManimParseTree(m.Scene):
         g.to_edge(m.UP).shift(m.DOWN)
         self.add(g)
         self.root.manim.move_to(g[start_symbol].get_center())
-
-        self.tokens_do_parsing_loop(g, tokens, start_symbol)
-
-        # in case parsing finishes but there are still tokens left in the stack
-        if len(tokens) > 0:
-            error.ERR_parsing_error()
-            error.ERR_manim_parsing_error(self)
-            return
-
-        # fade out the stack and transform the parse tree
-        reset_g(self, g, start_symbol, anim=[m.FadeOut(self.s.mstack)])
-
-        # self.s.write_under_stack("Stack emptied.")
-        fullscreen_notify(self, "Successfully parsed '" + " ".join(original_tokens) +
-                                "'!")
-        # display the parse tree
-        success = typer.style("Successfully parsed '" + " ".join(original_tokens) +
-                              "'!", fg=typer.colors.WHITE, bg=typer.colors.GREEN)
-        typer.echo(success + "\nParse tree:")
-        display_helper.print_parsetree(self.root)
-
-
-    def _do_parsing_loop(self, g, tokens, start_symbol, V_LABELS):
+         
         # begin parsing
         while self.s.stack != []:
             # in case we run out of input before the stack is empty
@@ -1039,58 +1081,58 @@ class ManimParseTree(m.Scene):
                     anims = []
                     tokens.remove(next)
 
-                    # # highlight parents
-                    # if self.parents == []:
-                    #     parent = None
+                    # highlight parents
+                    if self.parents == []:
+                        parent = None
 
-                    # # pops appropriately
-                    # if self.parents != []:
-                    #     popped = self.parents.pop()
-                    #     parent = self.parents[-1]
+                    # pops appropriately
+                    if self.parents != []:
+                        popped = self.parents.pop()
+                        parent = self.parents[-1]
 
-                    #     # always pop again if an epsilon was encountered
-                    #     if self.parents != []:
-                    #         done = False
+                        # always pop again if an epsilon was encountered
+                        if self.parents != []:
+                            done = False
 
-                    #         i = 1
-                    #         while not done:
-                    #             p = self.parents[-i]
-                    #             if re.match(RE_NONTERMINAL, p.id):
+                            i = 1
+                            while not done:
+                                p = self.parents[-i]
+                                if re.match(RE_NONTERMINAL, p.id):
 
-                    #                 # if we have encountered the first set which the production can fall under
-                    #                 if popped.id in self.firstset[p.id]:
-                    #                     parent = p
-                    #                     # remove children if they were previously added
-                    #                     if p.height != 0:
-                    #                         p.children = []
-                    #                     anytree.Node(
-                    #                         popped.id, parent=p, id=popped.id, manim=m.Text(popped.id, weight=m.BOLD))
+                                    # if we have encountered the first set which the production can fall under
+                                    if popped.id in self.cfg.first_set[p.id]:
+                                        parent = p
+                                        # remove children if they were previously added
+                                        if p.height != 0:
+                                            p.children = []
+                                        anytree.Node(
+                                            popped.id, parent=p, id=popped.id, manim=m.Text(popped.id, weight=m.BOLD))
 
-                    #                     # check for epsilons
-                    #                     rhs = self.parents[-i + 1:]
-                    #                     for r in rhs:
-                    #                         if re.match(RE_NONTERMINAL, r.id) and r.id != p.id and r.height == 0:
-                    #                             if "#" in self.firstset[r.id]:
-                    #                                 new_node = anytree.Node(
-                    #                                     "#", parent=r, id="eps", manim=m.MathTex("\epsilon"))
-                    #                                 vertex_id = r.id + "_" + new_node.id
-                    #                                 parent_id = r.id
-                    #                                 if r.id != start_symbol:
-                    #                                     parent_id = r.parent.id + "_" + r.id
-                    #                                 v = create_vertex(
-                    #                                     g, vertex_id, parent_id, "\epsilon")
-                    #                                 reset_g(
-                    #                                     self, g, start_symbol)
+                                        # check for epsilons
+                                        rhs = self.parents[-i + 1:]
+                                        for r in rhs:
+                                            if re.match(RE_NONTERMINAL, r.id) and r.id != p.id and r.height == 0:
+                                                if "#" in self.cfg.first_set[r.id]:
+                                                    new_node = anytree.Node(
+                                                        "#", parent=r, id="eps", manim=m.MathTex("\epsilon"))
+                                                    vertex_id = r.id + "_" + new_node.id
+                                                    parent_id = r.id
+                                                    if r.id != start_symbol:
+                                                        parent_id = r.parent.id + "_" + r.id
+                                                    v = create_vertex(
+                                                        g, vertex_id, parent_id, "\epsilon")
+                                                    reset_g(
+                                                        self, g, start_symbol)
 
-                    #                     # pop as many productions off as necessary
-                    #                     for j in range(i - 1):
-                    #                         self.parents.pop()
-                    #                     done = True
-                    #                 else:
-                    #                     i = i + 1
-                    #             else:
-                    #                 parent = self.root
-                    #                 break
+                                        # pop as many productions off as necessary
+                                        for j in range(i - 1):
+                                            self.parents.pop()
+                                        done = True
+                                    else:
+                                        i = i + 1
+                                else:
+                                    parent = self.root
+                                    break
 
                     # Add new connection if it exists :)
                     typer.echo(parent)
@@ -1102,7 +1144,7 @@ class ManimParseTree(m.Scene):
                         if parent.id == start_symbol:
                             parent_vertex_id = parent.id
                         else:
-                            parent_vertex_id = parent.parent.id + "_"+parent.id
+                            parent_vertex_id = parent.parent.id + "_"+ parent.id
 
                         typer.echo("adding node " + vertex_id +
                                    " with parent " + parent_vertex_id + "\ncurrently, nodes and edges are:")
@@ -1132,7 +1174,7 @@ class ManimParseTree(m.Scene):
                             # create and add new vertex
                             new_vertex = create_vertex(
                                 g, vertex_id, parent_vertex_id, vertex_id.split("_")[
-                                    1].strip(), V_LABELS, color=m.BLUE)
+                                    1].strip(), color=m.BLUE)
                             reset_g(self, g, start_symbol)
 
                     # pop off the stack and 'flash'
@@ -1144,8 +1186,9 @@ class ManimParseTree(m.Scene):
                     self.play(
                         m.LaggedStart(m.Indicate(m_tok[next], color=m.BLUE, scale_factor=1.5),
                                     m.FadeToColor(
-                            m_tok[next], m.BLUE)),
+                            m_tok[next],m.BLUE)),
                     )
+                    return
 
                 else:
                     error.ERR_parsing_error(
@@ -1158,23 +1201,15 @@ class ManimParseTree(m.Scene):
                     pt_entry = self.cfg.parsetable.pt_dict[top][next]
                     prods = pt_entry.split("->")
 
-                    typer.echo("interested in " + top + "," + next)
                     #  copy the cfg_line rather than manipulate it directly
                     cfg_line = self.manim_production_groups[prods[0].strip(
                     )][:]
-                    typer.echo("CFG LINE = ")
-                    typer.echo(cfg_line)
+                    cfg_line.next_to(self.s.mstack, m.DOWN).shift(
+                        0.8*m.DOWN).scale(0.7)
 
-                    # BUG
-                    cfg_line.next_to(self.s.mstack).shift(0.8*m.DOWN).scale(0.7)
-
-                    # self.play(
-                    #    m.FadeIn(cfg_line)
-                    # )
-                    
-                    # self.play(
-                    #    m.FadeIn(cfg_line)
-                    # )
+                    self.play(
+                        m.FadeIn(cfg_line)
+                    )
 
                     # set up animations
                     popped_off = self.s.stack[-1]
@@ -1250,86 +1285,402 @@ class ManimParseTree(m.Scene):
                             else:
                                 if p != "#":
                                     new_node = anytree.Node(
-                                        p, id=p, manim= m.Tex(p))
+                                        p, id=p, manim=m.Tex(p))
 
                         # we don't need to match epsilon, and we also only want non-terminals as parent nodes
                         if p != "#" and p != "$":
-                            m = prods[0].strip() + " \\to " + p
-                            self.s.push(p, m)
+                            new_prod = prods[0].strip() + " \\to " + p
+                            self.s.push(p, new_prod)
                             self.parents.append(new_node)
-                    # FIX
-                    # self.play(
-                    #     m.FadeOut(cfg_line)
-                    # )
+
+                    typer.echo("m has become:")
+                    typer.echo(m)
+                    self.play(
+                        m.FadeOut(cfg_line)
+                    )
 
                 except KeyError:
-                    error.ERR_parsing_error(self.root,
+                    error.ERR_parsing_error(
                         "ParseTable[" + top + ", " + top + "] is empty.")
                     return
 
             # transform the tree
             reset_g(self, g, start_symbol)
 
+        # in case parsing finishes but there are still tokens left in the stack
+        if len(tokens) > 0:
+            error.ERR_parsing_error()
+            error.ERR_manim_parsing_error(self)
+            return
+
+        # fade out the stack and transform the parse tree
+        reset_g(self, g, start_symbol, anim=[m.FadeOut(self.s.mstack)])
+
+        # self.s.write_under_stack("Stack emptied.")
+        self.fullscreen_notify("Successfully parsed '" + " ".join(original_tokens) +
+                                "'!")
+        # display the parse tree
+        success = typer.style("Successfully parsed '" + " ".join(original_tokens) +
+                              "'!", fg=typer.colors.WHITE, bg=typer.colors.GREEN)
+        typer.echo(success + "\nParse tree:")
+        self.print_pt(self.root)
 
 
 
-def create_tokens(tokens):
-    # Write equations
-    token_gp = []
-    for t in tokens:
-        token_gp.append(m.MathTex("\\text{"+t+"}"))
-    return token_gp
+    # # def _set_up_stack_and_table(self, start_symbol):
+    # #     # init mtable structure
+    # #     self.init_m_ll1_parsetable()
+
+    # #     # create then add start symbol to the stack
+    # #     self.s = stack.Stack(self, m.RIGHT+m.DOWN, 5)
+    # #     self.s.stack.append(start_symbol)
+    # #     self.root = anytree.Node(start_symbol, id=start_symbol,
+    # #                      manim=m.MathTex(start_symbol))
 
 
-def get_parent_id(parent, start_symbol):
-    if parent.parent != None:
-        return get_vertex_id(parent.id, parent.parent.id, start_symbol)
-    else:
-        return parent.id
+    # def vis_parse_ll1(self, input, ts):
+    #     # prelimenary set up
+    #     V_LABELS = {}
+    #     start_symbol = self.cfg.start_symbol
+    #     self._set_up_stack_and_table(start_symbol)
+
+    #     # copy the tokens
+    #     original_tokens = ts[:]
+    #     tokens = ts[:]
+
+    #     self.cfg.parsetable.print_parse_table()
+    #     typer.echo("parsing" + input)
+    #     typer.echo("tokens:")
+    #     typer.echo(tokens)
+
+    #     # initialise a way to track the parent nodes
+    #     self.parents = []
+
+    #     # draw LL(1) representation title
+    #     ll1_title = m.Tex(r"LL(1) Parsing")
+    #     keys = get_manim_cfg_group(self).to_edge(m.RIGHT)
+
+    #     # create the input group here
+    #     m_tok = {}
+    #     m_tok_gp = m.VGroup()
+    #     m_tok_gp.add(m.Tex("Token stream: ")).scale(0.7)
+    #     for t in tokens:
+    #         tex = m.MathTex("\\text{"+t+"}")
+    #         m_tok_gp.add(tex)
+    #         m_tok[t] = tex
+    #     m_tok_gp.arrange(m.RIGHT)
+    #     self.m_tok_gp = m_tok_gp
+    #     self.m_tok = m_tok
+
+    #     # set the stage
+    #     self.play(
+    #         ll1_title.animate.to_edge(m.UP),
+    #         m_tok_gp.animate.to_edge(m.UR).shift(m.DL),
+    #         self.s.mstack.animate.to_edge(m.LEFT).shift(
+    #             m.DR).align_to(self.mtable.get_center),
+    #     )
+
+    #     # TODO custom colour for terminals!
+    #     # TODO educational messages
+    #     # TODO show input and frame to move through
+    #     # TODO sound on popping
+
+    #     # create our first label
+    #     V_LABELS[start_symbol] = start_symbol
+    #     g = m.Graph([start_symbol], [], vertex_config=VCONFIG,
+    #               labels=V_LABELS, label_fill_color=m.WHITE)
+
+    #     g.to_edge(m.UP).shift(m.DOWN)
+    #     self.add(g)
+    #     self.root.manim.move_to(g[start_symbol].get_center())
+
+    #     self._do_parsing_loop(g, tokens, start_symbol, V_LABELS)
+
+    #     # in case parsing finishes but there are still tokens left in the stack
+    #     if len(tokens) > 0:
+    #         error.ERR_parsing_error()
+    #         error.ERR_manim_parsing_error(self)
+    #         return
+
+    #     # fade out the stack and transform the parse tree
+    #     reset_g(self, g, start_symbol, anim=[m.FadeOut(self.s.mstack)])
+
+    #     # self.s.write_under_stack("Stack emptied.")
+    #     fullscreen_notify(self, "Successfully parsed '" + " ".join(original_tokens) +
+    #                             "'!")
+    #     # display the parse tree
+    #     success = typer.style("Successfully parsed '" + " ".join(original_tokens) +
+    #                           "'!", fg=typer.colors.WHITE, bg=typer.colors.GREEN)
+    #     typer.echo(success + "\nParse tree:")
+    #     display_helper.print_parsetree(self.root)
+
+    # def _call_empty_tokens(self):
+    #     if re.match(RE_TERMINAL, self.s.stack[-1]):
+    #                 error.ERR_parsing_error("Expected " + self.s.stack[-1])
+    #     else:
+    #         error.ERR_parsing_error()
+    #     error.ERR_manim_parsing_error(self)
+
+    # def _create_epsilon_node_and_vertex(self, g, r):
+    #     new_node = anytree.Node(
+    #                         "#", parent=r, id="eps", manim=m.MathTex("\epsilon"))
+    #     vertex_id = r.id + "_" + new_node.id
+    #     parent_id = r.id
+    #     if r.id != self.cfg.start_symbol:
+    #         parent_id = r.parent.id + "_" + r.id
+    #     v = create_vertex(
+    #         g, vertex_id, parent_id, "\epsilon")
+    #     reset_g(
+    #         self, g, self.cfg.start_symbol)
+    #     return v
+
+    # # find 
+    # def _find_true_parent(self):
+
+    #     # highlight parents
+    #     if self.parents == []:
+    #         parent = None
+
+    #     # pops appropriately
+    #     if self.parents != []:
+    #         popped = self.parents.pop()
+    #         parent = self.parents[-1]
+
+    #         # always pop again if an epsilon was encountered
+    #         if self.parents != []:
+    #             done = False
+
+    #             i = 1
+    #             while not done:
+    #                 p = self.parents[-i]
+    #                 if re.match(RE_NONTERMINAL, p.id):
+
+    #                     # if we have encountered the first set which the production can fall under
+    #                     if popped.id in self.firstset[p.id]:
+    #                         parent = p
+    #                         # remove children if they were previously added
+    #                         if p.height != 0:
+    #                             p.children = []
+    #                         anytree.Node(
+    #                             popped.id, parent=p, id=popped.id, manim=m.Text(popped.id, weight=m.BOLD))
+
+    #                         # check for epsilons
+    #                         rhs = self.parents[-i + 1:]
+    #                         for r in rhs:
+    #                             if re.match(RE_NONTERMINAL, r.id) and r.id != p.id and r.height == 0:
+    #                                 if "#" in self.firstset[r.id]:
+    #                                     new_vertex = self._create_epsilon_node_and_vertex(g, r)
+    #                         # pop as many productions off as necessary
+    #                         for j in range(i - 1):
+    #                             self.parents.pop()
+    #                         done = True
+    #                     else:
+    #                         i = i + 1
+    #                 else:
+    #                     parent = self.root
+    #                     break
+    #         return [parent, new_vertex]
+
+    # def _highlight_parent(self, g, parent, top, anims, V_LABELS):
+    #         vertex_id = parent.id + "_" + top
+    #         typer.echo("parent is " + parent.id)
+
+    #         if parent.id == self.cfg.start_symbol:
+    #             parent_vertex_id = parent.id
+    #         else:
+    #             parent_vertex_id = parent.parent.id + "_"+parent.id
+
+    #         typer.echo("adding node " + vertex_id +
+    #                     " with parent " + parent_vertex_id + "\ncurrently, nodes and edges are:")
+
+    #         # check if we already have a vertex
+    #         try:
+    #             # get existing vertex
+    #             new_vertex = g[vertex_id]
+    #             # confirm the path by adding the colour
+    #             rendered_label = m.MathTex(
+    #                 "\\text{"+top+"}", color=m.BLACK)
+    #             new_vertex.fade_to(m.BLUE, 1)
+    #             rendered_label.move_to(new_vertex.get_center())
+    #             new_vertex.add(rendered_label)
+
+    #             self.play(
+    #                 m.Circumscribe(new_vertex, color=m.BLUE),
+    #                 run_time=2
+    #             )
+    #             try:
+    #                 edge = g.edges[(parent_vertex_id, vertex_id)]
+    #                 anims.append(
+    #                     m.FadeToColor(edge, color=m.WHITE))
+    #             except:
+    #                 pass
+    #         except KeyError:
+    #             # create and add new vertex
+    #             new_vertex = create_vertex(
+    #                 g, vertex_id, parent_vertex_id, vertex_id.split("_")[
+    #                     1].strip(), V_LABELS, color=m.BLUE)
+    #             reset_g(self, g, self.cfg.start_symbol)
+    #         return SUCCESS
+
+    # def _do_parsing_loop(self, g, tokens, start_symbol, V_LABELS):
+    #     global m 
+    #     # begin parsing
+    #     while self.s.stack != []:
+
+    #         # in case we run out of input before the stack is empty
+    #         if tokens == []:
+    #             self._call_empty_tokens_error()
+    #             return
+
+    #         top = self.s.stack[-1]
+    #         next = tokens[0]
+
+    #         # draw initial node if top is start symbol
+    #         if re.match(RE_TERMINAL, top) or top == "$":
+
+    #             if top == next:
+    #                 anims = []
+    #                 tokens.remove(next)
+
+    #                 parent_and_vertex = self._find_true_parent()
+    #                 parent = parent_and_vertex[0]
+    #                 new_vertex = parent_and_vertex[1]
+
+    #                 # Add new connection if it exists :)
+    #                 typer.echo(parent)
+
+    #                 if parent != None:
+    #                     self._highlight_parent(g, parent, top, anims, V_LABELS)
+                 
+    #                 # pop off the stack and 'flash'
+    #                 self.s.pop(anim=anims, vertex=new_vertex, matching=True, msg="\\text{Matched }" +
+    #                            self.s.stack[-1] + "\\text{!}")
+
+    #                 # highlight the token stream line and token that we matched
+    #                 self.play(m.ApplyWave(self.m_tok_gp))
+    #                 self.play(
+    #                     m.LaggedStart(m.Indicate(self.m_tok[next], color=m.BLUE, scale_factor=1.5),
+    #                                 m.FadeToColor(
+    #                         self.m_tok[next], m.BLUE)),
+    #                 )
+
+    #             else:
+    #                 error.ERR_parsing_error(
+    #                     "Unexpected token [" + top + "]")
+    #                 error.ERR_manim_parsing_error(self)
+    #                 return
+
+    #         elif re.match(RE_NONTERMINAL, top):
+    #             try:
+    #                 pt_entry = self.cfg.parsetable.pt_dict[top][next]
+    #                 prods = pt_entry.split("->")
+
+    #                 typer.echo("interested in " + top + "," + next)
+    #                 #  copy the cfg_line rather than manipulate it directly
+    #                 cfg_line = self.manim_production_groups[prods[0].strip(
+    #                 )][:]
+    #                 typer.echo("CFG LINE = ")
+    #                 typer.echo(cfg_line)
+
+    #                 cfg_line.next_to(self.s.mstack).shift(m.DOWN).scale(0.7)
+
+    #                 self.play(
+    #                    m.FadeIn(cfg_line)
+    #                 )
+
+    #                 # set up animations
+    #                 popped_off = self.s.stack[-1]
+    #                 anims = []
+
+    #                 # highlight the edge and vertex if applicable to our path
+    #                 if self.parents != []:
+    #                     parent_id = self.parents[-1].parent.id
+
+    #                     # create p_c and P_p links
+    #                     if popped_off != start_symbol:
+    #                         v_id = parent_id + "_" + popped_off
+
+    #                         if parent_id != start_symbol:
+    #                             parent_id = self.parents[-1].parent.parent.id + \
+    #                                 "_" + self.parents[-1].parent.id
+
+    #                         # highlight edge and vertex
+    #                         anims = []
+    #                         try:
+    #                             vertex = g[v_id]
+    #                             rendered_label = m.MathTex(
+    #                                 "\\text{"+popped_off+"}", color=m.BLACK)
+
+    #                             # confirm the path by adding the colour
+    #                             vertex.fade_to(m.BLUE, 1)
+    #                             rendered_label.move_to(vertex.get_center())
+    #                             vertex.add(rendered_label)
+
+    #                             self.play(
+    #                                 m.Circumscribe(vertex, color=m.BLUE),
+    #                                 run_time=2
+    #                             )
+    #                         except:
+    #                             pass
+
+    #                 self.s.pop(anim=anims,
+    #                            msg="\\text{Replacing }" + popped_off + "\\text{...}")
+
+    #                 # add sequence of productions to the stack
+    #                 ps = list(filter(None, re.findall(
+    #                     RE_PRODUCTION, prods[1])))
+
+    #                 for p in reversed(ps):
+    #                     # add to the tree
+    #                     if top == start_symbol:
+    #                         # create the node
+    #                         new_node = anytree.Node(
+    #                             p, parent=self.root, id=p)
+
+    #                         try:
+    #                             vertex_id = top + "_" + p.strip()
+    #                             vertex = g[vertex_id]
+
+    #                         except KeyError:
+    #                             # create the new vertex only if it doesn't exist already
+    #                             vertex_id = top + "_" + new_node.id
+    #                             v = create_vertex(
+    #                                 g, vertex_id, start_symbol, new_node.id, V_LABELS)
+    #                             reset_g(self, g, start_symbol)
+    #                     else:
+    #                         # add connecting node if it is a non-terminal
+    #                         if re.match(RE_NONTERMINAL, p):
+    #                             new_node = anytree.Node(
+    #                                 p, id=p, parent=self.parents[-1])
+
+    #                             parent = self.parents[-1]
+    #                             parent_id = get_parent_id(parent, start_symbol)
+    #                             typer.echo(parent_id)
+    #                             create_v_if_exists(
+    #                                 self, g, start_symbol, parent.id + "_" + p.strip(), p.strip(), parent_id)
+
+    #                         else:
+    #                             if p != "#":
+    #                                 new_node = anytree.Node(
+    #                                     p, id=p, manim= m.Tex(p))
+
+    #                     # we don't need to match epsilon, and we also only want non-terminals as parent nodes
+    #                     if p != "#" and p != "$":
+    #                         new_prod = prods[0].strip() + " \\to " + p
+    #                         self.s.push(p, new_prod)
+    #                         self.parents.append(new_node)
+    #                 # FIX
+    #                 self.play(
+    #                     m.FadeOut(cfg_line)
+    #                 )
+
+    #             except KeyError:
+    #                 error.ERR_parsing_error(self.root,
+    #                     "ParseTable[" + top + ", " + top + "] is empty.")
+    #                 return
+
+    #         # transform the tree
+    #         reset_g(self, g, start_symbol)
 
 
-def create_v_if_exists(scene, g, start_symbol, vertex_id, v_name, parent_id):
-    try:
-        vertex = g[vertex_id]
 
-    except KeyError:
-        # create the new vertex only if it doesn't exist already
-        v = create_vertex(
-            g, vertex_id, parent_id, v_name)
-        reset_g(scene, g, start_symbol)
-
-
-def get_vertex_id(vertex, parent, start_symbol):
-    if vertex == start_symbol:
-        return vertex
-    else:
-        if parent == start_symbol:
-            return start_symbol + "_" + vertex
-        else:
-            return parent + "_" + vertex
-
-
-def create_vertex(g, vertex_id, parent_id, label, V_LABELS, color=m.GRAY,  link=True):
-    V_LABELS[vertex_id] = label
-    # BUG Should be + DOWN
-    pos = g[parent_id].get_center()
-    v = g._add_vertex(
-        vertex_id, vertex_config={"color": color}, position=pos)
-    v.fill_colour = color
-
-    if link:
-        g._add_edge(
-            [parent_id, vertex_id], edge_config={"color": m.WHITE})
-    return v
-
-
-def reset_g(self, g, root, anim=[]):
-    for a in anim:
-        self.play(a)
-
-    self.play(
-        g.animate.change_layout(
-            "tree",
-            root_vertex=root,
-        ),
-    )
