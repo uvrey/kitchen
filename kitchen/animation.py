@@ -146,6 +146,40 @@ def get_manim_cfg_group(self):
     keys.fade_to(color=m.DARK_GRAY, alpha=1)
     return keys
 
+# helper function to obtain the follow and first set interpretation guide
+def get_guide():
+    guide_group_outer = m.VGroup()
+    square_colors = [m.TEAL, m.RED]
+    labels = ["Terminal", "Non-terminal"]
+    for i in range(2):
+        guide_group_inner = m.VGroup()
+        guide_group_inner.add(m.Square().set_fill(
+            square_colors[i], opacity=1))
+        guide_group_inner.add(m.Tex(labels[i]))
+        guide_group_inner.arrange(m.RIGHT)
+        guide_group_outer.add(guide_group_inner)
+    guide_group_outer.arrange(m.DOWN, aligned_edge=m.LEFT)
+    return guide_group_outer
+    
+def ts_m_epsilon(self):
+    ts_m = []
+    for t in self.ts:
+        if t == "#":
+            ts_m.append("\epsilon")
+        else:
+            ts_m.append(t)
+    return ts_m
+
+# initialise the row values for the manim table
+def init_row_contents(self):
+    row_vals = []
+    for n in self.nts:
+        row = []
+        for t in self.ts:
+            row.append(".")
+        row_vals.append(row)
+    return row_vals
+
 # TODO move some values across
 # TODO let animation restart again
 # Unique filename - Date and time?
@@ -297,7 +331,8 @@ class ManimFirstSet(m.Scene):
                             # fade in new terminal and corresponding element of the cfg
                             cfg_element = self.manim_prod_dict[production][i][0]
 
-                            self.add_sound("click.wav")
+                            # TODO add sound
+                            #self.add_sound("click.wav")
 
                             self.play(
                                 m.Write(msg),
@@ -582,14 +617,173 @@ class ManimFollowSet(m.Scene):
                     m.FadeIn(self.cfg.manim_followset_lead[production]),
                 )
 
-class ManimParsingTable(m.Scene):
+class ManimParseTable(m.Scene):
     def setup(self):
         self.frame_width = m.config["frame_width"]
         self.frame_height = m.config["frame_height"]
-    def __init__(self):
-        pass
 
-    def swap(self, row, col, new_val):
+    def construct(self):
+        self.vis_populate_table()
+
+    def init_pt_dict(self):
+        # set up parsing table structure
+        for n in self.nts:
+            for t in self.ts:
+                self.pt_dict[n] = {}
+                self.pt_dict[n][t] = None
+
+    def setup_manim(self, cfg):
+        self.ts = sorted(cfg.terminals)
+        self.nts = sorted(cfg.nonterminals)
+        self.cfg = cfg
+
+    # quickly get the row and column index of the parse table contents
+    def row(self, nt):
+        return self.nts.index(nt) + 1
+
+    def col(self, t):
+        return self.ts.index(t) + 1
+
+    def vis_populate_table(self):
+        """Visualises the algorithm which constructs the parsing table
+
+        Args:
+            scene (_type_): _description_
+        """
+        typer.echo("vis pop table")
+        # make sure parse table is fully reset
+        self.pt_dict = {}
+        self.init_pt_dict()
+
+        # set up the title
+        ll1_title = m.Tex(r"LL(1) Parsing: Setting up the Parse Table")
+        keys = get_manim_cfg_group(self)
+        keys.to_edge(m.LEFT)
+
+        # show key for colour coding
+        guide = get_guide().scale(0.3)
+
+        self.play(
+            ll1_title.animate.to_edge(m.UP),
+            guide.animate.to_corner(m.DOWN + m.RIGHT),
+            m.FadeIn(m.Text("CFG", weight=m.BOLD).move_to(
+                keys.get_top()+m.UP*0.3).align_to(keys.get_center()).scale(0.5)),
+            m.LaggedStart(*(m.FadeIn(k.scale(0.6), shift=m.UP)
+                        for k in keys)),
+        )
+
+        # draw establishing table animations
+        row_labels = self.nts
+        col_labels = ts_m_epsilon(self)
+
+        # build up the row values
+        row_vals = init_row_contents(self)
+
+        self.mtable = self.init_m_table(
+            row_vals, row_labels, col_labels)
+
+        self.mtable.get_row_labels().fade_to(color=m.RED, alpha=1)
+        self.mtable.get_col_labels().fade_to(color=m.TEAL, alpha=1)
+
+        self.play(
+           m.Write((self.mtable).get_labels()),
+            run_time=1
+        )
+
+        self.play(
+            m.Create((self.mtable).get_horizontal_lines()[2]),
+            m.Create((self.mtable).get_vertical_lines()[2]),
+            run_time=1
+        )
+
+        # populate the whole table with the first and follow set, if appropriate
+        for i, key in enumerate(self.cfg.first_set.keys(), start=0):
+            for j, item in enumerate(self.cfg.first_set[key], start=0):
+                # if the first set contains epsilon, may disappear
+                if item == "#":
+                    for f in self.cfg.follow_set[key]:
+                        if f == "$":
+                            mprod = key + " \\to DOLLAR"
+                            prod = key + " -> $"
+                        else:
+                            mprod = key + " \\to \epsilon"
+                            prod = key + " -> #"
+                        notify(
+                            "Following " + prod + "\nadded ε to First(" + key + ")", self.mtable)
+                        self.vis_add_to_parsetable( key, f, prod, mprod)
+                else:
+
+                    # add item to the parse table
+                    prod = self.cfg.firstset_index[key][j]
+                    mprod = prod
+                    tmp_prod = prod.replace(
+                        "->", "\\to").strip().replace("#", "\epsilon")
+                    notify(self, "Following " + prod + "\nadded " +
+                                 self.cfg.first_set[key][j] + " to First(" + key + ")", self.mtable)
+                    self.vis_add_to_parsetable(
+                         key, item, prod, tmp_prod)
+
+    def vis_add_to_parsetable(self, nt, t, prod, mprod):
+        typer.echo("trying to add " + mprod + "= " + prod)
+        try:
+            if self.pt_dict[nt][t] != None:
+                error.ERR_too_many_productions_ll1(nt, t)
+            else:
+                self.pt_dict[nt][t] = prod
+                self.swap(self.row(nt), self.col(t), mprod)
+
+        except KeyError:
+            self.pt_dict[nt][t] = prod
+            self.swap(self.row(nt), self.col(t), mprod)
+
+
+
+    # swap a current entry
+    def swap(self, row, col, new_val) -> m.MathTable:
+        """Swaps two elements in a manim parse table.
+
+        Args:
+            row (int): Row of element to be swapped.
+            col (int): Column of element to be swapped.
+            new_val (String): Value to be swapped into the table. 
+        """        
+        t_old = self.mtable.get_entries_without_labels((row, col))
+
+        self.play(
+            m.Indicate(t_old)
+        )
+
+        # set up new value with colour
+        t_new = m.MathTex(new_val).scale(0.7)
+        t_new.move_to(t_old)
+        t_new.fade_to(m.WHITE, alpha=0.2)
+
+        # fade out old value and into new value
+        self.play(
+            m.FadeIn(t_new),
+            m.FadeOut(t_old),
+        )
+
+
+    def init_m_table(self, row_vals, row_labels, col_labels):
+        row_labels = row_labels
+        col_labels = col_labels
+
+        table = m.MathTable(
+            row_vals,
+            row_labels=[m.MathTex(rl) for rl in row_labels],
+            col_labels=[m.MathTex(cl) for cl in col_labels],
+            include_outer_lines=True)
+
+        # Table
+        lab = table.get_labels()
+        lab.set_color(m.LIGHT_GRAY)
+        table.get_horizontal_lines()[2].set_stroke(width=8, color=m.LIGHT_GRAY)
+        table.get_vertical_lines()[2].set_stroke(width=8, color=m.LIGHT_GRAY)
+        return table
+
+
+    def mmswap(self, row, col, new_val):
         """Swaps two elements in a manim parse table.
 
         Args:
@@ -609,6 +803,13 @@ class ManimParsingTable(m.Scene):
             m.FadeIn(t_new),
             m.FadeOut(t_old),
         )
+
+ # TODO convert this to ManimParsingTable
+        self.mtable = self.init_m_table(
+            row_vals, row_labels, col_labels)
+
+        self.mtable.get_row_labels().fade_to(color=RED, alpha=1)
+        self.mtable.get_col_labels().fade_to(color=TEAL, alpha=1)
 
 
     def init_table(self, x_vals, y_vals, row_labels, col_labels):

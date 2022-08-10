@@ -249,6 +249,13 @@ class ParsingTable:
         except KeyError:
             self.pt_dict[nt][t] = production
 
+    def init_manim_parsetable(self):
+        self.m_parsetable = ParsingTable()
+        rows = sorted(self.nts)
+        cols = sorted(self.ts)
+        self.m_parsetable.init_table([], [], rows, cols)
+
+
    
     # TODO clean?
     def init_m_table(self, row_vals, row_labels, col_labels):

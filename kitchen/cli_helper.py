@@ -285,14 +285,12 @@ def _process_command(inp, cfg) -> None:
         _show_parsetable(cfg)
 
     elif inp == "\\vis parsetable" or inp == "\\vpt":
-        # a = animation.Animation()
-        # a.setup_manim("", [], [], None, None,
-        #               False, False, True, False)
-        # a.render()
-        pass
-        
-    elif inp == "\\show parse structures" or inp == "\ptss":
-        pass
+        if not cfg.first_set_calculated:
+            cfg.reset_first_set()
+        animation = anim.ManimParseTable()
+        animation.setup_manim(cfg)
+        animation.render()
+
     elif inp == "\\l":
         new_path = typer.prompt("New path to CFG")
         load_app(new_path)
