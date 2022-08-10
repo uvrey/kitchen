@@ -120,8 +120,8 @@ class ParsingTable:
 
         scene.play(
             ll1_title.animate.to_edge(UP),
-            guide.animate.to_corner(DOWN + RIGHT),
-            FadeIn(Text("CFG", weight=BOLD).move_to(
+            guide.animate.to_corner(m.DOWN + m.RIGHT),
+            FadeIn(m.Text("CFG", weight=m.BOLD).move_to(
                 keys.get_top()+UP*0.3).align_to(keys.get_center()).scale(0.5)),
             LaggedStart(*(FadeIn(k.scale(0.6), shift=UP)
                         for k in keys)),
@@ -141,7 +141,7 @@ class ParsingTable:
         self.mtable.get_col_labels().fade_to(color=TEAL, alpha=1)
 
         scene.play(
-            Write((self.mtable).get_labels()),
+           m.Write((self.mtable).get_labels()),
             run_time=1
         )
 
@@ -210,7 +210,7 @@ class ParsingTable:
         # fade out old value and into new value
         scene.play(
             FadeIn(t_new),
-            FadeOut(t_old),
+            m.FadeOut(t_old),
         )
 
 
@@ -386,7 +386,7 @@ class ManimParsingTable:
         # fade out old value and into new value
         self.play(
             FadeIn(t_new),
-            FadeOut(t_old),
+            m.FadeOut(t_old),
         )
 
 

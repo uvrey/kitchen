@@ -16,7 +16,7 @@ from kitchen import (
     __app_name__,
     display_helper,
     parse_table as pt,
-    animation,
+    animation as anim,
     error, 
     parser as p,
 )
@@ -265,7 +265,9 @@ def _process_command(inp, cfg) -> None:
         cfg.show_first_set()
     
     elif inp == "\\vis first" or inp == "\\vfs":
-        pass
+      #  animation = anim.ManimFirstSet()
+      #  animation.render()
+      pass
       
     elif inp == "\\show follow" or inp == "\\fw":
         cfg.show_follow_set()

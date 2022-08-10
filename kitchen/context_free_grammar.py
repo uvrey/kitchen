@@ -6,8 +6,7 @@ from itertools import chain
 from pathlib import Path
 import re
 from typing import Dict
-from manim import *
-from wsgiref import validate
+import manim as m
 import typer
 import pprint
 from kitchen import (
@@ -82,29 +81,6 @@ def get_prods(cfg_contents) -> list:
         line = line + 1
     return prods
 
-def generate_first_set(self) -> int:
-    a = animation.Animation()
-    a.setup_manim("", [], [], self.parser, self.parsetable, True, False)
-    a.render()
-
-def generate_follow_set(self) -> int:
-    a = animation.ManimFollowSet()
-    a.render()
-
-def generate_parse_table(self):
-    a = animation.Animation()
-    a.setup_manim("", [], [], self.parser, self.parsetable,
-                    False, False, True, False)
-    a.render()
-
-def generate_parse_ll1(self, input) -> int:
-    a = animation.Animation()
-    inp_list = input.split(" ")
-    a.setup_manim(input, inp_list, [], self.parser, self.parsetable,
-                    False, False, False, True)
-    a.render()
-    return SUCCESS
-
 def populate_manim_cfg(cfg_dict, lead_to) -> Dict:
     """_summary_Returns an equivalent cfg in manim where each non-terminal has an associated set of MObject
 
@@ -122,7 +98,7 @@ def populate_manim_cfg(cfg_dict, lead_to) -> Dict:
     try:
         for index, key in enumerate(cfg_dict.keys(), start=0):
             # append the text of the leading NT
-            manim_cfg[key] = [Text(key, weight=BOLD)]
+            manim_cfg[key] = [m.Text(key, weight=m.BOLD)]
 
             # make a list of sub-productions which are led to by this NT
             tmp_item = []
@@ -134,10 +110,10 @@ def populate_manim_cfg(cfg_dict, lead_to) -> Dict:
                     # gets manim equivalent of this text
                     if specific == "#":
                         tmp_split_list.append(
-                            Text("ε", weight=BOLD, slant=ITALIC))
+                            m.Text("ε", weight=m.BOLD, slant=m.ITALIC))
                     else:
                         tmp_split_list.append(
-                            Text(specific, weight=BOLD, slant=ITALIC))
+                            m.Text(specific, weight=m.BOLD, slant=m.ITALIC))
                 tmp_item.append(tmp_split_list)
 
             # append this list of manim productions to the manim cfg dictionary
@@ -230,11 +206,11 @@ class ContextFreeGrammar:
             self.cfg_dict[p_seq[0]] = p_seq[1]
 
             self.first_set[p_seq[0]] = []
-            self.manim_firstset_contents[p_seq[0]] = VGroup()
+            self.manim_firstset_contents[p_seq[0]] = m.VGroup()
             self.firstset_index[p_seq[0]] = []
 
             self.follow_set[p_seq[0]] = []
-            self.manim_followset_contents[p_seq[0]] = VGroup()
+            self.manim_followset_contents[p_seq[0]] = m.VGroup()
             self.manim_followset_lead[p_seq[0]] = None
             self.nonterminals.append(p_seq[0])
             self.lead_to.append(p_seq[1])
@@ -250,7 +226,7 @@ class ContextFreeGrammar:
             if re.match(RE_TERMINAL, t) and t != "#":
                 self.terminals.append(t)
                 self.follow_set[t] = []
-                self.manim_followset_contents[t] = VGroup()
+                self.manim_followset_contents[t] = m.VGroup()
             elif t == "#":
                 self.terminals.append(t)
 

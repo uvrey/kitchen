@@ -32,7 +32,7 @@ In this installation, we will use pip and Chocolatey. Ensure Pip is upgraded by 
   Some packages may require a reboot, so please do this :)
   
 3. Install LaTeX on Windows
-  MikTeX is recommended: https://miktex.org/download
+  MikTeX is recommended: https://miktex.org/m.DOWNload
   It will also assist with installing extra packages when you run the code for the first time.
   
 
