@@ -226,7 +226,7 @@ def _set_cfg_parser_ll1(inp, cfg) -> int:
         code = cfg.set_parser_ll1(p.ParserLL1(inp, cfg))
     return code
 
-def _init_parsing_vis_shortcut(inp) -> int:
+def _init_parsing_vis_shortcut(inp, cfg) -> int:
     """Initialises the visualisation of LL(1) parsing on some input, via the app shortcut '\\v <input>'.
 
     Args:
@@ -239,8 +239,9 @@ def _init_parsing_vis_shortcut(inp) -> int:
     if to_parse == "":
         error.ERR_no_input_given()
     else:
-        #kitchen.generate_parse_ll1(to_parse)
-        pass
+        animation = anim.ManimParseTree()
+        animation.setup_manim(to_parse, cfg)
+        animation.render()       
     return SUCCESS
 
 def _process_command(inp, cfg) -> None:
@@ -306,7 +307,13 @@ def _process_command(inp, cfg) -> None:
         _init_parsing_ll1_via_cmd(inp, cfg)
 
     elif inp[0:2] == "\\v":
-        _init_parsing_vis_shortcut(inp)
+        if not cfg.parsetable_calculated:
+            cfg.setup_parsetable()
+            cfg.calculate_parsetable()
+            
+        if not cfg.first_set_calculated:
+            cfg.reset_first_set()
+        _init_parsing_vis_shortcut(inp, cfg)
     
     else:
         display_helper.fail_secho('Invalid command')
