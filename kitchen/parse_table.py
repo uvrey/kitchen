@@ -342,7 +342,7 @@ class ParsingTable:
         col_label = "\t"
         for t in self.ts:
             col_label += t + "\t"
-        typer.echo(col_label)
+        display_helper.structure_secho(col_label)
 
         # print rows and contents
         for nts in self.nts:
@@ -354,7 +354,7 @@ class ParsingTable:
                                   self.firstset_index[nts][term_index]) + "\t"
                 else:
                     row += "\t"
-            typer.echo(row)
+            display_helper.structure_secho(row)
 
     def init_manim_parsetable(self):
         self.m_parsetable = ManimParsingTable()

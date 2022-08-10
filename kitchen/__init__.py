@@ -23,7 +23,8 @@ RE_PRODUCTION = '[A-Z][A-Z]*|[a-z][a-z]*|$|#|\+|-|/|\*'
     REGEX_WRITE_ERROR,
     INPUT_TOO_LONG,
     ERROR,
-) = range(14)
+    PARSING_ERROR
+) = range(15)
 
 ERRORS = {
     DIR_ERROR: "config directory error",

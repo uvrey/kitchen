@@ -42,6 +42,10 @@ def ERR_key_not_given_in_CFG(p):
     typer.echo(err + " Production for [" + p + "] not found - check your CFG!")
     raise typer.Abort()
 
+def ERR_cfg_loading_error():
+    err = typer.style("Error:", fg=typer.colors.WHITE, bg=typer.colors.RED)
+    typer.echo(err + " Production for [" + p + "] not found - check your CFG!")
+    raise typer.Abort()
 
 def ERR_too_many_productions_ll1(nt, t):
     err = typer.style("Error:", fg=typer.colors.WHITE, bg=typer.colors.RED)

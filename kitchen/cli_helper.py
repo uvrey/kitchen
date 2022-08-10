@@ -14,8 +14,11 @@ from kitchen import (
     FILE_LOADING_DIR_ERROR, 
     SUCCESS, 
     __app_name__,
+    display_helper,
     parse_table,
-    animation
+    animation,
+    error, 
+    parser as p,
 )
 
 CONFIG_DIR_PATH = Path(typer.get_app_dir(__app_name__))
@@ -104,47 +107,7 @@ def _validate_path(paths):
             return FILE_LOADING_EXISTS_ERROR
         return SUCCESS
 
-""" Functions for the Kitchen environment """
-
-def print_welcome():
-    """Helper function to print the welcome screen.
-    """    
-    typer.echo(
-        "\n -----------------------------------------------------------------------\n" +
-        "\t\t\tWelcome to Kitchen\n" +
-        " -----------------------------------------------------------------------\n" +
-        "type \\m for the menu\n\n")
-
-
-def _print_menu():
-    """Helper function to print the application menu.
-    """    
-    typer.echo(
-        " -----------------------------------------------------------------------")
-    typer.echo(
-        " COMMAND\t\tSHORTCUT\tDETAILS\n" +
-        " -----------------------------------------------------------------------\n" +
-        " \\menu \t\t\t\m\t\t Display menu\n" +
-        " \\config \t\t\\c\t\t Configure animation settings\n" +
-        " \\quit \t\t\t\\q\t\t Exit app\n\n"
-
-        " \\load <cfg path> \t\\l <path>\t Load new CFG\n" +
-        " \\show cfg \t\t\\cfg\t\t Displays the current CFG\n\n" +
-
-        " \\dsl \t\t\t\t\t Launches the DSL design tool\n\n" +
-        " \\firstset\t\t\\gfs\t\t Generates first set animation\n" +
-        " \\show first\t\t\\fs\t\t Displays the first set\n" +
-        " \\followset\t\t\\gfw\t\t Generates follow set animation\n" +
-        " \\show follow\t\t\\fw\t\t Displays the follow set\n\n" +
-        " \\show parsetable\t\\pt\t\t Displays the LL(1) parse table\n" +
-        " \\show parsestructures\t\\ptss\t\t Shows the LL(1) parse table structures\n" +
-        " \\ll1 <input> \t\t\t\t [Default] Parse input with LL(1)\n\n" +
-        " \\lalr <input> \t\t\t\t Parse input with LALR\n\n"
-    )
-    typer.echo(
-        " ------------------------------------------------------------------------")
-
-def load_app(path):
+def load_app(path) -> None:
     """Loads the application given a CFG path.
 
     Args:
@@ -164,8 +127,30 @@ def load_app(path):
         typer.secho(f"Initialisation successful! The cfg path is " + path, 
                     fg=typer.colors.GREEN)
 
-def handle_input(inp, cfg):
-    """Handles user input.
+def _show_parsetable(cfg) -> None:
+    """Displays the calculated parse table. 
+
+    Args:
+        cfg (ContextFreeGrammar): CFG for which the parse table is to be calculated.
+    """    
+    # reset cfg structures before we begin if needed
+    if not cfg.follow_set_calculated:
+        cfg.reset_follow_set()
+
+    if not cfg.first_set_calculated:
+        cfg.reset_first_set()
+
+    # initialise parse table
+    cfg.parsetable = parse_table.ParsingTable(cfg.terminals, cfg.nonterminals, cfg.cfg_dict)
+    
+    # set pt internals
+    cfg.parsetable.set_internals(
+            cfg.first_set, cfg.follow_set, cfg.firstset_index)
+    # print the parse table
+    cfg.parsetable.print_parse_table()
+
+def handle_input(inp, cfg) -> None:
+    """Handles user input by performing commands or otherwise parsing using the default method, LL(1)
 
     Args:
       inp (String): User input. 
@@ -174,7 +159,32 @@ def handle_input(inp, cfg):
     if inp.strip()[0] == "\\":
         _process_command(inp, cfg)
     else:
+        _init_parsing_ll1(inp.strip())
+
+def _init_parsing_ll1_cmd(inp) -> int:
+    config = inp.strip()[4:7].strip()
+    if config == "\\v":
+        to_parse = inp.strip()[7:].strip()
+        if to_parse == "":
+            error.ERR_no_input_given()
+        else:
+           # kitchen.generate_parse_ll1(to_parse)
+           pass
+    else:
+        _init_parsing_ll1(inp[4:].strip())
+    return SUCCESS
+
+def _init_parsing_ll1(inp, cfg):
+    cfg.parser_ll1 = ParserLL1()
+
+def _init_parsing_vis_shortcut(inp, cfg):
+    to_parse = inp.strip()[2:].strip()
+    if to_parse == "":
+        error.ERR_no_input_given()
+    else:
+        #kitchen.generate_parse_ll1(to_parse)
         pass
+    return SUCCESS
 
 def _process_command(inp, cfg):
     """Helper function to process a command from the user.
@@ -188,42 +198,34 @@ def _process_command(inp, cfg):
     """    
 
     if inp == "\\m":
-        _print_menu()
+        display_helper.print_menu()
     elif inp == "\\q":
         raise typer.Exit()
     elif inp == "\\dsl":
         # TODO start DSL tool
         pass
 
-    elif inp == "\\show firstset" or inp == "\\fs":
+    elif inp == "\\show first" or inp == "\\fs":
         cfg.show_first_set()
-
-    elif inp == "\\followset" or inp == "\gfw":
+    
+    elif inp == "\\vis first" or inp == "\\vfs":
         pass
       
     elif inp == "\\show follow" or inp == "\\fw":
         cfg.show_follow_set()
 
-    elif inp == "\\show parse table" or inp == "\pt":
-        # reset cfg structures before we begin
-        cfg.reset_follow_set()
-        cfg.reset_first_set()
+    elif inp == "\\vis follow" or inp == "\\vfw":
+        pass
 
-        # initialise parse table
-        pt = parse_table.ParsingTable(cfg.terminals, cfg.nonterminals, cfg.cfg_dict)
-        
-        # set pt internals
-        pt.set_internals(
-                cfg.first_set, cfg.follow_set, cfg.get_fs_index())
-        # print the parse table
-        pt.print_parse_table()
+    elif inp == "\\show parsetable" or inp == "\pt":
+        _show_parsetable(cfg)
 
-
-    elif inp == "\\parsetable" or inp == "\\vpt":
-        a = animation.Animation()
-        a.setup_manim("", [], [], None, None,
-                      False, False, True, False)
-        a.render()
+    elif inp == "\\vis parsetable" or inp == "\\vpt":
+        # a = animation.Animation()
+        # a.setup_manim("", [], [], None, None,
+        #               False, False, True, False)
+        # a.render()
+        pass
         
     elif inp == "\\show parse structures" or inp == "\ptss":
         pass
@@ -239,26 +241,13 @@ def _process_command(inp, cfg):
         typer.echo("Configuring animation settings")
 
     elif inp[0:4] == "\\ll1":
-        # config = inp.strip()[4:7].strip()
-        # if config == "\\v":
-        #     to_parse = inp.strip()[7:].strip()
-        #     if to_parse == "":
-        #         ERR_no_input_given()
-        #     else:
-        #         kitchen.generate_parse_ll1(to_parse)
-        # else:
-        #     kitchen.parse_ll1(inp[4:].strip())
-        pass
+        _init_parsing_ll1_cmd(inp, cfg)
 
     elif inp[0:2] == "\\v":
-        # to_parse = inp.strip()[2:].strip()
-        # if to_parse == "":
-        #     ERR_no_input_given()
-        # else:
-        #     kitchen.generate_parse_ll1(to_parse)
-        pass
+        _init_parsing_vis_shortcut(inp, cfg)
     
     else:
-        typer.secho(f'Invalid command', fg=typer.colors.RED)
+        display_helper.fail_secho('Invalid command')
+
 
 
