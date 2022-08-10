@@ -1146,9 +1146,6 @@ class ManimParseTree(m.Scene):
                         else:
                             parent_vertex_id = parent.parent.id + "_"+ parent.id
 
-                        typer.echo("adding node " + vertex_id +
-                                   " with parent " + parent_vertex_id + "\ncurrently, nodes and edges are:")
-
                         # check if we already have a vertex
                         try:
                             # get existing vertex
@@ -1188,7 +1185,6 @@ class ManimParseTree(m.Scene):
                                     m.FadeToColor(
                             m_tok[next],m.BLUE)),
                     )
-                    return
 
                 else:
                     error.ERR_parsing_error(
@@ -1293,8 +1289,6 @@ class ManimParseTree(m.Scene):
                             self.s.push(p, new_prod)
                             self.parents.append(new_node)
 
-                    typer.echo("m has become:")
-                    typer.echo(m)
                     self.play(
                         m.FadeOut(cfg_line)
                     )
@@ -1316,15 +1310,14 @@ class ManimParseTree(m.Scene):
         # fade out the stack and transform the parse tree
         reset_g(self, g, start_symbol, anim=[m.FadeOut(self.s.mstack)])
 
-        # self.s.write_under_stack("Stack emptied.")
-        self.fullscreen_notify("Successfully parsed '" + " ".join(original_tokens) +
+        self.s.write_under_stack("Stack emptied.")
+        fullscreen_notify(self, "Successfully parsed '" + " ".join(original_tokens) +
                                 "'!")
-        # display the parse tree
-        success = typer.style("Successfully parsed '" + " ".join(original_tokens) +
-                              "'!", fg=typer.colors.WHITE, bg=typer.colors.GREEN)
-        typer.echo(success + "\nParse tree:")
-        self.print_pt(self.root)
 
+        display_helper.success_secho("Successfully parsed '" + " ".join(original_tokens) +
+                              "'!\nParse tree:")
+        display_helper.print_parsetree(self.root)
+        return SUCCESS
 
 
     # # def _set_up_stack_and_table(self, start_symbol):
@@ -1336,7 +1329,6 @@ class ManimParseTree(m.Scene):
     # #     self.s.stack.append(start_symbol)
     # #     self.root = anytree.Node(start_symbol, id=start_symbol,
     # #                      manim=m.MathTex(start_symbol))
-
 
     # def vis_parse_ll1(self, input, ts):
     #     # prelimenary set up
