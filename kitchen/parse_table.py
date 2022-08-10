@@ -2,6 +2,7 @@ import typer
 from manim import *
 import re
 from kitchen import (
+    RE_TERMINAL,
     display_helper,
     error
 )
@@ -20,11 +21,11 @@ class ParsingTable:
         self.ts = sorted(terminals)
         self.nts = sorted(nonterminals)
         self.cfg_dict = cfgd
-        self.parsetable = {}
+        self.pt_dict = {}
         self.init_parsetable()
+        self.calculated = False
 
         """ initialises the parsing table """
-
     def show_structures(self) -> None:
         """Displays the structures involved in forming the parse table. 
         """        
@@ -55,8 +56,8 @@ class ParsingTable:
         """        
         for n in self.nts:
             for t in self.ts:
-                self.parsetable[n] = {}
-                self.parsetable[n][t] = None
+                self.pt_dict[n] = {}
+                self.pt_dict[n][t] = None
 
     def row(self, nt):
         """Obtain the row index of a given non-terminal.
@@ -106,8 +107,8 @@ class ParsingTable:
             scene (_type_): _description_
         """
         # make sure parse table is fully reset
-        self.parsetable = {}
-        self.init_parsetable()
+        self.pt_dict = {}
+        self.init_pt_dict()
 
         # set up the title
         ll1_title = Tex(r"LL(1) Parsing: Setting up the Parse Table")
@@ -180,14 +181,14 @@ class ParsingTable:
     def vis_add_to_parsetable(self, scene, nt, t, prod, mprod):
         typer.echo("trying to add " + mprod + "= " + prod)
         try:
-            if self.parsetable[nt][t] != None:
+            if self.pt_dict[nt][t] != None:
                 error.ERR_too_many_productions_ll1(nt, t)
             else:
-                self.parsetable[nt][t] = prod
+                self.pt_dict[nt][t] = prod
                 self.swap(scene, self.row(nt), self.col(t), mprod)
 
         except KeyError:
-            self.parsetable[nt][t] = prod
+            self.pt_dict[nt][t] = prod
             self.swap(scene, self.row(nt), self.col(t), mprod)
 
     # swap a current entry
@@ -240,13 +241,13 @@ class ParsingTable:
             production (String): Production at ParseTable[nt, t]
         """
         try:
-            if self.parsetable[nt][t] != None:
+            if self.pt_dict[nt][t] != None:
                 error.ERR_too_many_productions_ll1(nt, t)
             else:
-                self.parsetable[nt][t] = production
+                self.pt_dict[nt][t] = production
 
         except KeyError:
-            self.parsetable[nt][t] = production
+            self.pt_dict[nt][t] = production
 
    
     # TODO clean?
@@ -279,10 +280,10 @@ class ParsingTable:
             row = []
             for t in self.ts:
                 try:
-                    item = self.parsetable[n][t]
+                    item = self.pt_dict[n][t]
                     typer.echo(item)
                     if item != None:
-                        if re.match(terminal_regex, item):
+                        if re.match(RE_TERMINAL, item):
                             row.append(item)
                         else:
                             tmp = item.replace(

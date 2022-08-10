@@ -1,53 +1,57 @@
 """ General parser generator for Kitchen """
 # kitchen/parser.py
 
-
 import typer
 import anytree
 import re
 
 from kitchen import (
-    RE_NONTERMINAL, RE_PRODUCTION, RE_TERMINAL, display_helper, error, SUCCESS, PARSING_ERROR)
+    RE_NONTERMINAL, ERROR, RE_PRODUCTION, RE_TERMINAL, display_helper, error, SUCCESS, PARSING_ERROR)
 
-def init_parse_ll1(self, inp):
+def init_input(self, inp) -> int:
+    """Helper function to (re-)initialise the input of a Parser.
+
+    Args:
+        inp (_type_): _description_
+
+    Returns:
+        _type_: _description_
+    """    
     if len(inp) < 1:
         error.ERR_no_input_given()
+        return ERROR
     else:
-        _parse_ll1(inp, list(filter(None, inp.split(" "))))
+        self.inp = inp
+        self.tokens = _get_tokens_from_input(inp)
+    return SUCCESS
 
-def _parse_ll1(input, tokens):
-    pass
+def _get_tokens_from_input(inp) -> list:
+    """Obtains the token stream of an input string. 
 
+    Args:
+        inp (str): Input string
 
-
-class Parser:
-    def __init__(self):
-        pass
-
+    Returns:
+        list: Token stream
+    """    
+    return list(filter(None, inp.split(" ")))
 
 class ParserLL1:
-    def __init__(self):
-        pass
+    def __init__(self, inp, cfg):
+        init_input(self, inp)
+        self.cfg = cfg
+        self.pt_dict = cfg.parsetable.pt_dict
 
-    def show_parse_table(self):
-        self.parsetable.print_parse_table()
-
-    def show_parse_structures(self):
-        self.parsetable.show_structures()
-
-            # helper function to print the parse tree
-
-    def print_pt(self, root):
+    def print_parsetree(self, root):
         """Helper function to print the parse tree
 
         Args:
             root (_type_): _description_
         """        
-        for pre, fill, node in RenderTree(root):
-            typer.echo("%s%s" % (pre, node.name))
+        for pre, fill, node in anytree.RenderTree(root):
+            display_helper.structure_secho("%s%s" % (pre, node.name))
 
-
-    def parse_ll1(self, input, tokens) -> int:
+    def parse_ll1(self, start_symbol, inp="") -> int:
         """LL(1) Parser, which generates a parse tree and stores this to self.root
 
         Args:
@@ -57,14 +61,20 @@ class ParserLL1:
         Returns:
             int: Status code
         """      
+        # if new input is supplied to an existing LL(1) parser object
+        if inp == "":
+            inp = self.inp
+        else:
+            init_input(self, inp)
 
-        original_tokens = tokens[:]
+        # set up structures
+        tokens = self.tokens[:]
+        original_tokens = self.tokens[:]
         self.stack = []
 
         # add start symbol to the stack
-        start_symbol = list(self.cfg_dict.keys())[0]
         self.stack.append(start_symbol)
-        self.root = Node(start_symbol, id=start_symbol)
+        self.root = anytree.Node(start_symbol, id=start_symbol)
         self.parents = []
 
         while self.stack != []:
@@ -73,7 +83,7 @@ class ParserLL1:
                 if re.match(RE_TERMINAL, self.stack[-1]):
                     error.ERR_parsing_error("Expected " + self.stack[-1])
                 else:
-                    error.ERR_parsing_error()
+                    error.ERR_parsing_error("1")
                 return PARSING_ERROR
 
             top = self.stack[-1]
@@ -87,7 +97,6 @@ class ParserLL1:
                     # pops appropriately
                     if self.parents != []:
                         popped = self.parents.pop()
-                        typer.echo(self.parents)
 
                         # always pop again if an epsilon was encountered
                         if self.parents != []:
@@ -98,11 +107,11 @@ class ParserLL1:
                                 p = self.parents[-i]
                                 if re.match(RE_NONTERMINAL, p.id):
                                     # if we have encountered the first set which the production can fall under
-                                    if popped.id in self.firstset[p.id]:
+                                    if popped.id in self.cfg.first_set[p.id]:
                                         # remove children if they were previously added
                                         if p.height != 0:
                                             p.children = []
-                                        new_node = Node(
+                                        new_node = anytree.Node(
                                             popped.id, parent=p, id=popped.id)
                                      
                                         # check for epsilons
@@ -112,7 +121,7 @@ class ParserLL1:
                                             # AND that it hasn't been explored yet
                                             if re.match(RE_NONTERMINAL, r.id) and r.id != p.id and r.height == 0:
                                                 if "#" in self.firstset[r.id]:
-                                                    new_node = Node(
+                                                    new_node = anytree.Node(
                                                         "#", parent=r, id="eps")
 
                                         # pop as many productions off as necessary
@@ -131,7 +140,7 @@ class ParserLL1:
 
             elif re.match(RE_NONTERMINAL, top):
                 try:
-                    pt_entry = self.parsetable[top][next]
+                    pt_entry = self.pt_dict[top][next]
                     prods = pt_entry.split("->")
                     p = self.stack.pop()
 
@@ -142,15 +151,15 @@ class ParserLL1:
                     for p in reversed(ps):
                         # add to the tree
                         if top == start_symbol:
-                            new_node = Node(p, parent=self.root, id=p)
+                            new_node = anytree.Node(p, parent=self.root, id=p)
                         else:
                             # add connecting node if it is a non-terminal
                             if re.match(RE_NONTERMINAL, p):
-                                new_node = Node(
+                                new_node = anytree.Node(
                                     p, id=p, parent=self.parents[-1])
                             else:
                                 if p != "#":
-                                    new_node = Node(
+                                    new_node = anytree.Node(
                                         p, id=p)
 
                         # we don't need to match epsilon, and we also only want non-terminals as parent nodes
@@ -160,12 +169,12 @@ class ParserLL1:
 
                 except KeyError:
                     error.ERR_parsing_error(
-                        "ParseTable[" + next + ", " + top + "] is empty.")
+                        "ParseTable[" + top + ", " + next + "] is empty.")
                     return PARSING_ERROR
 
         # in case parsing finishes but there are still tokens left in the stack
         if len(tokens) > 0:
-            error.ERR_parsing_error()
+            error.ERR_parsing_error("a")
             return PARSING_ERROR
 
         # display the parse tree
@@ -173,7 +182,3 @@ class ParserLL1:
         display_helper.success_secho("Successfully parsed token stream'" + " ".join(original_tokens) +
                               "'!")
         return SUCCESS
-
-
-
-    

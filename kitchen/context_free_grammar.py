@@ -20,8 +20,8 @@ from kitchen import (
     display_helper,
     error,
     cli, 
-    animation
-)
+    animation,
+    parse_table as pt)
 
 DEFAULT_CFG_PATH = Path.home().joinpath(
     "." + Path.home().stem + "cfg.txt"
@@ -211,6 +211,10 @@ class ContextFreeGrammar:
         # structures for parsetable
         self.parsetable = {}
         self.parsetable_calculated = False
+
+        # structures for the LL(1) parser
+        self.parser_ll1 = None
+        self.is_parser_ll1_set_up = False
         
         # assigns initial values to these structures
         self._assign_structures()
@@ -489,20 +493,25 @@ class ContextFreeGrammar:
                     self.clean_follow_set(c, pstack)
         else:
             pstack.pop()
-
-    def set_parsetable(self, pt):
-        """Sets the CFG's internal parsing table. 
-
-        Args:
-            pt (ParsingTable): Parsing table data structure. 
-        """        
-        self.parsetable = pt
-        self.parsetable_calculated = True
     
-    def set_parser_ll1(self, parser):
+    def set_parser_ll1(self, parser) -> int:
         """Sets the internal parser. 
 
         Args:
             parser (ParserLL1): ParserLL1 Object
         """        
-        self.parser = parser
+        # set pt internals
+        self.parser_ll1 = parser
+        self.is_parser_ll1_set_up = True
+        return SUCCESS
+
+    def setup_parsetable(self) -> int:
+        self.parsetable = pt.ParsingTable(self.terminals, self.nonterminals, self.cfg_dict)
+        self.parsetable.set_internals(
+                self.first_set, self.follow_set, self.firstset_index)
+        return SUCCESS
+
+    def calculate_parsetable(self) -> int:
+        self.parsetable.populate_table()
+        self.parsetable_calculated = True
+        return SUCCESS

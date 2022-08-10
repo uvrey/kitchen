@@ -15,7 +15,7 @@ from kitchen import (
     SUCCESS, 
     __app_name__,
     display_helper,
-    parse_table,
+    parse_table as pt,
     animation,
     error, 
     parser as p,
@@ -127,26 +127,29 @@ def load_app(path) -> None:
         typer.secho(f"Initialisation successful! The cfg path is " + path, 
                     fg=typer.colors.GREEN)
 
+def _set_parsetable(cfg) -> int:
+    if not cfg.parsetable_calculated:
+    # reset cfg structures before we begin if needed
+        if not cfg.follow_set_calculated:
+            cfg.reset_follow_set()
+
+        if not cfg.first_set_calculated:
+            cfg.reset_first_set()
+
+        # initialise parsetable
+        cfg.setup_parsetable()
+
+        # calculate parsetable
+        code = cfg.calculate_parsetable()
+        cfg.parsetable.print_parse_table()
+    
 def _show_parsetable(cfg) -> None:
     """Displays the calculated parse table. 
 
     Args:
         cfg (ContextFreeGrammar): CFG for which the parse table is to be calculated.
     """    
-    # reset cfg structures before we begin if needed
-    if not cfg.follow_set_calculated:
-        cfg.reset_follow_set()
-
-    if not cfg.first_set_calculated:
-        cfg.reset_first_set()
-
-    # initialise parse table
-    cfg.parsetable = parse_table.ParsingTable(cfg.terminals, cfg.nonterminals, cfg.cfg_dict)
-    
-    # set pt internals
-    cfg.parsetable.set_internals(
-            cfg.first_set, cfg.follow_set, cfg.firstset_index)
-    # print the parse table
+    _set_parsetable(cfg)
     cfg.parsetable.print_parse_table()
 
 def handle_input(inp, cfg) -> None:
@@ -159,9 +162,9 @@ def handle_input(inp, cfg) -> None:
     if inp.strip()[0] == "\\":
         _process_command(inp, cfg)
     else:
-        _init_parsing_ll1(inp.strip())
+        _init_parsing_ll1(inp.strip(), cfg)
 
-def _init_parsing_ll1_cmd(inp) -> int:
+def _init_parsing_ll1_via_cmd(inp, cfg) -> int:
     config = inp.strip()[4:7].strip()
     if config == "\\v":
         to_parse = inp.strip()[7:].strip()
@@ -171,11 +174,36 @@ def _init_parsing_ll1_cmd(inp) -> int:
            # kitchen.generate_parse_ll1(to_parse)
            pass
     else:
-        _init_parsing_ll1(inp[4:].strip())
+        _init_parsing_ll1(inp[4:].strip(), cfg)
     return SUCCESS
 
 def _init_parsing_ll1(inp, cfg):
-    cfg.parser_ll1 = ParserLL1()
+    """Initialise parsing using LL(1) by associating the CFG with its own LL(1) Parser object.
+
+    Args:
+        inp (_type_): _description_
+        cfg (_type_): _description_
+    """    
+    # calculate the parse table if it has not yet been done so
+    if not cfg.parsetable_calculated:
+        _set_parsetable(cfg)
+
+    # set up the cfg parser 
+    code = _set_cfg_parser_ll1(inp, cfg)
+
+    # parse the input
+    if code == SUCCESS:
+        if inp == cfg.parser_ll1.inp:
+            inp = ""
+        cfg.parser_ll1.parse_ll1(cfg.start_symbol, inp)
+            
+
+def _set_cfg_parser_ll1(inp, cfg) -> int:
+    code = SUCCESS
+    # initialise a new parser if it is not set up already
+    if not cfg.is_parser_ll1_set_up:
+        code = cfg.set_parser_ll1(p.ParserLL1(inp, cfg))
+    return code
 
 def _init_parsing_vis_shortcut(inp, cfg):
     to_parse = inp.strip()[2:].strip()
@@ -241,7 +269,7 @@ def _process_command(inp, cfg):
         typer.echo("Configuring animation settings")
 
     elif inp[0:4] == "\\ll1":
-        _init_parsing_ll1_cmd(inp, cfg)
+        _init_parsing_ll1_via_cmd(inp, cfg)
 
     elif inp[0:2] == "\\v":
         _init_parsing_vis_shortcut(inp, cfg)
