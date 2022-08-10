@@ -1,5 +1,6 @@
 """ Top-level package for Kitchen """
 # kitchen/__init__.py
+import manim as m
 
 __app_name__= "kitchen"
 __version__ = "0.1.0"
@@ -7,6 +8,11 @@ __version__ = "0.1.0"
 RE_TERMINAL = '[a-z][a-z]*|$|#|\+|-|/|\*|\(|\)'
 RE_NONTERMINAL = '[A-Z][A-Z]*'
 RE_PRODUCTION = '[A-Z][A-Z]*|[a-z][a-z]*|$|#|\+|-|/|\*'
+
+
+TEXT_SCALE = 0.7
+COLOURS = [m.BLUE_B, m.TEAL_B, m.GREEN_B, m.YELLOW_B, m.GOLD_B,
+                     m.RED_B, m.MAROON_B, m.PURPLE_A, m.LIGHT_PINK, m.LIGHT_BROWN]
 
 (
     SUCCESS,

@@ -265,9 +265,9 @@ def _process_command(inp, cfg) -> None:
         cfg.show_first_set()
     
     elif inp == "\\vis first" or inp == "\\vfs":
-      #  animation = anim.ManimFirstSet()
-      #  animation.render()
-      pass
+        animation = anim.ManimFirstSet()
+        animation.setup_manim(cfg)
+        animation.render()
       
     elif inp == "\\show follow" or inp == "\\fw":
         cfg.show_follow_set()
@@ -302,7 +302,7 @@ def _process_command(inp, cfg) -> None:
         _init_parsing_ll1_via_cmd(inp, cfg)
 
     elif inp[0:2] == "\\v":
-        _init_parsing_vis_shortcut(inp, cfg)
+        _init_parsing_vis_shortcut(inp)
     
     else:
         display_helper.fail_secho('Invalid command')

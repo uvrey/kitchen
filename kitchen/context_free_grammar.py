@@ -123,19 +123,7 @@ def populate_manim_cfg(cfg_dict, lead_to) -> Dict:
         error.ERR_left_recursion_detected()
         return CFG_FILE_ERROR
 
-def get_next_production(first_set) -> int:
-    """Helper function to get the index of the first-encountered production with an empty first set.
 
-    Args:
-        first_set (Dictionary): The first set of a given CFG.
-
-    String: The production which requires a first set to be calculated. 
-        Integer: 
-    """    
-    for item in first_set.items():
-        if item[1] == []:
-            return item[0]
-    return -1
 
 class ContextFreeGrammar:
 
@@ -202,6 +190,8 @@ class ContextFreeGrammar:
             prods (List): List of productions.
         """
         # initialise base structures
+        self.start_symbol = self.prods[0][0]
+
         for p_seq in self.prods:
             self.cfg_dict[p_seq[0]] = p_seq[1]
 
@@ -212,6 +202,7 @@ class ContextFreeGrammar:
             self.follow_set[p_seq[0]] = []
             self.manim_followset_contents[p_seq[0]] = m.VGroup()
             self.manim_followset_lead[p_seq[0]] = None
+
             self.nonterminals.append(p_seq[0])
             self.lead_to.append(p_seq[1])
 
@@ -232,7 +223,21 @@ class ContextFreeGrammar:
 
         # set start symbol
         self.start_symbol = list(self.cfg_dict.keys())[0]
-    
+
+    def get_next_production(self, first_set) -> int:
+        """Helper function to get the index of the first-encountered production with an empty first set.
+
+        Args:
+            first_set (Dictionary): The first set of a given CFG.
+
+        String: The production which requires a first set to be calculated. 
+            Integer: 
+        """    
+        for item in first_set.items():
+            if item[1] == []:
+                return item[0]
+        return -1
+
     def show_contents(self) -> None:
         """Helper function to display the CFG contents.
         """        
@@ -326,7 +331,7 @@ class ContextFreeGrammar:
             # so let's find those that are still empty
             if len(pstack) == 1:
                 pstack = []
-                empty_set_nt = get_next_production(self.first_set)
+                empty_set_nt = self.get_next_production(self.first_set)
                 if empty_set_nt != -1:
                     self._calculate_first_set(empty_set_nt, [])
             else:

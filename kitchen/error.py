@@ -73,4 +73,4 @@ def ERR_no_input_given():
 
 def ERR_manim_parsing_error(scene, message=""):
     err_msg = "~ Parsing Error ~" + message
-    scene.fullscreen_notify(err_msg)
+    fullscreen_notify(err_msg)
