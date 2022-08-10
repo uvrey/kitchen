@@ -698,12 +698,18 @@ class ManimParseTable(m.Scene):
            m.Write((self.mtable).get_labels()),
             run_time=1
         )
+        # TODO play the sound effect
+        # typer.echo("SOUND EFFECT")
+        # self.add_sound(s.add_to_set_sound())
 
         self.play(
             m.Create((self.mtable).get_horizontal_lines()[2]),
             m.Create((self.mtable).get_vertical_lines()[2]),
-            run_time=1
+            run_time=2
         )
+        # # TODO play the sound effect
+        # typer.echo("SOUND EFFECT")
+        # self.add_sound(s.add_to_set_sound())
 
         # populate the whole table with the first and follow set, if appropriate
         for i, key in enumerate(self.cfg.first_set.keys(), start=0):
@@ -763,10 +769,6 @@ class ManimParseTable(m.Scene):
         t_new = m.MathTex(new_val).scale(0.7)
         t_new.move_to(t_old)
         t_new.fade_to(m.WHITE, alpha=0.2)
-
-        # TODO play the sound effect
-        typer.echo("SOUND EFFECT")
-        self.add_sound(s.add_to_set_sound())
 
         # fade out old value and into new value
         self.play(
