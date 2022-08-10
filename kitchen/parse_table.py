@@ -142,27 +142,6 @@ class ParsingTable:
         cols = sorted(self.ts)
         self.m_parsetable.init_table([], [], rows, cols)
 
-
-   
-    # TODO clean?
-    def init_m_table(self, row_vals, row_labels, col_labels):
-        row_labels = row_labels
-        col_labels = col_labels
-
-        table = MathTable(
-            row_vals,
-            row_labels=[MathTex(rl) for rl in row_labels],
-            col_labels=[MathTex(cl) for cl in col_labels],
-            include_outer_lines=True)
-
-        # Table
-        lab = table.get_labels()
-        lab.set_color(LIGHT_GRAY)
-        table.get_horizontal_lines()[2].set_stroke(width=8, color=LIGHT_GRAY)
-        table.get_vertical_lines()[2].set_stroke(width=8, color=LIGHT_GRAY)
-        return table
-
-
     def get_row_contents(self):
         """Gets the rows as a list of lists. 
 

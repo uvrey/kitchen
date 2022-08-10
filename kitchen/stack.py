@@ -86,7 +86,7 @@ class Stack:
 
         # set up message
         if msg != None:
-            m_msg = MathTex(msg).next_to(self.mstack, m.DOWN)
+            m_msg = m.MathTex(msg).next_to(self.mstack, m.DOWN)
 
         # add to backend stack
         self.stack.append(a)
@@ -94,7 +94,7 @@ class Stack:
         # create base of the stack
         if self.texts == []:
             t = m.MathTex(a).move_to(self.mstack.get_center()
-                                   ).shift((3*self.mstack_height/2)/4 * DOWN)
+                                   ).shift((3*self.mstack_height/2)/4 * m.DOWN)
             self.texts.append(t)
 
         else:

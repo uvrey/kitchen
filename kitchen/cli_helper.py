@@ -307,12 +307,19 @@ def _process_command(inp, cfg) -> None:
         _init_parsing_ll1_via_cmd(inp, cfg)
 
     elif inp[0:2] == "\\v":
+        if not cfg.first_set_calculated:
+            typer.echo("1")
+            cfg.reset_first_set()
+
+        if not cfg.follow_set_calculated:
+            typer.echo("2")
+            cfg.reset_follow_set()
+
         if not cfg.parsetable_calculated:
+            typer.echo("3")
             cfg.setup_parsetable()
             cfg.calculate_parsetable()
-            
-        if not cfg.first_set_calculated:
-            cfg.reset_first_set()
+
         _init_parsing_vis_shortcut(inp, cfg)
     
     else:

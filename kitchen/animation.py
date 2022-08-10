@@ -23,7 +23,6 @@ VCONFIG = {"radius": 0.25, "color": m.BLUE, "fill_opacity": 1}
 VCONFIG_TEMP = {"radius": 0.25, "color": m.GRAY}
 LCONFIG = {"vertex_spacing": (0.5, 1)}
 ECONFIG = {"color": m.WHITE}
-V_LABELS = {}
 ECONFIG_TEMP = {"color": m.GRAY, "fill_opacity": 0.7}
 
 # set global configs
@@ -876,7 +875,6 @@ class ManimParseTree(m.Scene):
     def construct(self):
         self.vis_parse_ll1(self.inp, self.tokens)
         
-    # TODO sharing
     def init_m_table(self, row_vals, row_labels, col_labels):
         row_labels = row_labels
         col_labels = col_labels
@@ -933,30 +931,31 @@ class ManimParseTree(m.Scene):
             row_vals.append(row)
         return row_vals
 
-
-    def vis_parse_ll1(self, input, tokens):
-        global V_LABELS
-        global VCONFIG
-        global m
-        # BUG
-        # set up the stack and the parsing table
-        pos = m.DOWN
-        self.s = stack.Stack(self, pos, 5)
+    def _set_up_stack_and_table(self, start_symbol):
+        # init mtable structure
         self.init_m_ll1_parsetable()
-        V_LABELS = {}
 
-        if self.cfg.parsetable.pt_dict == None:
-            typer.echo("no pt from cfg")
-            raise typer.Abort()
-
-        # add start symbol to the stack
-        start_symbol = self.cfg.start_symbol
+        # create then add start symbol to the stack
+        self.s = stack.Stack(self, m.RIGHT+m.DOWN, 5)
         self.s.stack.append(start_symbol)
         self.root = anytree.Node(start_symbol, id=start_symbol,
-                         m=m.MathTex(start_symbol))
+                         manim=m.MathTex(start_symbol))
+
+
+    def vis_parse_ll1(self, input, ts):
+        # prelimenary set up
+        V_LABELS = {}
+        start_symbol = self.cfg.start_symbol
+        self._set_up_stack_and_table(start_symbol)
 
         # copy the tokens
-        original_tokens = tokens[:]
+        original_tokens = ts[:]
+        tokens = ts[:]
+
+        self.cfg.parsetable.print_parse_table()
+        typer.echo("parsing" + input)
+        typer.echo("tokens:")
+        typer.echo(tokens)
 
         # initialise a way to track the parent nodes
         self.parents = []
@@ -995,8 +994,30 @@ class ManimParseTree(m.Scene):
 
         g.to_edge(m.UP).shift(m.DOWN)
         self.add(g)
-        self.root.m.move_to(g[start_symbol].get_center())
+        self.root.manim.move_to(g[start_symbol].get_center())
 
+        self.tokens_do_parsing_loop(g, tokens, start_symbol)
+
+        # in case parsing finishes but there are still tokens left in the stack
+        if len(tokens) > 0:
+            error.ERR_parsing_error()
+            error.ERR_manim_parsing_error(self)
+            return
+
+        # fade out the stack and transform the parse tree
+        reset_g(self, g, start_symbol, anim=[m.FadeOut(self.s.mstack)])
+
+        # self.s.write_under_stack("Stack emptied.")
+        fullscreen_notify(self, "Successfully parsed '" + " ".join(original_tokens) +
+                                "'!")
+        # display the parse tree
+        success = typer.style("Successfully parsed '" + " ".join(original_tokens) +
+                              "'!", fg=typer.colors.WHITE, bg=typer.colors.GREEN)
+        typer.echo(success + "\nParse tree:")
+        display_helper.print_parsetree(self.root)
+
+
+    def _do_parsing_loop(self, g, tokens, start_symbol, V_LABELS):
         # begin parsing
         while self.s.stack != []:
             # in case we run out of input before the stack is empty
@@ -1018,58 +1039,58 @@ class ManimParseTree(m.Scene):
                     anims = []
                     tokens.remove(next)
 
-                    # highlight parents
-                    if self.parents == []:
-                        parent = None
+                    # # highlight parents
+                    # if self.parents == []:
+                    #     parent = None
 
-                    # pops appropriately
-                    if self.parents != []:
-                        popped = self.parents.pop()
-                        parent = self.parents[-1]
+                    # # pops appropriately
+                    # if self.parents != []:
+                    #     popped = self.parents.pop()
+                    #     parent = self.parents[-1]
 
-                        # always pop again if an epsilon was encountered
-                        if self.parents != []:
-                            done = False
+                    #     # always pop again if an epsilon was encountered
+                    #     if self.parents != []:
+                    #         done = False
 
-                            i = 1
-                            while not done:
-                                p = self.parents[-i]
-                                if re.match(RE_NONTERMINAL, p.id):
+                    #         i = 1
+                    #         while not done:
+                    #             p = self.parents[-i]
+                    #             if re.match(RE_NONTERMINAL, p.id):
 
-                                    # if we have encountered the first set which the production can fall under
-                                    if popped.id in self.firstset[p.id]:
-                                        parent = p
-                                        # remove children if they were previously added
-                                        if p.height != 0:
-                                            p.children = []
-                                        anytree.Node(
-                                            popped.id, parent=p, id=popped.id, m=m.Text(popped.id, weight=BOLD))
+                    #                 # if we have encountered the first set which the production can fall under
+                    #                 if popped.id in self.firstset[p.id]:
+                    #                     parent = p
+                    #                     # remove children if they were previously added
+                    #                     if p.height != 0:
+                    #                         p.children = []
+                    #                     anytree.Node(
+                    #                         popped.id, parent=p, id=popped.id, manim=m.Text(popped.id, weight=m.BOLD))
 
-                                        # check for epsilons
-                                        rhs = self.parents[-i + 1:]
-                                        for r in rhs:
-                                            if re.match(RE_NONTERMINAL, r.id) and r.id != p.id and r.height == 0:
-                                                if "#" in self.firstset[r.id]:
-                                                    new_node = anytree.Node(
-                                                        "#", parent=r, id="eps", m=m.MathTex("\epsilon"))
-                                                    vertex_id = r.id + "_" + new_node.id
-                                                    parent_id = r.id
-                                                    if r.id != start_symbol:
-                                                        parent_id = r.parent.id + "_" + r.id
-                                                    v = create_vertex(
-                                                        g, vertex_id, parent_id, "\epsilon")
-                                                    reset_g(
-                                                        self, g, start_symbol)
+                    #                     # check for epsilons
+                    #                     rhs = self.parents[-i + 1:]
+                    #                     for r in rhs:
+                    #                         if re.match(RE_NONTERMINAL, r.id) and r.id != p.id and r.height == 0:
+                    #                             if "#" in self.firstset[r.id]:
+                    #                                 new_node = anytree.Node(
+                    #                                     "#", parent=r, id="eps", manim=m.MathTex("\epsilon"))
+                    #                                 vertex_id = r.id + "_" + new_node.id
+                    #                                 parent_id = r.id
+                    #                                 if r.id != start_symbol:
+                    #                                     parent_id = r.parent.id + "_" + r.id
+                    #                                 v = create_vertex(
+                    #                                     g, vertex_id, parent_id, "\epsilon")
+                    #                                 reset_g(
+                    #                                     self, g, start_symbol)
 
-                                        # pop as many productions off as necessary
-                                        for j in range(i - 1):
-                                            self.parents.pop()
-                                        done = True
-                                    else:
-                                        i = i + 1
-                                else:
-                                    parent = self.root
-                                    break
+                    #                     # pop as many productions off as necessary
+                    #                     for j in range(i - 1):
+                    #                         self.parents.pop()
+                    #                     done = True
+                    #                 else:
+                    #                     i = i + 1
+                    #             else:
+                    #                 parent = self.root
+                    #                 break
 
                     # Add new connection if it exists :)
                     typer.echo(parent)
@@ -1111,7 +1132,7 @@ class ManimParseTree(m.Scene):
                             # create and add new vertex
                             new_vertex = create_vertex(
                                 g, vertex_id, parent_vertex_id, vertex_id.split("_")[
-                                    1].strip(), color=m.BLUE)
+                                    1].strip(), V_LABELS, color=m.BLUE)
                             reset_g(self, g, start_symbol)
 
                     # pop off the stack and 'flash'
@@ -1141,12 +1162,19 @@ class ManimParseTree(m.Scene):
                     #  copy the cfg_line rather than manipulate it directly
                     cfg_line = self.manim_production_groups[prods[0].strip(
                     )][:]
-                    cfg_line.next_to(self.s.mstack, m.DOWN).shift(
-                        0.8*m.DOWN).scale(0.7)
+                    typer.echo("CFG LINE = ")
+                    typer.echo(cfg_line)
 
-                    self.play(
-                       m.FadeIn(cfg_line)
-                    )
+                    # BUG
+                    cfg_line.next_to(self.s.mstack).shift(0.8*m.DOWN).scale(0.7)
+
+                    # self.play(
+                    #    m.FadeIn(cfg_line)
+                    # )
+                    
+                    # self.play(
+                    #    m.FadeIn(cfg_line)
+                    # )
 
                     # set up animations
                     popped_off = self.s.stack[-1]
@@ -1222,17 +1250,17 @@ class ManimParseTree(m.Scene):
                             else:
                                 if p != "#":
                                     new_node = anytree.Node(
-                                        p, id=p, m=m.Tex(p))
+                                        p, id=p, manim= m.Tex(p))
 
                         # we don't need to match epsilon, and we also only want non-terminals as parent nodes
                         if p != "#" and p != "$":
                             m = prods[0].strip() + " \\to " + p
                             self.s.push(p, m)
                             self.parents.append(new_node)
-
-                    self.play(
-                        m.FadeOut(cfg_line)
-                    )
+                    # FIX
+                    # self.play(
+                    #     m.FadeOut(cfg_line)
+                    # )
 
                 except KeyError:
                     error.ERR_parsing_error(self.root,
@@ -1242,23 +1270,6 @@ class ManimParseTree(m.Scene):
             # transform the tree
             reset_g(self, g, start_symbol)
 
-        # in case parsing finishes but there are still tokens left in the stack
-        if len(tokens) > 0:
-            error.ERR_parsing_error()
-            error.ERR_manim_parsing_error(self)
-            return
-
-        # fade out the stack and transform the parse tree
-        reset_g(self, g, start_symbol, anim=[m.FadeOut(self.s.mstack)])
-
-        # self.s.write_under_stack("Stack emptied.")
-        self.fullscreen_notify("Successfully parsed '" + " ".join(original_tokens) +
-                                "'!")
-        # display the parse tree
-        success = typer.style("Successfully parsed '" + " ".join(original_tokens) +
-                              "'!", fg=typer.colors.WHITE, bg=typer.colors.GREEN)
-        typer.echo(success + "\nParse tree:")
-        self.print_pt(self.root)
 
 
 
@@ -1298,9 +1309,10 @@ def get_vertex_id(vertex, parent, start_symbol):
             return parent + "_" + vertex
 
 
-def create_vertex(g, vertex_id, parent_id, label, color=m.GRAY, link=True):
+def create_vertex(g, vertex_id, parent_id, label, V_LABELS, color=m.GRAY,  link=True):
     V_LABELS[vertex_id] = label
-    pos = g[parent_id].get_center()+m.DOWN
+    # BUG Should be + DOWN
+    pos = g[parent_id].get_center()
     v = g._add_vertex(
         vertex_id, vertex_config={"color": color}, position=pos)
     v.fill_colour = color
