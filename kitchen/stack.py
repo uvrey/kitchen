@@ -21,7 +21,7 @@ class Stack:
         # draws the stack
         self.mstack.set_points_as_corners(
             [left_edge + height*m.UP, left_edge, left_edge + m.RIGHT, (left_edge + m.RIGHT) + height*m.UP])
-        self.mstack.set_stroke(width=2, color=m.WHITE)
+        self.mstack.set_stroke(width=2, color=_mode_col())
 
     def pop(self, msg, vertex=None, anim=[], matching=False):
         # set up stack in backend
@@ -113,7 +113,7 @@ class Stack:
             )
 
             self.scene.play(
-                m.FadeToColor(t, color=m.WHITE),
+                m.FadeToColor(t, color=_mode_col()),
                 m.FadeOut(m_msg),
             )
         else:
@@ -128,5 +128,5 @@ class Stack:
                 )
 
             self.scene.play(
-                m.FadeToColor(t, color=m.WHITE),
+                m.FadeToColor(t, color=_mode_col()),
             )

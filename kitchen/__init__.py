@@ -1,5 +1,6 @@
 """ Top-level package for Kitchen """
 # kitchen/__init__.py
+from sqlite3 import DateFromTicks
 import manim as m
 import typer
 from pathlib import Path
@@ -16,6 +17,11 @@ TEXT_SCALE = 1
 CFG_SCALE = 0.7
 COLOURS = [m.BLUE_B, m.TEAL_B, m.GREEN_B, m.YELLOW_B, m.GOLD_B,
                      m.RED_B, m.MAROON_B, m.PURPLE_A, m.LIGHT_PINK, m.LIGHT_BROWN]
+
+(
+    DARK,
+    LIGHT
+) = range(2)
 
 (
     SUCCESS,

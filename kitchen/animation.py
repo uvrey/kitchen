@@ -19,13 +19,15 @@ from kitchen import (
     COLOURS,
     error,
     stack, 
+    DARK,
+    LIGHT,
     sounds as s,
 )
 
 VCONFIG = {"radius": 0.25, "color": m.BLUE, "fill_opacity": 1}
 VCONFIG_TEMP = {"radius": 0.25, "color": m.GRAY}
 LCONFIG = {"vertex_spacing": (0.5, 1)}
-ECONFIG = {"color": m.WHITE}
+ECONFIG = {"color": display_helper.opp_col()}
 ECONFIG_TEMP = {"color": m.GRAY, "fill_opacity": 0.7}
 V_LABELS = {}
 
@@ -38,23 +40,36 @@ m.config.include_sound = True
 # TODO neaten up animations
 
 def _get_title_mobject(title):
-    return m.Tex(title, tex_template=m.TexFontTemplates.french_cursive).scale(1.5)
+    return m.Tex(title, tex_template=m.TexFontTemplates.french_cursive, color= m.BLUE_A).scale(1.5)
 
 def _to_tex(item):
     tex_item = item.replace("$", "\$").replace("#", "\\epsilon")
     return tex_item
 
-def _play_msg_with_other(self, msg, anim):
+def _opp_col():
+    if display_helper.MODE == DARK:
+        return m.WHITE
+    else:
+        return m.BLACK
+
+def _mode_col():
+    if display_helper.MODE == LIGHT:
+        return m.WHITE
+    else:
+        return m.BLACK
+
+
+def _play_msg_with_other(self, msg, anim=[]):
     if msg != []:
         msg_group = m.VGroup()
 
         for ms in msg:
-            msg_txt = m.Tex(ms, tex_template=m.TexFontTemplates.french_cursive, color=GREEN)
+            msg_txt = m.Tex(ms, color=_opp_col())
             msg_group.add(msg_txt)
         msg_group.arrange(m.DOWN)
         
         # create fading area
-        rect = m.Rectangle(width=20, height=10, color=m.BLACK, fill_opacity=0.9)
+        rect = m.Rectangle(width=20, height=10, color=_mode_col(), fill_opacity=0.9)
         msg_group.move_to(rect.get_center())
 
         self.play(
@@ -62,7 +77,8 @@ def _play_msg_with_other(self, msg, anim):
         )
 
         self.play(
-            m.Write(msg_group)
+            m.Write(msg_group),
+            m.Circumscribe(msg_group, color=_opp_col()),
         )
 
         self.wait()
@@ -73,9 +89,10 @@ def _play_msg_with_other(self, msg, anim):
         )
 
         # add the additional animation
-        self.play(
-            *[a for a in anim]
-        ),
+        if anim != []:
+            self.play(
+                *[a for a in anim]
+            ),
     return SUCCESS
 
 def _get_tokens_from_input(inp) -> list:
@@ -92,7 +109,7 @@ def _get_tokens_from_input(inp) -> list:
     # Helper function to put a message on the screen
 def notify(self, message, next_to_this):
     # returns a keys group, which is the cfg representation
-    msg_text = m.Text(message, color=m.WHITE, weight=m.BOLD).scale(0.5).next_to(
+    msg_text = m.Text(message, color=_opp_col(), weight=m.BOLD).scale(0.5).next_to(
         next_to_this, m.RIGHT)
     self.play(
         m.Write(msg_text),
@@ -104,8 +121,8 @@ def notify(self, message, next_to_this):
 
 def fullscreen_notify(self, message):
     err_msg = message
-    err_m_msg = m.Tex(err_msg, color=m.WHITE)
-    rect = m.Rectangle(width=20, height=10, color=m.BLACK, fill_opacity=0.85)
+    err_m_msg = m.Tex(err_msg, color=_opp_col())
+    rect = m.Rectangle(width=20, height=10, color=_opp_col(), fill_opacity=0.85)
     err_m_msg.move_to(rect.get_center())
     self.play(
         m.FadeIn(rect),
@@ -138,7 +155,7 @@ def get_token_colour(self):
         if not self.token_has_this_colour[index]:
             self.token_has_this_colour[index] = True
             return col
-    return m.WHITE
+    return _opp_col()
 
 # fades the scene out
 def fade_scene(self):
@@ -245,33 +262,35 @@ class ManimFirstSet(m.Scene):
         self.cfg = cfg
 
     def construct(self):
-        keys = get_manim_cfg_group(self).scale(CFG_SCALE)
         display_helper.info_secho("Visualising the First Set:")
+
+        # set title and scaling here since the function is recursive
+        fs_title = _get_title_mobject("first set calculation") 
+        self.play(fs_title.animate.to_edge(m.UP))
+
+        keys = get_manim_cfg_group(self)
+        keys.scale(CFG_SCALE).to_edge(m.LEFT)
         self.vis_first_set(keys, self.cfg.start_symbol, self.cfg.start_symbol, [])
 
     # animates a visualisation of the first set
     def vis_first_set(self, keys, start, production, pstack):
 
-        # draw first set title
-        fs_title = _get_title_mobject("first set calculation") 
-        self.play(fs_title.animate.to_edge(m.UP))
-
         #  global vis_has_epsilon
         pstack.append(production)
 
         # reset all keys to white except the one we are looking at
-        keys.fade_to(color=m.DARK_GRAY, alpha=1).to_edge(m.LEFT).scale(CFG_SCALE)
+        keys.fade_to(color=m.DARK_GRAY, alpha=1)
 
         # highlight manim production
         cfg_line = self.manim_production_groups[production][:]
 
         # add the first set titles to the canvas
         self.cfg.manim_firstset_lead[production] = m.Tex("First(" + production + "):",
-                                                    ).next_to(cfg_line, m.RIGHT).scale(TEXT_SCALE)
+                                                    ).align_to(cfg_line, m.UP).shift(m.LEFT)
 
         self.play(
             m.FadeIn(self.cfg.manim_firstset_lead[production]),
-            m.FadeToColor(cfg_line, color=m.WHITE),
+            m.FadeToColor(cfg_line, color=_opp_col()),
         )
 
         # if production does not have a first set
@@ -293,7 +312,6 @@ class ManimFirstSet(m.Scene):
 
                             if j > 1:
                                 prev_element = self.manim_prod_dict[production][i][j-1]
-                                prev_element.scale(TEXT_SCALE)
 
                             # if a terminal is encountered after the list
                             # fade in new terminal and corresponding element of the cfg
@@ -362,7 +380,7 @@ class ManimFirstSet(m.Scene):
                         for ps in reversed(pstack):
                             # make sure the production in focus is shaded white
                             self.manim_production_groups[ps].fade_to(
-                                color=m.WHITE, alpha=1)
+                                color=_opp_col(), alpha=1)
 
                             # begin adding to its first set
                             if first_terminal[0] not in self.cfg.first_set[ps]:
@@ -405,7 +423,7 @@ class ManimFirstSet(m.Scene):
 
                             # reset other colours to white
                             self.cfg.manim_firstset_contents[ps].fade_to(
-                                color=m.WHITE, alpha=1)
+                                color=_opp_col(), alpha=1)
 
                             # reset all cfg lines to white except the one we are looking at
                             keys.fade_to(color=m.DARK_GRAY, alpha=1)
@@ -661,7 +679,7 @@ class ManimFollowSet(m.Scene):
             # highlight manim production
             keys.fade_to(color=m.GRAY, alpha=1)
             cfg_line = self.manim_production_groups[production][:]
-            anims.append(m.FadeToColor(cfg_line, m.WHITE))
+            anims.append(m.FadeToColor(cfg_line, _opp_col()))
 
             # add the follow set titles to the canvas
             if self.cfg.manim_followset_lead[production] == None:
@@ -826,7 +844,7 @@ class ManimParseTable(m.Scene):
         # set up new value with colour
         t_new = m.MathTex(new_val).scale(0.7)
         t_new.move_to(t_old)
-        t_new.fade_to(m.WHITE, alpha=0.2)
+        t_new.fade_to(_opp_col(), alpha=0.2)
 
         # fade out old value and into new value
         self.play(
@@ -930,7 +948,7 @@ def create_vertex(g, vertex_id, parent_id, label, color=m.GRAY,  link=True):
 
     if link:
         g._add_edge(
-            [parent_id, vertex_id], edge_config={"color": m.WHITE})
+            [parent_id, vertex_id], edge_config={"color": _opp_col()})
     return v
 
 
@@ -1073,7 +1091,7 @@ class ManimParseTree(m.Scene):
         # create our first label
         V_LABELS[start_symbol] = start_symbol
         g = m.Graph([start_symbol], [], vertex_config=VCONFIG,
-                  labels=V_LABELS, label_fill_color=m.WHITE)
+                  labels=V_LABELS, label_fill_color=_opp_col())
 
         g.to_edge(m.UP).shift(m.DOWN)
         self.add(g)
@@ -1171,7 +1189,7 @@ class ManimParseTree(m.Scene):
                             new_vertex = g[vertex_id]
                             # confirm the path by adding the colour
                             rendered_label = m.MathTex(
-                                "\\text{"+top+"}", color=m.BLACK)
+                                "\\text{"+top+"}", color=_opp_col())
                             new_vertex.fade_to(m.BLUE, 1)
                             rendered_label.move_to(new_vertex.get_center())
                             new_vertex.add(rendered_label)
@@ -1183,7 +1201,7 @@ class ManimParseTree(m.Scene):
                             try:
                                 edge = g.edges[(parent_vertex_id, vertex_id)]
                                 anims.append(
-                                    m.FadeToColor(edge, color=m.WHITE))
+                                    m.FadeToColor(edge, color=_opp_col()))
                             except:
                                 pass
                         except KeyError:
@@ -1247,7 +1265,7 @@ class ManimParseTree(m.Scene):
                             try:
                                 vertex = g[v_id]
                                 rendered_label = m.MathTex(
-                                    "\\text{"+popped_off+"}", color=m.BLACK)
+                                    "\\text{"+popped_off+"}", color=_opp_col())
 
                                 # confirm the path by adding the colour
                                 vertex.fade_to(m.BLUE, 1)

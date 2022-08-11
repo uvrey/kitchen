@@ -1,8 +1,24 @@
 """ Contains functions for displaying information to the console. """
 # kitchen/display_helper.py
 
+from kitchen import DARK
 import typer
 import anytree
+import manim as m
+
+# set mode to dark by default
+MODE = DARK
+
+def set_mode(mode):
+    global MODE
+    MODE = mode
+
+def opp_col():
+    global MODE
+    if MODE == DARK:
+        return m.WHITE
+    else:
+        return m.BLACK
 
 def info_secho(msg):
     """Helper function to echo an informative message. 
@@ -14,7 +30,6 @@ def info_secho(msg):
         f'{msg}',
         fg = typer.colors.BLUE
     ) 
-
 
 def general_secho(msg):
     """Helper function to echo an informative message. 
