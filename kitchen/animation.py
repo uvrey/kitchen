@@ -367,7 +367,8 @@ class ManimFirstSet(m.Scene):
 
                                 # display the message alongside narration
                                 _play_msg_with_other(self, [production + " leads to " + current_item + ",", "so First("+production +
-                                             ") \\subseteq First("+current_item+")"], raw_msg=production + "leads to " + current_item + " so this should be in the first set.")
+                                             ") \\subseteq First("+current_item+")"], raw_msg=production + "leads to another non terminal" + current_item + ", so their first sets will overlap.")
+
 
                                 self.vis_first_set(
                                     keys, production, current_item, pstack)
@@ -413,7 +414,7 @@ class ManimFirstSet(m.Scene):
                                 msg = ["Terminal " + terminal_to_write +
                                            " is also", "added to First(" + ps + "),", "since " +
                                            ps + " leads to " + production]
-                                raw_msg = ps + " leads to " + production + ", so we add " + first_terminal[0] + " to both."
+                                raw_msg = ps + " leads to " + production + ", so we add " + first_terminal[0] + " to both. "
                             else:
                                 msg = ["Terminal " + terminal_to_write +
                                            " is ", "added to First(" + ps + ")"]
