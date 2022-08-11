@@ -43,7 +43,7 @@ def _get_title_mobject(title):
     return m.Tex(title, tex_template=m.TexFontTemplates.french_cursive, color= m.BLUE_A).scale(1.5)
 
 def _to_tex(item):
-    tex_item = item.replace("$", "\$").replace("#", "\\epsilon")
+    tex_item = item.replace("$", "\$").replace("#", "\\epsilon").replace("\\subseteq", "$\\subseteq$")
     return tex_item
 
 def _opp_col():
@@ -64,7 +64,7 @@ def _play_msg_with_other(self, msg, anim=[]):
         msg_group = m.VGroup()
 
         for ms in msg:
-            msg_txt = m.Tex(ms, color=_opp_col())
+            msg_txt = m.Tex(_to_tex(ms), color=_opp_col())
             msg_group.add(msg_txt)
         msg_group.arrange(m.DOWN)
         
@@ -78,7 +78,6 @@ def _play_msg_with_other(self, msg, anim=[]):
 
         self.play(
             m.Write(msg_group),
-            m.Circumscribe(msg_group, color=_opp_col()),
         )
 
         self.wait()
@@ -479,8 +478,8 @@ class ManimFollowSet(m.Scene):
                 if is_start_symbol:
                     self.cfg.follow_set[production].append("$")
                     self._add_to_follow_vis(
-                        production, "$", keys, [production + " is the start symbol,", "so we append \$", "to Follow(" +
-                        production + "\\)"])
+                        production, "$", keys, [production + " is the start symbol,", "so we append $", "to Follow(" +
+                        production + ")"])
                     is_start_symbol = False
                     
                 # inspect each element in the production
@@ -502,18 +501,17 @@ class ManimFollowSet(m.Scene):
 
                             # observe that the follow of a standalone terminal is ε
                             if index == len(pps) - 1:
-                                msg = m.Tex("Follow (" + ti + ")\nmay not exist").scale(
-                                    TEXT_SCALE).next_to(self.cfg.manim_followset_contents[production], m.RIGHT)
-
-                                self.play(
-                                    m.FadeIn(msg),
-                                    m.Circumscribe(cfg_element, color=m.TEAL, shape = m.Circle),
-                                    m.FadeToColor(cfg_element, color=m.TEAL),
+                                # prepare simultaneous animations
+                                anims = []
+                                tmp_anim = [m.Circumscribe(cfg_element, color=m.TEAL, shape = m.Circle),
+                                    m.FadeToColor(cfg_element, color=m.TEAL)]
+                                for t in tmp_anim:
+                                    anims.append(t
                                 )
-                                self.wait()
-                                self.play(m.FadeOut(msg))
+                                _play_msg_with_other(["Follow (" + _to_tex(ti) + ") may not exist"])
+
                             else:
-                                # normally highlight the terminal
+                                # just highlight the terminal
                                 self.play(
                                     m.Circumscribe(cfg_element, color=m.TEAL, shape = m.Circle),
                                     m.FadeToColor(cfg_element, color=m.TEAL),
@@ -558,7 +556,7 @@ class ManimFollowSet(m.Scene):
                                         m.FadeToColor(next_cfg_element, color=m.RED),
                                     )
                                 
-                                _play_msg_with_other(self, "{First ("+next_item+") - \\epsilon} \\ \\in Follow (" + item + ")")
+                                _play_msg_with_other(self, ["{First ("+next_item+") - #}", "\\subseteq Follow (" + item + ")"])
 
                                 for t in tmp_follow:
                                     if t != "#":
@@ -569,7 +567,7 @@ class ManimFollowSet(m.Scene):
                                         # we found an epsilon, so this non-terminal
                                         self.cfg.follow_set[item].append(next_item)
                                         self._add_to_follow_vis(
-                                            item, next_item, keys, ["\\epsilon \\in First("+next_item+"),", "so "+next_item+ "may not", "actually appear after "+item])
+                                            item, next_item, keys, ["\\epsilon \\subseteq First("+next_item+"),", "so "+next_item+ "may not", "actually appear after "+item])
 
             # start cleaning the follow set
             self.is_cleaned = []
@@ -593,7 +591,7 @@ class ManimFollowSet(m.Scene):
                     # puts $ at end of list for consistency
                     if has_eos:
                         new_fs_group.add(
-                            m.Tex("\$", color = m.BLUE).scale(TEXT_SCALE))
+                            m.Tex(_to_tex("$"), color = m.BLUE).scale(TEXT_SCALE))
                     new_fs_group.arrange_in_grid(rows=1, buff=0.5).next_to(
                         self.cfg.manim_followset_lead[key], m.RIGHT)
 
@@ -652,6 +650,7 @@ class ManimFollowSet(m.Scene):
             else:
                 # append it directly as a terminal
                 element = _to_tex(item)
+                typer.echo("ELEMENT TO BE TURNED TO TEX:" + element) 
                 new_element = m.Tex(
                     element, color=m.TEAL)
 
@@ -794,13 +793,13 @@ class ManimParseTable(m.Scene):
                 if item == "#":
                     for f in self.cfg.follow_set[key]:
                         if f == "$":
-                            mprod = key + " \\to DOLLAR"
+                            mprod = key + " \\to $"
                             prod = key + " -> $"
                         else:
                             mprod = key + " \\to \epsilon"
                             prod = key + " -> #"
                         notify(
-                            "Following " + prod + "\nadds \\epsilon to First(" + key + ")", self.mtable)
+                            "Following " + prod + "\nadds \\epsilon to First(" + _to_tex(key) + ")", self.mtable)
                         self.vis_add_to_parsetable( key, f, prod, mprod)
                 else:
 
