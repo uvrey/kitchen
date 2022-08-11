@@ -42,8 +42,6 @@ m.config.include_sound = True
 # TODO  Unique filename - Date and time?
 # TODO neaten up animations
 
-
-
 def _get_title_mobject(title):
     return m.Tex(title, tex_template=m.TexFontTemplates.french_cursive)
 
@@ -64,7 +62,7 @@ def _mode_col():
     else:
         return m.BLACK
 
-def _play_msg_with_other(self, msg, anim=[]):
+def _play_msg_with_other(self, msg, raw_msg= "", anim=[]):
     if msg != []:
         msg_group = m.VGroup()
 
@@ -79,6 +77,10 @@ def _play_msg_with_other(self, msg, anim=[]):
         self.play(
             m.FadeIn(rect),
         )
+
+        # generate voiceover
+        if raw_msg != "":
+            sounds.narrate(raw_msg, self)
 
         self.play(
             m.Write(msg_group),
@@ -265,8 +267,7 @@ class ManimFirstSet(m.Scene):
         self.cfg = cfg
 
     def construct(self):
-
-        sounds.narrate("Hello world", self)
+        sounds.narrate("Let's find the first set!", self)
         display_helper.info_secho("Visualising the First Set:")
 
         # set title and scaling here since the function is recursive
@@ -280,7 +281,7 @@ class ManimFirstSet(m.Scene):
 
         # success message and sound
         sounds.add_sound_to_scene(self, sounds.SUCCESS)
-        _play_msg_with_other(self, ["Successfully found the first set :)"])
+        _play_msg_with_other(self, ["Successfully found the first set :)"], raw_msg= "Woohoo! We got the first set!")
 
 
     # animates a visualisation of the first set
@@ -364,8 +365,9 @@ class ManimFirstSet(m.Scene):
                                         color=m.DARK_GRAY, alpha=1)
                                     prev_element.scale(TEXT_SCALE)
 
+                                # display the message alongside narration
                                 _play_msg_with_other(self, [production + " leads to " + current_item + ",", "so First("+production +
-                                             ") \\subseteq First("+current_item+")"])
+                                             ") \\subseteq First("+current_item+")"], raw_msg=production + "leads to " + current_item + " so this should be in the first set.")
 
                                 self.vis_first_set(
                                     keys, production, current_item, pstack)
@@ -411,11 +413,13 @@ class ManimFirstSet(m.Scene):
                                 msg = ["Terminal " + terminal_to_write +
                                            " is also", "added to First(" + ps + "),", "since " +
                                            ps + " leads to " + production]
+                                raw_msg = ps + " leads to " + production + ", so we add " + first_terminal[0] + " to both."
                             else:
                                 msg = ["Terminal " + terminal_to_write +
                                            " is ", "added to First(" + ps + ")"]
-                            _play_msg_with_other(self, msg)
-                            
+                                raw_msg = "Let's add terminal " + first_terminal[0] + "!"
+                            _play_msg_with_other(self, msg, raw_msg)
+
                             # fade in new terminal and corresponding element of the cfg
                             cfg_element = self.manim_prod_dict[production][i][0]
 

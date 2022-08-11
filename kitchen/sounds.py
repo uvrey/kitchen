@@ -7,6 +7,10 @@ from kitchen import SOUND_ERROR, SUCCESS, display_helper
 from gtts import gTTS
 
 (
+    SOUND,
+    NO_SOUND,
+    NARR, 
+    NO_NARR,
     CLICK,
     CLANG,
     FLASH,
@@ -16,9 +20,14 @@ from gtts import gTTS
     YAY,
     OOF,
     POP
-) = range(9)
+) = range(13)
 
 id = 0
+config = NARR
+
+def set_config(config_option):
+    config = config_option
+    return config
 
 def _get_narration_path() -> String:
     global id
@@ -41,10 +50,11 @@ def _get_narration(script) -> String:
     return path
 
 def narrate(script, scene) -> int:
-    _new_narration = _get_narration(script)
-    if not os.path.isfile(_new_narration):
-        return SOUND_ERROR
-    scene.add_sound(_new_narration)
+    if config == NARR:
+        _new_narration = _get_narration(script)
+        if not os.path.isfile(_new_narration):
+            return SOUND_ERROR
+        scene.add_sound(_new_narration)
     return SUCCESS
 
 def add_sound_to_scene(scene, sound_spec):
