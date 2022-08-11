@@ -508,7 +508,7 @@ class ManimFollowSet(m.Scene):
                                 for t in tmp_anim:
                                     anims.append(t
                                 )
-                                _play_msg_with_other(["Follow (" + _to_tex(ti) + ") may not exist"])
+                                _play_msg_with_other(self, ["Follow (" + _to_tex(ti) + ") may not exist"])
 
                             else:
                                 # just highlight the terminal
