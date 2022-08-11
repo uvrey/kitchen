@@ -40,10 +40,11 @@ m.config.include_sound = True
 # TODO neaten up animations
 
 def _get_title_mobject(title):
-    return m.Tex(title, tex_template=m.TexFontTemplates.french_cursive, color= m.BLUE_A).scale(1.5)
+    return m.Tex(title, tex_template=m.TexFontTemplates.french_cursive)
 
 def _to_tex(item):
-    tex_item = item.replace("$", "\$").replace("#", "\\epsilon").replace("\\subseteq", "$\\subseteq$")
+    tex_item = item.replace("$", "\$").replace("#", "\\epsilon").replace("\\subseteq", "$\\subseteq$").replace("->", "$\\to$")
+    typer.echo("Nice text: " + tex_item)
     return tex_item
 
 def _opp_col():
@@ -57,7 +58,6 @@ def _mode_col():
         return m.WHITE
     else:
         return m.BLACK
-
 
 def _play_msg_with_other(self, msg, anim=[]):
     if msg != []:
@@ -226,11 +226,11 @@ def get_guide():
     for i in range(2):
         guide_group_inner = m.VGroup()
         guide_group_inner.add(m.Square().set_fill(
-            square_colors[i], opacity=1))
-        guide_group_inner.add(m.Tex(labels[i]))
-        guide_group_inner.arrange(m.RIGHT)
+            square_colors[i], opacity=1).scale(0.6))
+        guide_group_inner.add(m.Tex(labels[i]).scale(1.2))
+        guide_group_inner.arrange_in_grid(rows = 1, buff = 0.5)
         guide_group_outer.add(guide_group_inner)
-    guide_group_outer.arrange(m.DOWN, aligned_edge=m.LEFT)
+    guide_group_outer.arrange_in_grid(rows = len(labels), buff = 0.5)
     return guide_group_outer
     
 def ts_m_epsilon(self):
@@ -734,25 +734,25 @@ class ManimParseTable(m.Scene):
         Args:
             scene (_type_): _description_
         """
-        typer.echo("vis pop table")
         # make sure parse table is fully reset
         self.pt_dict = {}
         self.init_pt_dict()
 
         # set up the title
-        ll1_title = _get_title_mobject("LL(1) parsing: setting up the parse table")
+        ll1_title = _get_title_mobject("LL(1) parsing: parse table")
         keys = get_manim_cfg_group(self)
         keys.to_edge(m.LEFT).scale(CFG_SCALE)
 
         # show key for colour coding
-        guide = get_guide().scale(0.3)
+        guide = get_guide().scale(CFG_SCALE)
+        cfg_heading = m.Tex("Context-Free Grammar", tex_template = m.TexFontTemplates.french_cursive).next_to(keys, m.UP).align_to(keys.get_center)
+        cfg_heading.scale(0.6)
 
         self.play(
             ll1_title.animate.to_edge(m.UP),
-            guide.animate.to_corner(m.DOWN + m.RIGHT),
-            m.FadeIn(m.Text("CFG", weight=m.BOLD).move_to(
-                keys.get_top()+m.UP*0.3).align_to(keys.get_center())),
-            m.LaggedStart(*(m.FadeIn(k.scale(0.6), shift=m.UP)
+            guide.animate.to_edge(m.RIGHT),
+            m.FadeIn(cfg_heading),
+            m.LaggedStart(*(m.FadeIn(k.scale(CFG_SCALE), shift=m.UP)
                         for k in keys)),
         )
 
@@ -798,8 +798,7 @@ class ManimParseTable(m.Scene):
                         else:
                             mprod = key + " \\to \epsilon"
                             prod = key + " -> #"
-                        notify(
-                            "Following " + prod + "\nadds \\epsilon to First(" + _to_tex(key) + ")", self.mtable)
+                        _play_msg_with_other(self, ["Following " + prod + "adds #", "to First(" + _to_tex(key) + ")"])
                         self.vis_add_to_parsetable( key, f, prod, mprod)
                 else:
 
@@ -808,8 +807,8 @@ class ManimParseTable(m.Scene):
                     mprod = prod
                     tmp_prod = prod.replace(
                         "->", "\\to").strip().replace("#", "\epsilon")
-                    notify(self, "Following " + prod + "\nadded " +
-                                 self.cfg.first_set[key][j] + " to First(" + key + ")", self.mtable)
+                    _play_msg_with_other(self, ["Following " + prod + " adds " +
+                                 self.cfg.first_set[key][j], " to First(" + key + ")"])
                     self.vis_add_to_parsetable(
                          key, item, prod, tmp_prod)
 
@@ -866,8 +865,8 @@ class ManimParseTable(m.Scene):
         # Table
         lab = table.get_labels()
         lab.set_color(m.LIGHT_GRAY)
-        table.get_horizontal_lines()[2].set_stroke(width=8, color=m.LIGHT_GRAY)
-        table.get_vertical_lines()[2].set_stroke(width=8, color=m.LIGHT_GRAY)
+        table.get_horizontal_lines()[2].set_stroke(width=3, color=m.LIGHT_GRAY)
+        table.get_vertical_lines()[2].set_stroke(width=3, color=m.LIGHT_GRAY)
         return table
 
     def init_table(self, x_vals, y_vals, row_labels, col_labels):
