@@ -38,7 +38,7 @@ m.config.include_sound = True
 # TODO neaten up animations
 
 def _get_title_mobject(title):
-    return m.Tex(title, tex_template=m.TexFontTemplates.french_cursive).scale(1.5).shift(m.UP*0.3)
+    return m.Tex(title, tex_template=m.TexFontTemplates.french_cursive).scale(1.5)
 
 def _to_tex(item):
     tex_item = item.replace("$", "\$").replace("#", "\\epsilon")
@@ -49,7 +49,7 @@ def _play_msg_with_other(self, msg, anim):
         msg_group = m.VGroup()
 
         for ms in msg:
-            msg_txt = m.Tex(ms, tex_template=m.TexFontTemplates.french_cursive)
+            msg_txt = m.Tex(ms, tex_template=m.TexFontTemplates.french_cursive, color=GREEN)
             msg_group.add(msg_txt)
         msg_group.arrange(m.DOWN)
         
@@ -254,7 +254,7 @@ class ManimFirstSet(m.Scene):
 
         # draw first set title
         fs_title = _get_title_mobject("first set calculation") 
-        self.play(m.FadeIn(fs_title))
+        self.play(fs_title.animate.to_edge(m.UP))
 
         #  global vis_has_epsilon
         pstack.append(production)
