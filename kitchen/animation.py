@@ -15,6 +15,7 @@ from kitchen import (
     RE_TERMINAL,
     display_helper,
     TEXT_SCALE,
+    CFG_SCALE,
     COLOURS,
     error,
     stack, 
@@ -35,6 +36,9 @@ m.config.include_sound = True
 # TODO add sound
 # TODO  Unique filename - Date and time?
 # TODO neaten up animations
+
+def _get_title_mobject(title):
+    return m.Tex(title, tex_template=m.TexFontTemplates.french_cursive).scale(1.5).shift(m.UP*0.3)
 
 def _to_tex(item):
     tex_item = item.replace("$", "\$").replace("#", "\\epsilon")
@@ -241,14 +245,18 @@ class ManimFirstSet(m.Scene):
         self.cfg = cfg
 
     def construct(self):
-        keys = get_manim_cfg_group(self).scale(TEXT_SCALE)
-        display_helper.info_secho("Visualising first set calculation:")
+        keys = get_manim_cfg_group(self).scale(CFG_SCALE)
+        display_helper.info_secho("Visualising the First Set:")
         self.vis_first_set(keys, self.cfg.start_symbol, self.cfg.start_symbol, [])
 
     # animates a visualisation of the first set
     def vis_first_set(self, keys, start, production, pstack):
 
-      #  global vis_has_epsilon
+        # draw first set title
+        fs_title = _get_title_mobject("first set calculation") 
+        self.play(m.FadeIn(fs_title))
+
+        #  global vis_has_epsilon
         pstack.append(production)
 
         # reset all keys to white except the one we are looking at
@@ -435,11 +443,11 @@ class ManimFollowSet(m.Scene):
     def vis_follow_set(self, is_start_symbol):
 
             # Set up CFG keys
-            keys = get_manim_cfg_group(self).to_edge(m.LEFT).scale(TEXT_SCALE)
+            keys = get_manim_cfg_group(self).to_edge(m.LEFT).scale(CFG_SCALE)
             keys.fade_to(m.GRAY, 1).to_edge(m.LEFT)
 
-            # draw LL(1) representation title
-            fw_title = m.Tex(r"Follow Set calculation")
+            # draw follow set title
+            fw_title = _get_title_mobject("follow set calculation") 
 
             # set the stage
             self.play(
@@ -567,19 +575,23 @@ class ManimFollowSet(m.Scene):
                 if not re.match(RE_TERMINAL, key):
                     new_fs_group = m.VGroup()
                     has_eos = False
+
+                    # rewrite the elements of the set
                     for item in self.cfg.follow_set[key]:
                         if item == "$":
                             has_eos = True
                         else:
                             new_fs_group.add(
-                                m.Text(item, weight=m.BOLD, slant=m.ITALIC, color=m.TEAL).scale(TEXT_SCALE))
+                                m.Tex(_to_tex(item), color = m.BLUE).scale(TEXT_SCALE))
+
                     # puts $ at end of list for consistency
                     if has_eos:
                         new_fs_group.add(
-                            m.Text("$", weight=m.BOLD, slant=m.ITALIC, color=m.TEAL).scale(TEXT_SCALE))
-                    new_fs_group.arrange(m.RIGHT).next_to(
+                            m.Tex("\$", color = m.BLUE).scale(TEXT_SCALE))
+                    new_fs_group.arrange_in_grid(rows=1, buff=0.5).next_to(
                         self.cfg.manim_followset_lead[key], m.RIGHT)
 
+                    # transform to new contents
                     self.play(
                         m.Transform(
                             self.cfg.manim_followset_contents[key], new_fs_group),
@@ -723,9 +735,9 @@ class ManimParseTable(m.Scene):
         self.init_pt_dict()
 
         # set up the title
-        ll1_title = m.Tex(r"LL(1) Parsing: Setting up the Parse Table")
+        ll1_title = _get_title_mobject("LL(1) parsing: setting up the parse table")
         keys = get_manim_cfg_group(self)
-        keys.to_edge(m.LEFT)
+        keys.to_edge(m.LEFT).scale(CFG_SCALE)
 
         # show key for colour coding
         guide = get_guide().scale(0.3)
@@ -734,7 +746,7 @@ class ManimParseTable(m.Scene):
             ll1_title.animate.to_edge(m.UP),
             guide.animate.to_corner(m.DOWN + m.RIGHT),
             m.FadeIn(m.Text("CFG", weight=m.BOLD).move_to(
-                keys.get_top()+m.UP*0.3).align_to(keys.get_center()).scale(0.5)),
+                keys.get_top()+m.UP*0.3).align_to(keys.get_center())),
             m.LaggedStart(*(m.FadeIn(k.scale(0.6), shift=m.UP)
                         for k in keys)),
         )
@@ -1044,7 +1056,7 @@ class ManimParseTree(m.Scene):
         self.parents = []
 
         # draw LL(1) representation title
-        ll1_title = m.Tex(r"LL(1) Parsing")
+        ll1_title = _get_title_mobject("LL(1) parsing")
         keys = get_manim_cfg_group(self).to_edge(m.RIGHT)
 
         # create the input group here
