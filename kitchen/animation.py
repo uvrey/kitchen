@@ -260,14 +260,14 @@ class ManimFirstSet(m.Scene):
         pstack.append(production)
 
         # reset all keys to white except the one we are looking at
-        keys.fade_to(color=m.DARK_GRAY, alpha=1).to_edge(m.LEFT)
+        keys.fade_to(color=m.DARK_GRAY, alpha=1).to_edge(m.LEFT).scale(CFG_SCALE)
 
         # highlight manim production
         cfg_line = self.manim_production_groups[production][:]
 
         # add the first set titles to the canvas
-        self.cfg.manim_firstset_lead[production] = m.Text("First(" + production + "):",
-                                                    weight=m.BOLD).align_to(cfg_line, m.UP).scale(0.6).shift(m.LEFT)
+        self.cfg.manim_firstset_lead[production] = m.Tex("First(" + production + "):",
+                                                    ).next_to(cfg_line, m.RIGHT).scale(TEXT_SCALE)
 
         self.play(
             m.FadeIn(self.cfg.manim_firstset_lead[production]),
@@ -277,10 +277,13 @@ class ManimFirstSet(m.Scene):
         # if production does not have a first set
         try:
             if self.cfg.first_set[production] == []:
+
                 # loop through values which a production leads to
                 for i, p in enumerate(self.cfg.cfg_dict[production], start=0):
+
                     # if a production is/ starts with a non-terminal
                     if p in self.cfg.cfg_dict or p[0].isupper():
+
                         # find all the productions which are led by a non-terminal
                         p_nt = list(
                             filter(None, re.findall(RE_PRODUCTION, p)))
@@ -289,7 +292,6 @@ class ManimFirstSet(m.Scene):
                             current_item = item.strip()
 
                             if j > 1:
-
                                 prev_element = self.manim_prod_dict[production][i][j-1]
                                 prev_element.scale(TEXT_SCALE)
 
@@ -301,19 +303,19 @@ class ManimFirstSet(m.Scene):
                                     if current_item not in self.firstset[ps]:
                                         self.firstset[ps].append(current_item)
                                         # add this terminal and play VGroup of each production in the stack
-                                        new_element = m.Text(
-                                            terminal_to_write, color=m.TEAL, slant=m.ITALIC, weight=BOLD).scale(TEXT_SCALE)
+                                        new_element = m.Tex(
+                                            _to_tex(terminal_to_write), color=m.TEAL).scale(TEXT_SCALE)
                                         self.manim_firstset_contents[ps].add(
                                             new_element)
-                                        self.manim_firstset_contents[ps].arrange(m.RIGHT).next_to(
+                                        self.manim_firstset_contents[ps].arrange_in_grid(row=1, buff = 0.5).next_to(
                                             self.manim_firstset_lead[ps], m.RIGHT)
 
                                      # fade in new terminal and corresponding element of the cfg
                                     cfg_element = self.manim_prod_dict[production][i][j]
                                     self.play(
                                         m.FadeIn(new_element),
-                                        m.Circumscribe(cfg_element, color=m.TEAL),
-                                        m.FadeToColor(cfg_element, color=m.TEAL),
+                                        m.Circumscribe(cfg_element, color=m.TEAL, shape = m.Circle),
+                                        m.FadeToColor(cfg_element, color=m.TEAL, shape = m.Circle),
                                     )
                                 break
                             else:
@@ -321,8 +323,10 @@ class ManimFirstSet(m.Scene):
                                 cfg_element = self.manim_prod_dict[production][i][j]
                                 cfg_element.fade_to(color=m.RED, alpha=1)
                                 self.play(
-                                    m.ScaleInPlace(cfg_element, 1.5),
-                                    m.Circumscribe(cfg_element, color=m.RED),
+                                    m.LaggedStart(
+                                    m.Circumscribe(cfg_element, color=m.RED, shape = m.Circle),
+                                    m.FadeToColor(cfg_element, color = m.RED),
+                                    )
                                 )
                                 if j > 1:
                                     # fade out the previous non-terminal
@@ -331,8 +335,8 @@ class ManimFirstSet(m.Scene):
                                         color=m.DARK_GRAY, alpha=1)
                                     prev_element.scale(TEXT_SCALE)
 
-                                notify(self, production + " leads to " + current_item + ",\nso First("+production +
-                                             ") = First("+current_item+")", 2*m.RIGHT)
+                                _play_msg_with_other(self, [production + " leads to " + current_item + ",", "so First("+production +
+                                             ") = First("+current_item+")"])
 
                                 self.vis_first_set(
                                     keys, production, current_item, pstack)
@@ -350,10 +354,9 @@ class ManimFirstSet(m.Scene):
 
                         if first_terminal[0] == "#":
                             # the non-terminal which led to this may disappear in the original production
-                            terminal_to_write = "ε"
                             self.cfg.vis_has_epsilon = True
-                        else:
-                            terminal_to_write = first_terminal[0]
+
+                        terminal_to_write = _to_tex(first_terminal[0])
 
                             # appends this terminal to the first set of previous non-terminals
                         for ps in reversed(pstack):
@@ -366,23 +369,24 @@ class ManimFirstSet(m.Scene):
                                 # add to first set
                                 self.cfg.first_set[ps].append(first_terminal[0])
                                 # add this terminal and play VGroup of each production in the stack
-                                new_element = m.Text(
-                                    terminal_to_write, color=m.TEAL, slant=m.ITALIC, weight=m.BOLD).scale(TEXT_SCALE)
+                                new_element = m.Tex(
+                                     terminal_to_write, color=m.TEAL).scale(TEXT_SCALE)
                                 self.cfg.manim_firstset_contents[ps].add(
                                     new_element)
-                                self.cfg.manim_firstset_contents[ps].arrange(m.RIGHT).next_to(
+                                self.cfg.manim_firstset_contents[ps].arrange_in_grid(row=1, buff = 0.5).next_to(
                                     self.cfg.manim_firstset_lead[ps], m.RIGHT)
 
                             # Notify as to what is happening
-                            msg = None
+                            msg = []
                             if len(pstack) > 1 and ps != production:
-                                msg = m.Text("Terminal " + terminal_to_write +
-                                           " is also\nadded to First(" + ps + "),\nsince " +
-                                           ps + " leads to " + production, weight=m.BOLD).scale(0.5).to_edge(m.RIGHT).shift(m.UP)
+                                msg = ["Terminal " + terminal_to_write +
+                                           " is also", "added to First(" + ps + "),", "since " +
+                                           ps + " leads to " + production]
                             else:
-                                msg = m.Text("Terminal " + terminal_to_write +
-                                           " is \nadded to First(" + ps + ")", weight=m.BOLD).scale(0.5).to_edge(m.RIGHT).shift(m.UP)
-
+                                msg = ["Terminal " + terminal_to_write +
+                                           " is ", "added to First(" + ps + ")"]
+                            _play_msg_with_other(self, msg)
+                            
                             # fade in new terminal and corresponding element of the cfg
                             cfg_element = self.manim_prod_dict[production][i][0]
 
@@ -390,21 +394,14 @@ class ManimFirstSet(m.Scene):
                             #self.add_sound("click.wav")
 
                             self.play(
-                                m.Write(msg),
                                 m.FadeIn(new_element),
-                                m.Circumscribe(cfg_element, color=m.TEAL),
+                                m.Circumscribe(cfg_element, color=m.TEAL, shape = m.Circle),
                                 m.FadeToColor(cfg_element, color=m.TEAL),
-                            )
-                            self.wait()
-                            self.play(
-                                m.FadeOut(msg),
-                                run_time=0.25
                             )
 
                             # notify about user epsilon if we are somewhere in the stack
                             if first_terminal[0] == "#" and ps != start:
-                                notify(self, 
-                                    "ε found at \nproduction " + production + ", so " + production + " may\n disappear :)", self.manim_firstset_contents[ps])
+                                _play_msg_with_other(self, ["\\epsilon found at production " + production + ",", "so " + production + " may disappear :)"])
 
                             # reset other colours to white
                             self.cfg.manim_firstset_contents[ps].fade_to(
@@ -492,7 +489,7 @@ class ManimFollowSet(m.Scene):
 
                                 self.play(
                                     m.FadeIn(msg),
-                                    m.Circumscribe(cfg_element, color=m.TEAL),
+                                    m.Circumscribe(cfg_element, color=m.TEAL, shape = m.Circle),
                                     m.FadeToColor(cfg_element, color=m.TEAL),
                                 )
                                 self.wait()
@@ -500,13 +497,13 @@ class ManimFollowSet(m.Scene):
                             else:
                                 # normally highlight the terminal
                                 self.play(
-                                    m.Circumscribe(cfg_element, color=m.TEAL),
+                                    m.Circumscribe(cfg_element, color=m.TEAL, shape = m.Circle),
                                     m.FadeToColor(cfg_element, color=m.TEAL),
                                 )
 
                         else:
                             self.play(
-                                m.Circumscribe(cfg_element, color=m.RED),
+                                m.Circumscribe(cfg_element, color=m.RED, shape = m.Circle),
                                 m.FadeToColor(cfg_element, color=m.RED),
                             )
 
@@ -533,13 +530,13 @@ class ManimFollowSet(m.Scene):
                                 if re.match(RE_TERMINAL, next_item):
                                     self.play(
                                         m.Circumscribe(
-                                            next_cfg_element, color=m.TEAL),
+                                            next_cfg_element, color=m.TEAL, shape = m.Circle),
                                         m.FadeToColor(next_cfg_element, color=m.TEAL),
                                     )
                                 else:
                                     self.play(
                                         m.Circumscribe(
-                                            next_cfg_element, color=m.RED),
+                                            next_cfg_element, color=m.RED, shape = m.Circle),
                                         m.FadeToColor(next_cfg_element, color=m.RED),
                                     )
                                 
@@ -785,7 +782,7 @@ class ManimParseTable(m.Scene):
                             mprod = key + " \\to \epsilon"
                             prod = key + " -> #"
                         notify(
-                            "Following " + prod + "\nadded ε to First(" + key + ")", self.mtable)
+                            "Following " + prod + "\nadds \\epsilon to First(" + key + ")", self.mtable)
                         self.vis_add_to_parsetable( key, f, prod, mprod)
                 else:
 
@@ -1180,7 +1177,7 @@ class ManimParseTree(m.Scene):
                             new_vertex.add(rendered_label)
 
                             self.play(
-                                m.Circumscribe(new_vertex, color=m.BLUE),
+                                m.Circumscribe(new_vertex, color=m.BLUE, shape = m.Circle),
                                 run_time=2
                             )
                             try:
@@ -1258,7 +1255,7 @@ class ManimParseTree(m.Scene):
                                 vertex.add(rendered_label)
 
                                 self.play(
-                                    m.Circumscribe(vertex, color=m.BLUE),
+                                    m.Circumscribe(vertex, color=m.BLUE, shape = m.Circle),
                                     run_time=2
                                 )
                             except:
