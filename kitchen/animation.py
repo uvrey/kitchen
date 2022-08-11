@@ -226,12 +226,12 @@ def get_guide():
     for i in range(2):
         guide_group_inner = m.VGroup()
         guide_group_inner.add(m.Square().set_fill(
-            square_colors[i], opacity=1).scale(0.6))
-        guide_group_inner.add(m.Tex(labels[i]).scale(1.2))
-        guide_group_inner.arrange_in_grid(rows = 1, buff = 0.5)
+            square_colors[i], opacity=1).scale(0.5))
+        guide_group_inner.add(m.Tex(labels[i]))
+        guide_group_inner.arrange_in_grid(rows = 1, buff = 0.8)
         guide_group_outer.add(guide_group_inner)
-    guide_group_outer.arrange_in_grid(rows = len(labels), buff = 0.5)
-    return guide_group_outer
+    guide_group_outer.arrange_in_grid(rows = len(labels), buff = 0.5, aligned_edge=m.LEFT)
+    return guide_group_outer.arrange(aligned_edge=m.LEFT)
     
 def ts_m_epsilon(self):
     ts_m = []
@@ -746,7 +746,7 @@ class ManimParseTable(m.Scene):
         # show key for colour coding
         guide = get_guide().scale(CFG_SCALE)
         cfg_heading = m.Tex("Context-Free Grammar", tex_template = m.TexFontTemplates.french_cursive).next_to(keys, m.UP).align_to(keys.get_center)
-        cfg_heading.scale(0.6)
+        cfg_heading.scale(0.5)
 
         self.play(
             ll1_title.animate.to_edge(m.UP),
