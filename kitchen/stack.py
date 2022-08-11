@@ -7,7 +7,8 @@ from kitchen import (
     RE_NONTERMINAL,
     RE_TERMINAL,
     RE_PRODUCTION,
-    display_helper
+    display_helper,
+    sounds
 )
 
 class Stack:
@@ -58,6 +59,7 @@ class Stack:
                         run_time=0.5,
                     )
 
+                    sounds.add_sound_to_scene(self.scene, sounds.TWINKLE)
                     self.scene.play(
                         m.Flash(top_text, line_length=0.4,
                               num_lines=30, color=m.BLUE,

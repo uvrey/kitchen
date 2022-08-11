@@ -1,8 +1,12 @@
 """ Configuration for the application """
 
+from ast import BoolOp
 import configparser
 from pathlib import Path
+from xmlrpc.client import Boolean
 import typer
+import os
+import shutil
 
 from kitchen import (
     CFG_WRITE_ERROR, 
@@ -19,11 +23,13 @@ from kitchen import (
     animation as anim,
     error, 
     parser as p,
+    sounds
 )
 
 CONFIG_DIR_PATH = Path(typer.get_app_dir(__app_name__))
 CONFIG_FILE_PATH = CONFIG_DIR_PATH / "config.ini"
 CONFIG_SOUND_PATH = CONFIG_DIR_PATH / "add_to_set.wav"
+PARTIALS_PATH = ""
 
 def init_app(cfg_path: str) -> int:
     """Initialises the application by creating its configuration file and CFG path.
@@ -244,6 +250,27 @@ def _init_parsing_vis_shortcut(inp, cfg) -> int:
         animation.render()       
     return SUCCESS
 
+def _set_partials_path():
+    PARTIALS_PATH =  os.getcwd()+r'\media\videos\1080p60\partial_movie_files'
+    return SUCCESS
+
+def _partials_exists() -> Boolean:
+    if PARTIALS_PATH != "":
+        return os.path.isdir(PARTIALS_PATH)
+    return False
+
+def _clear_partial_movie_files():
+    """path could either be relative or absolute. """
+    # check if file or directory exists
+    if os.path.isfile(PARTIALS_PATH) or os.path.islink(PARTIALS_PATH):
+        # remove file
+        os.remove(PARTIALS_PATH)
+    elif os.path.isdir({PARTIALS_PATH}):
+        # remove directory and all its content
+        shutil.rmtree(PARTIALS_PATH)
+    else:
+        raise ValueError("Path {} is not a file or dir.".format(PARTIALS_DIR_1080p))
+
 def _process_command(inp, cfg) -> None:
     """Helper function to process a command from the user.
 
@@ -257,6 +284,10 @@ def _process_command(inp, cfg) -> None:
 
     if inp == "\\m":
         display_helper.print_menu()
+
+    elif inp == "\\n":
+        typer.echo("narrating...")
+        sounds.narrate()
     elif inp == "\\q":
         raise typer.Exit()
     elif inp == "\\dsl":

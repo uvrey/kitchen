@@ -22,7 +22,8 @@ from kitchen import (
     stack, 
     DARK,
     LIGHT,
-    sounds as s,
+    SOUND_ERROR, 
+    sounds,
 )
 
 VCONFIG = {"radius": 0.25, "color": m.BLUE, "fill_opacity": 1}
@@ -38,9 +39,10 @@ GRID_ITEM_SCALE = 0.9
 m.config.include_sound = True
 
 # TODO clean up this file a bit better
-# TODO add sound
 # TODO  Unique filename - Date and time?
 # TODO neaten up animations
+
+
 
 def _get_title_mobject(title):
     return m.Tex(title, tex_template=m.TexFontTemplates.french_cursive)
@@ -73,7 +75,6 @@ def _play_msg_with_other(self, msg, anim=[]):
         
         # create fading area
         rect = m.Rectangle(width=20, height=10, color=_mode_col(), fill_opacity=0.9)
-        msg_group.move_to(rect.get_center())
 
         self.play(
             m.FadeIn(rect),
@@ -264,6 +265,8 @@ class ManimFirstSet(m.Scene):
         self.cfg = cfg
 
     def construct(self):
+
+        sounds.narrate("Hello world", self)
         display_helper.info_secho("Visualising the First Set:")
 
         # set title and scaling here since the function is recursive
@@ -272,7 +275,13 @@ class ManimFirstSet(m.Scene):
 
         keys = get_manim_cfg_group(self)
         keys.scale(CFG_SCALE).to_edge(m.LEFT)
+
         self.vis_first_set(keys, self.cfg.start_symbol, self.cfg.start_symbol, [])
+
+        # success message and sound
+        sounds.add_sound_to_scene(self, sounds.SUCCESS)
+        _play_msg_with_other(self, ["Successfully found the first set :)"])
+
 
     # animates a visualisation of the first set
     def vis_first_set(self, keys, start, production, pstack):
@@ -356,7 +365,7 @@ class ManimFirstSet(m.Scene):
                                     prev_element.scale(TEXT_SCALE)
 
                                 _play_msg_with_other(self, [production + " leads to " + current_item + ",", "so First("+production +
-                                             ") = First("+current_item+")"])
+                                             ") \\subseteq First("+current_item+")"])
 
                                 self.vis_first_set(
                                     keys, production, current_item, pstack)
@@ -410,11 +419,11 @@ class ManimFirstSet(m.Scene):
                             # fade in new terminal and corresponding element of the cfg
                             cfg_element = self.manim_prod_dict[production][i][0]
 
-                            # TODO add sound
-                            #self.add_sound("click.wav")
+                            # adds sound as the new element is added
+                            sounds.add_sound_to_scene(self, sounds.CLICK)
+                            self.add(new_element)
 
                             self.play(
-                                m.FadeIn(new_element),
                                 m.Circumscribe(cfg_element, color=m.TEAL, shape = m.Circle),
                                 m.FadeToColor(cfg_element, color=m.TEAL),
                             )
@@ -636,7 +645,6 @@ class ManimFollowSet(m.Scene):
         else:
             pstack.pop()
 
-  
     def _add_to_follow_vis(self, production, item, keys, msg=[]):
         new_element = None
 
@@ -652,8 +660,7 @@ class ManimFollowSet(m.Scene):
 
             else:
                 # append it directly as a terminal
-                element = _to_tex(item)
-                typer.echo("ELEMENT TO BE TURNED TO TEX:" + element) 
+                element = _to_tex(item) 
                 new_element = m.Tex(
                     element, color=m.TEAL)
 
@@ -668,6 +675,8 @@ class ManimFollowSet(m.Scene):
             if msg != []:
                 _play_msg_with_other(self, msg, [m.FadeIn(new_element)])
             else:
+                # adds sound as the new element is added
+                sounds.add_sound_to_scene(self, sounds.CLANG)
                 self.play(
                     m.FadeIn(new_element)
                 )
@@ -701,7 +710,6 @@ class ManimFollowSet(m.Scene):
             self.play(
                 *[a for a in anims]
             )
-
 
 class ManimParseTable(m.Scene):
     def setup(self):
@@ -905,7 +913,6 @@ class ManimParseTable(m.Scene):
             width=8, color=m.LIGHT_GRAY)
         self.table.get_vertical_lines()[2].set_stroke(
             width=8, color=m.LIGHT_GRAY)
-
 
 def create_tokens(tokens):
     # Write equations
@@ -1354,7 +1361,7 @@ class ManimParseTree(m.Scene):
         reset_g(self, g, start_symbol, anim=[m.FadeOut(self.s.mstack)])
 
         self.s.write_under_stack("Stack emptied.")
-        fullscreen_notify(self, "Successfully parsed '" + " ".join(original_tokens) +
+        fullscreen_notify(self, "Successfully parsed `" + " ".join(original_tokens) +
                                 "'!")
 
         display_helper.success_secho("Successfully parsed '" + " ".join(original_tokens) +

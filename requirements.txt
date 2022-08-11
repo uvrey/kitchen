@@ -3,3 +3,4 @@ colorama==0.4.4
 shellingham==1.4.0
 pytest==6.2.4
 pyyaml==6.0
+gtts==2.2.4

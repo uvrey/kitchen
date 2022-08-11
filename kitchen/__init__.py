@@ -23,6 +23,7 @@ COLOURS = [m.BLUE_B, m.TEAL_B, m.GREEN_B, m.YELLOW_B, m.GOLD_B,
     LIGHT
 ) = range(2)
 
+
 (
     SUCCESS,
     DIR_ERROR,
@@ -38,8 +39,9 @@ COLOURS = [m.BLUE_B, m.TEAL_B, m.GREEN_B, m.YELLOW_B, m.GOLD_B,
     REGEX_WRITE_ERROR,
     INPUT_TOO_LONG,
     ERROR,
-    PARSING_ERROR
-) = range(15)
+    PARSING_ERROR,
+    SOUND_ERROR
+) = range(16)
 
 ERRORS = {
     DIR_ERROR: "config directory error",
@@ -53,4 +55,5 @@ ERRORS = {
     REGEX_WRITE_ERROR: "error writing regex file to dir",
     CFG_WRITE_ERROR: "error writing cfg file to dir",
     INPUT_TOO_LONG: "input too long",
+    SOUND_ERROR: "couldn't find sound or 'asset/sounds' folder"
 }
