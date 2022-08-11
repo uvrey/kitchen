@@ -37,6 +37,40 @@ m.config.include_sound = True
 # TODO neaten up animations
 
 
+def _play_msg_with_other(self, msg, anim):
+    if msg != []:
+        msg_group = m.VGroup()
+
+        for ms in msg:
+            msg_txt = m.MathTex(ms)
+            msg_group.add(msg_txt)
+        msg_group.arrange(m.DOWN)
+        
+        # create fading area
+        rect = m.Rectangle(width=20, height=10, color=m.BLACK, fill_opacity=0.9)
+        msg_group.move_to(rect.get_center())
+
+        self.play(
+            m.FadeIn(rect),
+        )
+
+        self.play(
+            m.Write(msg_group)
+        )
+
+        self.wait()
+
+        self.play(
+            m.FadeOut(msg_group),
+            m.FadeOut(rect),
+        )
+
+        # add the additional animation
+        self.play(
+            *[a for a in anim]
+        ),
+    return SUCCESS
+
 def _get_tokens_from_input(inp) -> list:
     """Obtains the token stream of an input string. 
 
@@ -63,7 +97,7 @@ def notify(self, message, next_to_this):
 
 def fullscreen_notify(self, message):
     err_msg = message
-    err_m_msg = m.Text(err_msg, color=m.WHITE)
+    err_m_msg = m.Tex(err_msg, color=m.WHITE)
     rect = m.Rectangle(width=20, height=10, color=m.BLACK, fill_opacity=0.85)
     err_m_msg.move_to(rect.get_center())
     self.play(
@@ -114,6 +148,7 @@ def get_manim_cfg_group(self):
     manim_cfg = self.cfg.manim_cfg
 
     keys = m.VGroup()
+
     self.manim_prod_dict = {}
     self.manim_nt_dict = {}     
     self.manim_production_groups = {}
@@ -128,7 +163,7 @@ def get_manim_cfg_group(self):
         arrow = m.Arrow(start=m.LEFT, end=m.RIGHT, buff=0).scale(0.6).next_to(
             new_cfg_production, m.RIGHT)
 
-        # add A -> to the production group
+        # add -> to the production group
         production_group.add(new_cfg_production, arrow)
         prev_element = arrow
 
@@ -154,8 +189,9 @@ def get_manim_cfg_group(self):
         production_group.arrange(m.RIGHT)
         keys.add(production_group)
         self.manim_production_groups[key] = production_group
-
-    keys.arrange(m.DOWN)
+    
+    row_no = len(manim_cfg)
+    keys.arrange_in_grid(rows=row_no, buff=0.5)
     keys.fade_to(color=m.DARK_GRAY, alpha=1)
     return keys
 
@@ -390,23 +426,37 @@ class ManimFollowSet(m.Scene):
         self.cfg = cfg
 
     def construct(self):     
-        keys = get_manim_cfg_group(self).scale(TEXT_SCALE)
         display_helper.info_secho("Visualising follow set calculation:")
-        self.vis_follow_set(keys, True)
+        self.vis_follow_set(True)
 
-    def vis_follow_set(self, keys, is_start_symbol):
+    def vis_follow_set(self, is_start_symbol):
+
+            # Set up CFG keys
+            keys = get_manim_cfg_group(self).to_edge(m.LEFT).scale(TEXT_SCALE)
+            keys.fade_to(m.GRAY, 1).to_edge(m.LEFT)
+
+            # draw LL(1) representation title
+            fw_title = m.Tex(r"Follow Set calculation")
+
+            # set the stage
+            self.play(
+                fw_title.animate.to_edge(m.UP),
+                m.FadeIn(keys)
+            )
+            
+            # obtain set for each production
             for production in self.cfg.cfg_dict.keys():
-                keys.fade_to(color=m.WHITE, alpha=1).to_edge(m.LEFT)
-                self.prepare_cfg_line(self, production)
+                # fade the other keys
+                self._prepare_follow_set_line(production, keys)
 
                 # Rule 1
                 if is_start_symbol:
                     self.cfg.follow_set[production].append("$")
                     self.add_to_follow_vis(
-                        self, production, "$", production + " is the start symbol,\nso we append $\nto Follow(" +
-                        production + ")")
+                        production, "$", keys, [production + "\\text{ is the start symbol,}", "\\text{so we append \$}", "\\text{ to Follow(}" +
+                        production + "\\text{)}"])
                     is_start_symbol = False
-
+                    
                 # inspect each element in the production
                 for i, p in enumerate(self.cfg.cfg_dict[production]):
 
@@ -426,8 +476,9 @@ class ManimFollowSet(m.Scene):
 
                             # observe that the follow of a standalone terminal is ε
                             if index == len(pps) - 1:
-                                msg = m.Text("Follow (" + ti + ")\nmay not exist", weight=m.BOLD, color=m.YELLOW).scale(
-                                    0.5).align_to(self.manim_production_groups[production], m.UP).shift(m.RIGHT*4)
+                                msg = m.Tex("Follow (" + ti + ")\nmay not exist").scale(
+                                    TEXT_SCALE).next_to(self.cfg.manim_followset_contents[production], m.RIGHT)
+
                                 self.play(
                                     m.FadeIn(msg),
                                     m.Circumscribe(cfg_element, color=m.TEAL),
@@ -453,7 +504,7 @@ class ManimFollowSet(m.Scene):
                             # temporarily append production to let us then iterate over and replace it
                             self.cfg.follow_set[item].append(production)
                             self.add_to_follow_vis(
-                                self, item, production, "Follow (" + production + ") ⊆ Follow (" + item + ")")
+                                item, production, keys, ["Follow (" + production + ") \\subseteq Follow (" + item + ")"])
 
                         elif index < len(pps) - 1:
                             next_item = pps[index + 1]
@@ -461,7 +512,7 @@ class ManimFollowSet(m.Scene):
                             if re.match(RE_TERMINAL, next_item):
                                 self.cfg.follow_set[item].append(next_item)
                                 self.add_to_follow_vis(
-                                    self, item, next_item, "")
+                                    item, next_item, keys)
                             else:
                                 # we add the first of the non-terminal at this next index
                                 tmp_follow = self.cfg.first_set[next_item]
@@ -481,10 +532,13 @@ class ManimFollowSet(m.Scene):
                                         m.FadeToColor(next_cfg_element, color=m.RED),
                                     )
 
-                                msg = m.Text("{First ("+next_item+") - ε}\n⊆ Follow (" + item + ")", weight=m.BOLD, color=m.YELLOW).scale(
-                                    0.5).align_to(self.manim_production_groups[production], m.UP).shift(m.RIGHT*5)
+                                msg = m.Tex("{First ("+next_item+") - \\epsilon} \\ \\in Follow (" + item + ")").scale(
+                                    TEXT_SCALE).next_to(self.manim_followset_contents[production], m.RIGHT) 
                                 self.play(
-                                    m.FadeIn(msg),
+                                    m.LaggedStart(
+                                        m.FadeIn(msg),
+                                        m.Indicate(msg),
+                                    )
                                 )
                                 self.wait()
                                 self.play(m.FadeOut(msg))
@@ -493,12 +547,12 @@ class ManimFollowSet(m.Scene):
                                     if t != "#":
                                         self.cfg.follow_set[item].append(t)
                                         self.add_to_follow_vis(
-                                            self, item, t, t + " ⊆ {First ("+next_item+") - ε}")
+                                            item, t, keys, [t + " \\in \\text{\{First}("+next_item+"\\) - \\epsilon\}"])
                                     else:
                                         # we found an epsilon, so this non-terminal
                                         self.cfg.follow_set[item].append(next_item)
                                         self.add_to_follow_vis(
-                                            self, item, next_item, "ε ⊆ First ("+next_item+"),\nso "+next_item+" may not\nactually appear after "+item)
+                                            item, next_item, keys, ["\\epsilon \\in \\text\{First\}("+next_item+")\\text{,}", "\\text{so }"+next_item+"\\text{ may not}", "\\text{actually appear after }"+item])
 
             # start cleaning the follow set
             self.is_cleaned = []
@@ -560,12 +614,12 @@ class ManimFollowSet(m.Scene):
         else:
             pstack.pop()
 
-    def add_to_follow_vis(self, scene, production, item, msg):
+    def add_to_follow_vis(self, production, item, keys, msg=[]):
         new_element = None
 
         if not re.match(RE_TERMINAL, production) and item != production:
             # display adding to the non-terminal followsets
-            self.prepare_cfg_line(self, production)
+            self._prepare_follow_set_line(production, keys)
 
             # check if item to be added is a non-terminal
             if re.match(RE_NONTERMINAL, item):
@@ -586,44 +640,44 @@ class ManimFollowSet(m.Scene):
             self.cfg.manim_followset_contents[production].next_to(
                 self.cfg.manim_followset_lead[production], m.RIGHT)
 
-            # Play the addition of the item to the followset and message, if given
-            if msg != "":
-                msg_txt = m.Text(msg, weight=m.BOLD, color=m.YELLOW).scale(0.45).align_to(
-                    self.manim_production_groups[production], m.UP).shift(m.RIGHT*5)
-                # TODO add sound, narration here
-                self.play(
-                    m.FadeIn(new_element),
-                    m.Write(msg_txt)
-                )
-                self.wait()
-                self.play(
-                    m.FadeOut(msg_txt)
-                )
+        # Play the addition of the item to the followset and message, if given
+            if msg != []:
+                _play_msg_with_other(self, msg, [m.FadeIn(new_element)])
             else:
                 self.play(
                     m.FadeIn(new_element)
                 )
 
-    def prepare_cfg_line(self, scene, production):
+    def _prepare_follow_set_line(self, production, keys):
         # only prepare a follow set for non-terminals
         if not re.match(RE_TERMINAL, production):
+            # create anims buffer
+            anims = []
 
             # highlight manim production
+            keys.fade_to(color=m.GRAY, alpha=1)
             cfg_line = self.manim_production_groups[production][:]
+            anims.append(m.FadeToColor(cfg_line, m.WHITE))
 
             # add the follow set titles to the canvas
             if self.cfg.manim_followset_lead[production] == None:
-                self.cfg.manim_followset_lead[production] = m.Text("Follow(" + production + "):",
-                                                             weight=m.BOLD).align_to(cfg_line, m.UP).scale(0.6).shift(m.LEFT)
+                self.cfg.manim_followset_lead[production] = m.Tex("Follow(" + production + "):",
+                                                             ).align_to(cfg_line, m.UP).shift(m.LEFT)
                 # prepare content group
                 self.cfg.manim_followset_contents[production].next_to(
                     self.cfg.manim_followset_lead[production], m.RIGHT)
                 self.cfg.manim_followset_contents[production].arrange(m.RIGHT)
 
                 # show the new follow area
-                self.play(
+                anims.append(
                     m.FadeIn(self.cfg.manim_followset_lead[production]),
                 )
+
+            # animate the cfg line highlight
+            self.play(
+                *[a for a in anims]
+            )
+
 
 class ManimParseTable(m.Scene):
     def setup(self):
