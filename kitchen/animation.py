@@ -124,7 +124,7 @@ def notify(self, message, next_to_this):
 def fullscreen_notify(self, message):
     err_msg = message
     err_m_msg = m.Tex(err_msg, color=_opp_col())
-    rect = m.Rectangle(width=20, height=10, color=_opp_col(), fill_opacity=0.85)
+    rect = m.Rectangle(width=20, height=10, color=_mode_col(), fill_opacity=0.85)
     err_m_msg.move_to(rect.get_center())
     self.play(
         m.FadeIn(rect),
@@ -1182,7 +1182,6 @@ class ManimParseTree(m.Scene):
 
                     if parent != None:
                         vertex_id = parent.id + "_" + top
-                        typer.echo("parent is " + parent.id)
 
                         if parent.id == start_symbol:
                             parent_vertex_id = parent.id
@@ -1218,8 +1217,9 @@ class ManimParseTree(m.Scene):
                             reset_g(self, g, start_symbol)
 
                     # pop off the stack and 'flash'
-                    self.s.pop(anim=anims, vertex=new_vertex, matching=True, msg="\\text{Matched }" +
-                               self.s.stack[-1] + "\\text{!}")
+                    self.s.pop(anim=anims, vertex=new_vertex, matching=True, msg="Matched " +
+                               _to_tex(self.s.stack[-1]) + "!")
+
 
                     # highlight the token stream line and token that we matched
                     self.play(m.ApplyWave(m_tok_gp))
@@ -1271,7 +1271,7 @@ class ManimParseTree(m.Scene):
                             try:
                                 vertex = g[v_id]
                                 rendered_label = m.MathTex(
-                                    "\\text{"+popped_off+"}", color=_opp_col())
+                                    "\\text{"+_to_tex(popped_off)+"}", color=_opp_col())
 
                                 # confirm the path by adding the colour
                                 vertex.fade_to(m.BLUE, 1)
@@ -1286,7 +1286,7 @@ class ManimParseTree(m.Scene):
                                 pass
 
                     self.s.pop(anim=anims,
-                               msg="\\text{Replacing }" + popped_off + "\\text{...}")
+                               msg="Replacing " + _to_tex(popped_off) + "...")
 
                     # add sequence of productions to the stack
                     ps = list(filter(None, re.findall(
@@ -1328,8 +1328,8 @@ class ManimParseTree(m.Scene):
 
                         # we don't need to match epsilon, and we also only want non-terminals as parent nodes
                         if p != "#" and p != "$":
-                            new_prod = prods[0].strip() + " \\to " + p
-                            self.s.push(p, new_prod)
+                            new_prod = prods[0].strip() + " -> " + p
+                            self.s.push(p, _to_tex(new_prod))
                             self.parents.append(new_node)
 
                     self.play(

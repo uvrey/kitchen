@@ -6,7 +6,8 @@ import re
 from kitchen import (
     RE_NONTERMINAL,
     RE_TERMINAL,
-    RE_PRODUCTION
+    RE_PRODUCTION,
+    display_helper
 )
 
 class Stack:
@@ -21,7 +22,7 @@ class Stack:
         # draws the stack
         self.mstack.set_points_as_corners(
             [left_edge + height*m.UP, left_edge, left_edge + m.RIGHT, (left_edge + m.RIGHT) + height*m.UP])
-        self.mstack.set_stroke(width=2, color=_mode_col())
+        self.mstack.set_stroke(width=2, color=display_helper.opp_col())
 
     def pop(self, msg, vertex=None, anim=[], matching=False):
         # set up stack in backend
@@ -86,7 +87,7 @@ class Stack:
 
         # set up message
         if msg != None:
-            m_msg = m.MathTex(msg).next_to(self.mstack, m.DOWN)
+            m_msg = m.Tex(msg, color = display_helper.opp_col()).next_to(self.mstack, m.DOWN)
 
         # add to backend stack
         self.stack.append(a)
@@ -105,6 +106,7 @@ class Stack:
             t.move_to(self.texts[-1].get_top()).shift(m.UP*0.5)
             self.texts.append(t)
 
+        
         if msg != None:
             self.scene.play(
                 m.LaggedStart(
@@ -113,7 +115,7 @@ class Stack:
             )
 
             self.scene.play(
-                m.FadeToColor(t, color=_mode_col()),
+                m.FadeToColor(t, color=display_helper.opp_col()),
                 m.FadeOut(m_msg),
             )
         else:
@@ -128,5 +130,5 @@ class Stack:
                 )
 
             self.scene.play(
-                m.FadeToColor(t, color=_mode_col()),
+                m.FadeToColor(t, color=display_helper._col()),
             )
