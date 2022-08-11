@@ -2,6 +2,7 @@
 # kitchen/animation.py
 
 from pathlib import Path
+from turtle import color
 import manim as m
 import re
 import typer
@@ -30,6 +31,8 @@ LCONFIG = {"vertex_spacing": (0.5, 1)}
 ECONFIG = {"color": display_helper.opp_col()}
 ECONFIG_TEMP = {"color": m.GRAY, "fill_opacity": 0.7}
 V_LABELS = {}
+
+GRID_ITEM_SCALE = 0.9
 
 # set global configs
 m.config.include_sound = True
@@ -230,8 +233,8 @@ def get_guide():
         guide_group_inner.add(m.Tex(labels[i]))
         guide_group_inner.arrange_in_grid(rows = 1, buff = 0.8)
         guide_group_outer.add(guide_group_inner)
-    guide_group_outer.arrange_in_grid(rows = len(labels), buff = 0.5, aligned_edge=m.LEFT)
-    return guide_group_outer.arrange(aligned_edge=m.LEFT)
+    guide_group_outer.arrange_in_grid(rows = len(labels), buff = 0.8)
+    return guide_group_outer.arrange(m.DOWN, aligned_edge=m.LEFT)
     
 def ts_m_epsilon(self):
     ts_m = []
@@ -836,11 +839,11 @@ class ManimParseTable(m.Scene):
         t_old = self.mtable.get_entries_without_labels((row, col))
 
         self.play(
-            m.Indicate(t_old)
+            m.Indicate(t_old, color = m.WHITE)
         )
 
         # set up new value with colour
-        t_new = m.MathTex(new_val).scale(0.7)
+        t_new = m.MathTex(new_val).scale(GRID_ITEM_SCALE)
         t_new.move_to(t_old)
         t_new.fade_to(_opp_col(), alpha=0.2)
 
@@ -849,6 +852,11 @@ class ManimParseTable(m.Scene):
             m.FadeIn(t_new),
             m.FadeOut(t_old),
         )
+
+        self.play(
+            m.ApplyWave(t_new),
+        )
+
         # pause
         self.wait()
 
