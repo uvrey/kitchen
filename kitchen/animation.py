@@ -36,6 +36,9 @@ m.config.include_sound = True
 # TODO  Unique filename - Date and time?
 # TODO neaten up animations
 
+def _to_tex(item):
+    tex_item = item.replace("$", "\$").replace("#", "\\epsilon")
+    return tex_item
 
 def _play_msg_with_other(self, msg, anim):
     if msg != []:
@@ -614,6 +617,7 @@ class ManimFollowSet(m.Scene):
         else:
             pstack.pop()
 
+  
     def add_to_follow_vis(self, production, item, keys, msg=[]):
         new_element = None
 
@@ -624,19 +628,19 @@ class ManimFollowSet(m.Scene):
             # check if item to be added is a non-terminal
             if re.match(RE_NONTERMINAL, item):
                 # non terminal
-                new_element = m.Text(
-                    "Follow(" + item + ")", color=m.BLUE, slant=m.ITALIC, weight=m.BOLD).scale(0.5)
+                new_element = m.Tex(
+                    r'Follow(', item, ')', color=m.BLUE)
 
             else:
                 # append it directly as a terminal
-                new_element = m.Text(
-                    item, color=m.TEAL, slant=m.ITALIC, weight=m.BOLD).scale(TEXT_SCALE)
+                element = _to_tex(item)
+                new_element = m.Tex(
+                    element, color=m.TEAL)
 
             # add to the content group
             self.cfg.manim_followset_contents[production].add(
                 new_element)
-            self.cfg.manim_followset_contents[production].arrange(
-                m.RIGHT)
+            self.cfg.manim_followset_contents[production].arrange_in_grid(rows=1, buff=0.5)
             self.cfg.manim_followset_contents[production].next_to(
                 self.cfg.manim_followset_lead[production], m.RIGHT)
 
