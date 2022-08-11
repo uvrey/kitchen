@@ -49,7 +49,7 @@ def _play_msg_with_other(self, msg, anim):
         msg_group = m.VGroup()
 
         for ms in msg:
-            msg_txt = m.MathTex(ms)
+            msg_txt = m.Tex(ms, tex_template=m.TexFontTemplates.french_cursive)
             msg_group.add(msg_txt)
         msg_group.arrange(m.DOWN)
         
@@ -463,9 +463,9 @@ class ManimFollowSet(m.Scene):
                 # Rule 1
                 if is_start_symbol:
                     self.cfg.follow_set[production].append("$")
-                    self.add_to_follow_vis(
-                        production, "$", keys, [production + "\\text{ is the start symbol,}", "\\text{so we append \$}", "\\text{ to Follow(}" +
-                        production + "\\text{)}"])
+                    self._add_to_follow_vis(
+                        production, "$", keys, [production + " is the start symbol,", "so we append \$", "to Follow(" +
+                        production + "\\)"])
                     is_start_symbol = False
                     
                 # inspect each element in the production
@@ -514,7 +514,7 @@ class ManimFollowSet(m.Scene):
                         if index == len(pps) - 1 and item != "#" and item != production:
                             # temporarily append production to let us then iterate over and replace it
                             self.cfg.follow_set[item].append(production)
-                            self.add_to_follow_vis(
+                            self._add_to_follow_vis(
                                 item, production, keys, ["Follow (" + production + ") \\subseteq Follow (" + item + ")"])
 
                         elif index < len(pps) - 1:
@@ -522,7 +522,7 @@ class ManimFollowSet(m.Scene):
                             # if an item is directly followed by a terminal, it is appended to its follow set
                             if re.match(RE_TERMINAL, next_item):
                                 self.cfg.follow_set[item].append(next_item)
-                                self.add_to_follow_vis(
+                                self._add_to_follow_vis(
                                     item, next_item, keys)
                             else:
                                 # we add the first of the non-terminal at this next index
@@ -542,28 +542,19 @@ class ManimFollowSet(m.Scene):
                                             next_cfg_element, color=m.RED),
                                         m.FadeToColor(next_cfg_element, color=m.RED),
                                     )
-
-                                msg = m.Tex("{First ("+next_item+") - \\epsilon} \\ \\in Follow (" + item + ")").scale(
-                                    TEXT_SCALE).next_to(self.manim_followset_contents[production], m.RIGHT) 
-                                self.play(
-                                    m.LaggedStart(
-                                        m.FadeIn(msg),
-                                        m.Indicate(msg),
-                                    )
-                                )
-                                self.wait()
-                                self.play(m.FadeOut(msg))
+                                
+                                _play_msg_with_other(self, "{First ("+next_item+") - \\epsilon} \\ \\in Follow (" + item + ")")
 
                                 for t in tmp_follow:
                                     if t != "#":
                                         self.cfg.follow_set[item].append(t)
-                                        self.add_to_follow_vis(
-                                            item, t, keys, [t + " \\in \\text{\{First}("+next_item+"\\) - \\epsilon\}"])
+                                        self._add_to_follow_vis(
+                                            item, t, keys, [t + " \\in \{First("+next_item+"\\) - \\epsilon\}"])
                                     else:
                                         # we found an epsilon, so this non-terminal
                                         self.cfg.follow_set[item].append(next_item)
-                                        self.add_to_follow_vis(
-                                            item, next_item, keys, ["\\epsilon \\in \\text\{First\}("+next_item+")\\text{,}", "\\text{so }"+next_item+"\\text{ may not}", "\\text{actually appear after }"+item])
+                                        self._add_to_follow_vis(
+                                            item, next_item, keys, ["\\epsilon \\in First("+next_item+"),", "so "+next_item+ "may not", "actually appear after "+item])
 
             # start cleaning the follow set
             self.is_cleaned = []
@@ -630,7 +621,7 @@ class ManimFollowSet(m.Scene):
             pstack.pop()
 
   
-    def add_to_follow_vis(self, production, item, keys, msg=[]):
+    def _add_to_follow_vis(self, production, item, keys, msg=[]):
         new_element = None
 
         if not re.match(RE_TERMINAL, production) and item != production:
