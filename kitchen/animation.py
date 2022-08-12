@@ -526,7 +526,7 @@ class ManimFollowSet(m.Scene):
                                 for t in tmp_anim:
                                     anims.append(t)
                                 
-                                _play_msg_with_other(self, ["Follow (" + _to_tex(ti) + ") may not exist"], raw_msg = "A standalone non epsilon terminal won't have a follow set.")
+                                _play_msg_with_other(self, ["Follow(" + _to_tex(ti) + ") may not exist"], raw_msg = "A standalone non epsilon terminal won't have a follow set.")
 
 
                             else:
@@ -553,7 +553,7 @@ class ManimFollowSet(m.Scene):
                             self.cfg.follow_set[item].append(production)
                             self.wait()
                             self._add_to_follow_vis(
-                                item, production, keys, ["Follow (" + production + ") \\subseteq Follow (" + item + ")"], raw_msg = "The follow set of " + production + " is a subset of that of " + item + " ")
+                                item, production, keys, ["Follow(" + production + ") \\subseteq Follow(" + item + ")"], raw_msg = "The follow set of " + production + " is a subset of that of " + item + " ")
 
                         elif index < len(pps) - 1:
                             next_item = pps[index + 1]
@@ -599,7 +599,7 @@ class ManimFollowSet(m.Scene):
             self.is_cleaned = self.cfg.get_reset_cleaned_set()
             self.clean_follow_set(self.cfg.start_symbol, [])
 
-            sounds.narrate("Time to simplify the sets.")
+            sounds.narrate("Time to simplify the sets.", self)
             self.wait()
 
 
@@ -631,8 +631,7 @@ class ManimFollowSet(m.Scene):
                     )
 
             # show success
-            sounds.add_sound_to_scene(sounds.SUCCESS, self)
-            sounds.narrate("Success!", self)
+            sounds.narrate("Awesome. We found the follow set!", self)
                                 
 # cleans the follow set up after everything is found, so that we don't miss elements
     def clean_follow_set(self, start, pstack):
