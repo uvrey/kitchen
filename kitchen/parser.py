@@ -172,5 +172,6 @@ class ParserLL1:
         # display the parse tree
         # TODO change to parsing input specifically rather than tokens
         display_helper.success_secho("Successfully parsed token stream '" + " ".join(original_tokens) +
-                              "'!")
+                              "'!\nParse tree:")
+        display_helper.print_parsetree(self.root)
         return SUCCESS
