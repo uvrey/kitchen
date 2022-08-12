@@ -48,7 +48,6 @@ class Stack:
                         self.scene.play(
                             a
                         )
-                    sounds.add_sound_to_scene(sounds.POP, self)
                     self.scene.play(m.FadeOut(top_text))
 
                 else:

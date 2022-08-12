@@ -17,11 +17,12 @@ from gtts import gTTS
     WAVE,
     TWINKLE,
     FAIL,
+    CLACK,
     YAY,
-    OOF,
     POP,
-    MOVE
-) = range(14)
+    MOVE,
+    TYPE
+) = range(15)
 
 id = 0
 config = NARR
@@ -80,18 +81,18 @@ def add_sound_to_scene(scene, sound_spec):
             scene.add_sound(os.getcwd() + r'\assets\sounds\click.wav')
         elif sound_spec == FLASH:
             pass
-        elif sound_spec == WAVE:
-            pass
+        elif sound_spec == TYPE:
+            scene.add_sound(os.getcwd() + r'\assets\sounds\type.wav')
         elif sound_spec == CLANG:
             scene.add_sound(os.getcwd() + r'\assets\sounds\clang.wav')
         elif sound_spec == TWINKLE:
             scene.add_sound(os.getcwd() + r'\assets\sounds\twinkle.wav') 
         elif sound_spec == FAIL:
             scene.add_sound(os.getcwd() + r'\assets\sounds\fail.wav')
+        elif sound_spec == CLACK:
+            scene.add_sound(os.getcwd() + r'\assets\sounds\clack.wav')
         elif sound_spec == YAY:
-            scene.add_sound(os.getcwd() + r'\assets\sounds\yay.wav')
-        elif sound_spec == OOF:
-            scene.add_sound(os.getcwd() + r'\assets\sounds\oof.wav')   
+            scene.add_sound(os.getcwd() + r'\assets\sounds\yay.wav')   
         elif sound_spec == POP:
             scene.add_sound(os.getcwd() + r'\assets\sounds\pop.wav') 
         elif sound_spec==MOVE:

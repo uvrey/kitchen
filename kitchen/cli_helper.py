@@ -285,9 +285,12 @@ def _process_command(inp, cfg) -> None:
     if inp == "\\m":
         display_helper.print_menu()
 
-    elif inp == "\\n":
-        typer.echo("narrating...")
-        sounds.narrate()
+    elif inp == "\\gary":
+        sounds._get_narration("Gary is the best supervisor ever.")
+    
+    elif inp == "\\simon":
+        sounds._get_narration("Simon is a great project partner")
+
     elif inp == "\\q":
         raise typer.Exit()
     elif inp == "\\dsl":

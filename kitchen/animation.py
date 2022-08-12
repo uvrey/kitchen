@@ -632,6 +632,9 @@ class ManimFollowSet(m.Scene):
 
             # show success
             sounds.narrate("Awesome. We found the follow set!", self)
+            self.play(
+                m.FadeOut(keys)
+            )
                                 
 # cleans the follow set up after everything is found, so that we don't miss elements
     def clean_follow_set(self, start, pstack):
@@ -755,7 +758,6 @@ class ManimParseTable(m.Scene):
         self.ts = sorted(cfg.terminals)
         self.nts = sorted(cfg.nonterminals)
         self.cfg = cfg
-        self.add_sound(os.getcwd() + "\\assets\sounds\\add_to_set.wav")
 
     # quickly get the row and column index of the parse table contents
     def row(self, nt):
@@ -776,7 +778,7 @@ class ManimParseTable(m.Scene):
 
         # set up the title
         ll1_title = _get_title_mobject("LL(1) parsing: parse table")
-        sounds.narrate("Let's find the parse table for this grammar.")
+        sounds.narrate("Let's find the parse table for this grammar.", self)
         keys = get_manim_cfg_group(self)
         keys.to_edge(m.LEFT).scale(CFG_SCALE)
 
@@ -822,6 +824,15 @@ class ManimParseTable(m.Scene):
 
         # populate the whole table with the first and follow set, if appropriate
         for i, key in enumerate(self.cfg.first_set.keys(), start=0):
+            # reset all lines to gray
+            keys.fade_to(m.GRAY, 1)
+
+            # highlight the CFG line
+            cfg_line = self.manim_production_groups[key][:]
+            self.play(
+                    m.FadeToColor(cfg_line, color=_opp_col())
+            )
+
             for j, item in enumerate(self.cfg.first_set[key], start=0):
                 # if the first set contains epsilon, may disappear
                 if item == "#":
@@ -832,7 +843,9 @@ class ManimParseTable(m.Scene):
                         else:
                             mprod = key + " \\to \epsilon"
                             prod = key + " -> #"
-                        _play_msg_with_other(self, ["Following " + prod + "adds #", "to First(" + _to_tex(key) + ")"], raw_msg = "If we follow this production, we find an epsilon. So, we add this production to the parsetable in the epsilon column and non terminal " + key + "'s row")
+                        _play_msg_with_other(self, ["Following " + prod + "adds #", "to First(" + _to_tex(key) + ")"], raw_msg = "If we follow "+key+"'s production, we find an epsilon. So, we add this production to the parse table in the epsilon column and non terminal " + key + "'s row")
+                        self.wait()
+
                         self.vis_add_to_parsetable( key, f, prod, mprod)
                 else:
 
@@ -842,10 +855,16 @@ class ManimParseTable(m.Scene):
                     tmp_prod = prod.replace(
                         "->", "\\to").strip().replace("#", "\epsilon")
                     _play_msg_with_other(self, ["Following " + prod + " adds " +
-                                 self.cfg.first_set[key][j], " to First(" + key + ")"], raw_msg = "If we follow this production, we encounter " + self.cfg.first_set[key][j] + ". So, let's add this production to the parsetable at row " + key + " and column " + self.cfg.first_set[key][j])
+                                 self.cfg.first_set[key][j], " to First(" + key + ")"], raw_msg = "If we follow " + key + "'s production, we encounter terminal " + self.cfg.first_set[key][j] + ". So, let's add this production to the parse table at row " + key + " and column " + self.cfg.first_set[key][j])
  
                     self.vis_add_to_parsetable(
                          key, item, prod, tmp_prod)
+        
+        self.wait()
+        sounds.add_sound_to_scene(sounds.YAY, self)
+        self.wait()
+        sounds.narrate("The parse table is complete. Yay!", self)
+        return SUCCESS
 
     def vis_add_to_parsetable(self, nt, t, prod, mprod):
         try:
@@ -871,7 +890,7 @@ class ManimParseTable(m.Scene):
         t_old = self.mtable.get_entries_without_labels((row, col))
 
         self.play(
-            m.Indicate(t_old, color = m.WHITE)
+            m.Indicate(t_old, color = _opp_col())
         )
 
         # set up new value with colour
@@ -1002,7 +1021,6 @@ def reset_g(self, g, root, anim=[]):
     )
 
 
-
 class ManimParseTree(m.Scene):
     # Parse LL(1) in the CLI
     def setup(self):
@@ -1101,7 +1119,7 @@ class ManimParseTree(m.Scene):
 
         # draw LL(1) representation title
         ll1_title = _get_title_mobject("LL(1) parsing")
-        sounds.narrate("Let's parse this input using the L.L.1. parsing algorithm")
+        _play_msg_with_other(self, ["Parsing `" +  " ".join(original_tokens) + "' :)"], raw_msg = "Let's parse this input using the L L 1 parsing algorithm")
         keys = get_manim_cfg_group(self).to_edge(m.RIGHT)
 
         # create the input group here
@@ -1126,7 +1144,7 @@ class ManimParseTree(m.Scene):
         # create our first label
         V_LABELS[start_symbol] = start_symbol
         g = m.Graph([start_symbol], [], vertex_config=VCONFIG,
-                  labels=V_LABELS, label_fill_color=_opp_col())
+                  labels=V_LABELS, label_fill_color=m.BLACK)
 
         g.to_edge(m.UP).shift(m.DOWN)
         self.add(g)
@@ -1153,6 +1171,9 @@ class ManimParseTree(m.Scene):
                     anims = []
                     tokens.remove(next)
 
+                    sounds.narrate("The next token " + next + " matches the top of the stack!", self)
+                    self.wait()
+
                     # highlight parents
                     if self.parents == []:
                         parent = None
@@ -1178,7 +1199,7 @@ class ManimParseTree(m.Scene):
                                         if p.height != 0:
                                             p.children = []
                                         anytree.Node(
-                                            popped.id, parent=p, id=popped.id, manim=m.Text(popped.id, weight=m.BOLD))
+                                            popped.id, parent=p, id=popped.id, manim=m.Tex(popped.id, color = m.BLACK))
 
                                         # check for epsilons
                                         rhs = self.parents[-i + 1:]
@@ -1222,8 +1243,8 @@ class ManimParseTree(m.Scene):
                             # get existing vertex
                             new_vertex = g[vertex_id]
                             # confirm the path by adding the colour
-                            rendered_label = m.MathTex(
-                                "\\text{"+top+"}", color=_opp_col())
+                            rendered_label = m.Tex(
+                                top, color = m.BLACK)
                             new_vertex.fade_to(m.BLUE, 1)
                             rendered_label.move_to(new_vertex.get_center())
                             new_vertex.add(rendered_label)
@@ -1246,11 +1267,12 @@ class ManimParseTree(m.Scene):
                             reset_g(self, g, start_symbol)
 
                     # pop off the stack and 'flash'
-                    self.s.pop(anim=anims, vertex=new_vertex, matching=True, msg="Matched " +
-                               _to_tex(self.s.stack[-1]) + "!")
+                    self.s.pop(anim=anims, vertex=new_vertex, matching=True, msg="\\text{Matched }" +
+                               _to_tex(self.s.stack[-1]) + "\\text{!}")
 
 
                     # highlight the token stream line and token that we matched
+                    sounds.add_sound_to_scene(sounds.YAY, self)
                     self.play(m.ApplyWave(m_tok_gp))
                     self.play(
                         m.LaggedStart(m.Indicate(m_tok[next], color=m.BLUE, scale_factor=1.5),
@@ -1268,6 +1290,8 @@ class ManimParseTree(m.Scene):
                 try:
                     pt_entry = self.cfg.parsetable.pt_dict[top][next]
                     prods = pt_entry.split("->")
+
+                    _play_msg_with_other(self, ["We must find the entry at ParseTable["+top+"]["+next+"]"], raw_msg = "Let's consider the parse table entry at non-terminal " + top + "'s row and terminal " + next + "'s column.")
 
                     #  copy the cfg_line rather than manipulate it directly
                     cfg_line = self.manim_production_groups[prods[0].strip(
@@ -1299,8 +1323,8 @@ class ManimParseTree(m.Scene):
                             anims = []
                             try:
                                 vertex = g[v_id]
-                                rendered_label = m.MathTex(
-                                    "\\text{"+_to_tex(popped_off)+"}", color=_opp_col())
+                                rendered_label = m.Tex(
+                                    "\\text{"+_to_tex(popped_off)+"}", color=m.WHITE)
 
                                 # confirm the path by adding the colour
                                 vertex.fade_to(m.BLUE, 1)
@@ -1313,9 +1337,11 @@ class ManimParseTree(m.Scene):
                                 )
                             except:
                                 pass
-
+                                
+                    _play_msg_with_other(self, [_to_tex(popped_off) + " is a non-terminal,", "so we can replace it with", "its sub-productions."], raw_msg="Let's replace " + popped_off + " with its sub productions")
+                    sounds.add_sound_to_scene(sounds.POP, self)
                     self.s.pop(anim=anims,
-                               msg="Replacing " + _to_tex(popped_off) + "...")
+                               msg="\\text{Replacing }" + _to_tex(popped_off) + "\\text{...}")
 
                     # add sequence of productions to the stack
                     ps = list(filter(None, re.findall(
@@ -1327,7 +1353,6 @@ class ManimParseTree(m.Scene):
                             # create the node
                             new_node = anytree.Node(
                                 p, parent=self.root, id=p)
-
                             try:
                                 vertex_id = top + "_" + p.strip()
                                 vertex = g[vertex_id]
@@ -1380,11 +1405,11 @@ class ManimParseTree(m.Scene):
             return
 
         # fade out the stack and transform the parse tree
+        self.s.write_under_stack("\\text{Stack emptied.}")
         reset_g(self, g, start_symbol, anim=[m.FadeOut(self.s.mstack)])
 
-        self.s.write_under_stack("Stack emptied.")
-        fullscreen_notify(self, "Successfully parsed `" + " ".join(original_tokens) +
-                                "'!")
+        _play_msg_with_other(self, ["Successfully parsed `" + " ".join(original_tokens) +
+                                "'!"], raw_msg= "Parsing successful! That was a valid input.")
 
         display_helper.success_secho("Successfully parsed '" + " ".join(original_tokens) +
                               "'!\nParse tree:")
