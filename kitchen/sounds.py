@@ -19,8 +19,9 @@ from gtts import gTTS
     FAIL,
     YAY,
     OOF,
-    POP
-) = range(13)
+    POP,
+    MOVE
+) = range(14)
 
 id = 0
 config = NARR
@@ -50,6 +51,8 @@ def _get_narration(script) -> String:
     return path
 
 def narrate(script, scene) -> int:
+    display_helper.info_secho("trying to narrate: ")
+    display_helper.info_secho(script)
     if config == NARR:
         _new_narration = _get_narration(script)
         if not os.path.isfile(_new_narration):
@@ -91,6 +94,8 @@ def add_sound_to_scene(scene, sound_spec):
             scene.add_sound(os.getcwd() + r'\assets\sounds\oof.wav')   
         elif sound_spec == POP:
             scene.add_sound(os.getcwd() + r'\assets\sounds\pop.wav') 
+        elif sound_spec==MOVE:
+            scene.add_sound(os.getcwd() + r'\assets\sounds\move.wav')
     except OSError:
         display_helper.fail_secho("Sound not found - please check your assets folder.")
         return SOUND_ERROR

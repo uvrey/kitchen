@@ -367,7 +367,7 @@ class ManimFirstSet(m.Scene):
 
                                 # display the message alongside narration
                                 _play_msg_with_other(self, [production + " leads to " + current_item + ",", "so First("+production +
-                                             ") \\subseteq First("+current_item+")"], raw_msg=production + "leads to another non terminal" + current_item + ", so their first sets will overlap.")
+                                             ") \\subseteq First("+current_item+")"], raw_msg=production + ", leads to another non terminal" + current_item + ", so their first sets will overlap.")
 
 
                                 self.vis_first_set(
@@ -435,7 +435,7 @@ class ManimFirstSet(m.Scene):
 
                             # notify about user epsilon if we are somewhere in the stack
                             if first_terminal[0] == "#" and ps != start:
-                                _play_msg_with_other(self, ["\\epsilon found at production " + production + ",", "so " + production + " may disappear :)"])
+                                _play_msg_with_other(self, ["\\epsilon found at production " + production + ",", "so " + production + " may disappear :)"], raw_msg = "The production may disappear since it can lead to epsilon.")
 
                             # reset other colours to white
                             self.cfg.manim_firstset_contents[ps].fade_to(
@@ -468,6 +468,7 @@ class ManimFollowSet(m.Scene):
         self.cfg = cfg
 
     def construct(self):     
+        sounds.narrate("Let's find the follow set.", self)
         display_helper.info_secho("Visualising follow set calculation:")
         self.vis_follow_set(True)
 
@@ -496,9 +497,9 @@ class ManimFollowSet(m.Scene):
                     self.cfg.follow_set[production].append("$")
                     self._add_to_follow_vis(
                         production, "$", keys, [production + " is the start symbol,", "so we append $", "to Follow(" +
-                        production + ")"])
+                        production + ")"], raw_msg = production + ", is the start symbol, so we append $ to its follow set.")
                     is_start_symbol = False
-                    
+
                 # inspect each element in the production
                 for i, p in enumerate(self.cfg.cfg_dict[production]):
 
@@ -512,29 +513,32 @@ class ManimFollowSet(m.Scene):
                         # highlight items as we inspect them
                         if re.match(RE_TERMINAL, item):
                             if item == "#":
-                                ti = "ε"
+                                ti = "#"
                             else:
                                 ti = item
 
-                            # observe that the follow of a standalone terminal is ε
+                            # observe that the follow of a standalone terminal may be ε
                             if index == len(pps) - 1:
                                 # prepare simultaneous animations
                                 anims = []
                                 tmp_anim = [m.Circumscribe(cfg_element, color=m.TEAL, shape = m.Circle),
                                     m.FadeToColor(cfg_element, color=m.TEAL)]
                                 for t in tmp_anim:
-                                    anims.append(t
-                                )
-                                _play_msg_with_other(self, ["Follow (" + _to_tex(ti) + ") may not exist"])
+                                    anims.append(t)
+                                
+                                _play_msg_with_other(self, ["Follow (" + _to_tex(ti) + ") may not exist"], raw_msg = "A standalone non epsilon terminal won't have a follow set.")
+
 
                             else:
                                 # just highlight the terminal
+                                sounds.narrate(item + " , is a terminal.")
                                 self.play(
                                     m.Circumscribe(cfg_element, color=m.TEAL, shape = m.Circle),
                                     m.FadeToColor(cfg_element, color=m.TEAL),
                                 )
 
                         else:
+                            sounds.narrate("Let's now look at " +item +", which is a non terminal.", self)
                             self.play(
                                 m.Circumscribe(cfg_element, color=m.RED, shape = m.Circle),
                                 m.FadeToColor(cfg_element, color=m.RED),
@@ -545,7 +549,7 @@ class ManimFollowSet(m.Scene):
                             # temporarily append production to let us then iterate over and replace it
                             self.cfg.follow_set[item].append(production)
                             self._add_to_follow_vis(
-                                item, production, keys, ["Follow (" + production + ") \\subseteq Follow (" + item + ")"])
+                                item, production, keys, ["Follow (" + production + ") \\subseteq Follow (" + item + ")"], raw_msg = "The follow set of " + production + " is a subset of that of " + item + " ")
 
                         elif index < len(pps) - 1:
                             next_item = pps[index + 1]
@@ -573,7 +577,7 @@ class ManimFollowSet(m.Scene):
                                         m.FadeToColor(next_cfg_element, color=m.RED),
                                     )
                                 
-                                _play_msg_with_other(self, ["{First ("+next_item+") - #}", "\\subseteq Follow (" + item + ")"])
+                                _play_msg_with_other(self, ["{First ("+next_item+") - #}", "\\subseteq Follow (" + item + ")"], raw_msg = "The first set of " + next_item + " without epsilon is a subset of " + item + "'s follow set.")
 
                                 for t in tmp_follow:
                                     if t != "#":
@@ -584,7 +588,7 @@ class ManimFollowSet(m.Scene):
                                         # we found an epsilon, so this non-terminal
                                         self.cfg.follow_set[item].append(next_item)
                                         self._add_to_follow_vis(
-                                            item, next_item, keys, ["\\epsilon \\subseteq First("+next_item+"),", "so "+next_item+ "may not", "actually appear after "+item])
+                                            item, next_item, keys, ["\\epsilon \\subseteq First("+next_item+"),", "so "+next_item+ "may not", "actually appear after "+item], raw_msg = "Epsilon is in the first set of " + item + " so the non terminal "+next_item + " might not actually appear after " + item)
 
             # start cleaning the follow set
             self.is_cleaned = []
@@ -613,6 +617,7 @@ class ManimFollowSet(m.Scene):
                         self.cfg.manim_followset_lead[key], m.RIGHT)
 
                     # transform to new contents
+                    sounds.add_sound_to_scene(sounds.SUCCESS, self)
                     self.play(
                         m.Transform(
                             self.cfg.manim_followset_contents[key], new_fs_group),
@@ -650,7 +655,7 @@ class ManimFollowSet(m.Scene):
         else:
             pstack.pop()
 
-    def _add_to_follow_vis(self, production, item, keys, msg=[]):
+    def _add_to_follow_vis(self, production, item, keys, msg=[], raw_msg = ""):
         new_element = None
 
         if not re.match(RE_TERMINAL, production) and item != production:
@@ -678,7 +683,12 @@ class ManimFollowSet(m.Scene):
 
         # Play the addition of the item to the followset and message, if given
             if msg != []:
-                _play_msg_with_other(self, msg, [m.FadeIn(new_element)])
+                _play_msg_with_other(self, msg, raw_msg = raw_msg)
+                sounds.add_sound_to_scene(self, sounds.CLANG)
+                self.play(
+                    m.FadeIn(new_element)
+                )
+
             else:
                 # adds sound as the new element is added
                 sounds.add_sound_to_scene(self, sounds.CLANG)
@@ -756,6 +766,7 @@ class ManimParseTable(m.Scene):
 
         # set up the title
         ll1_title = _get_title_mobject("LL(1) parsing: parse table")
+        sounds.narrate("Let's find the parse table for this grammar.")
         keys = get_manim_cfg_group(self)
         keys.to_edge(m.LEFT).scale(CFG_SCALE)
 
@@ -764,6 +775,7 @@ class ManimParseTable(m.Scene):
         cfg_heading = m.Tex("Context-Free Grammar", tex_template = m.TexFontTemplates.french_cursive).next_to(keys, m.UP).align_to(keys.get_center)
         cfg_heading.scale(0.5)
 
+        sounds.add_sound_to_scene(sounds.MOVE, self)
         self.play(
             ll1_title.animate.to_edge(m.UP),
             guide.animate.to_edge(m.RIGHT),
@@ -785,22 +797,18 @@ class ManimParseTable(m.Scene):
         self.mtable.get_row_labels().fade_to(color=m.RED, alpha=1)
         self.mtable.get_col_labels().fade_to(color=m.TEAL, alpha=1)
 
+        # add typing sound as the labels are drawn
+        sounds.add_sound_to_scene(sounds.TYPE, self)
         self.play(
            m.Write((self.mtable).get_labels()),
             run_time=1
         )
-        # TODO play the sound effect
-        # typer.echo("SOUND EFFECT")
-        # self.add_sound(s.add_to_set_sound())
 
         self.play(
             m.Create((self.mtable).get_horizontal_lines()[2]),
             m.Create((self.mtable).get_vertical_lines()[2]),
             run_time=2
         )
-        # # TODO play the sound effect
-        # typer.echo("SOUND EFFECT")
-        # self.add_sound(s.add_to_set_sound())
 
         # populate the whole table with the first and follow set, if appropriate
         for i, key in enumerate(self.cfg.first_set.keys(), start=0):
@@ -814,7 +822,7 @@ class ManimParseTable(m.Scene):
                         else:
                             mprod = key + " \\to \epsilon"
                             prod = key + " -> #"
-                        _play_msg_with_other(self, ["Following " + prod + "adds #", "to First(" + _to_tex(key) + ")"])
+                        _play_msg_with_other(self, ["Following " + prod + "adds #", "to First(" + _to_tex(key) + ")"], raw_msg = "If we follow this production, we find an epsilon. So, we add this production to the parsetable in the epsilon column and non terminal " + key + "'s row")
                         self.vis_add_to_parsetable( key, f, prod, mprod)
                 else:
 
@@ -824,7 +832,8 @@ class ManimParseTable(m.Scene):
                     tmp_prod = prod.replace(
                         "->", "\\to").strip().replace("#", "\epsilon")
                     _play_msg_with_other(self, ["Following " + prod + " adds " +
-                                 self.cfg.first_set[key][j], " to First(" + key + ")"])
+                                 self.cfg.first_set[key][j], " to First(" + key + ")"], raw_msg = "If we follow this production, we encounter " + self.cfg.first_set[key][j] + ". So, let's add this production to the parsetable at row " + key + " and column " + self.cfg.first_set[key][j])
+ 
                     self.vis_add_to_parsetable(
                          key, item, prod, tmp_prod)
 
@@ -861,6 +870,7 @@ class ManimParseTable(m.Scene):
         t_new.fade_to(_opp_col(), alpha=0.2)
 
         # fade out old value and into new value
+        sounds.add_sound_to_scene(sounds.CLACK, self)
         self.play(
             m.FadeIn(t_new),
             m.FadeOut(t_old),
@@ -958,7 +968,6 @@ def get_vertex_id(vertex, parent, start_symbol):
 def create_vertex(g, vertex_id, parent_id, label, color=m.GRAY,  link=True):
     global m
     V_LABELS[vertex_id] = label
-    # BUG Should be + DOWN
     pos = g[parent_id].get_center()+m.DOWN
     v = g._add_vertex(
         vertex_id, vertex_config={"color": color}, position=pos)
@@ -974,6 +983,7 @@ def reset_g(self, g, root, anim=[]):
     for a in anim:
         self.play(a)
 
+    sounds.add_sound_to_scene(sounds.MOVE, self)
     self.play(
         g.animate.change_layout(
             "tree",
@@ -1081,6 +1091,7 @@ class ManimParseTree(m.Scene):
 
         # draw LL(1) representation title
         ll1_title = _get_title_mobject("LL(1) parsing")
+        sounds.narrate("Let's parse this input using the L.L.1. parsing algorithm")
         keys = get_manim_cfg_group(self).to_edge(m.RIGHT)
 
         # create the input group here
@@ -1102,10 +1113,6 @@ class ManimParseTree(m.Scene):
         )
 
         # TODO custom colour for terminals!
-        # TODO educational messages
-        # TODO show input and frame to move through
-        # TODO sound on popping
-
         # create our first label
         V_LABELS[start_symbol] = start_symbol
         g = m.Graph([start_symbol], [], vertex_config=VCONFIG,
