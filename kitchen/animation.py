@@ -531,6 +531,7 @@ class ManimFollowSet(m.Scene):
 
                             else:
                                 # just highlight the terminal
+                                self.wait()
                                 sounds.narrate(item + " , is a terminal.")
                                 self.play(
                                     m.Circumscribe(cfg_element, color=m.TEAL, shape = m.Circle),
@@ -538,16 +539,19 @@ class ManimFollowSet(m.Scene):
                                 )
 
                         else:
+                            self.wait()
                             sounds.narrate("Let's now look at " +item +", which is a non terminal.", self)
                             self.play(
                                 m.Circumscribe(cfg_element, color=m.RED, shape = m.Circle),
                                 m.FadeToColor(cfg_element, color=m.RED),
                             )
+                            self.wait()
 
                         # start processing
                         if index == len(pps) - 1 and item != "#" and item != production:
                             # temporarily append production to let us then iterate over and replace it
                             self.cfg.follow_set[item].append(production)
+                            self.wait()
                             self._add_to_follow_vis(
                                 item, production, keys, ["Follow (" + production + ") \\subseteq Follow (" + item + ")"], raw_msg = "The follow set of " + production + " is a subset of that of " + item + " ")
 
@@ -595,6 +599,10 @@ class ManimFollowSet(m.Scene):
             self.is_cleaned = self.cfg.get_reset_cleaned_set()
             self.clean_follow_set(self.cfg.start_symbol, [])
 
+            sounds.narrate("Time to simplify the sets.")
+            self.wait()
+
+
             # transform current follow sets to cleaned versions
             for key in reversed(self.cfg.follow_set.keys()):
                 if not re.match(RE_TERMINAL, key):
@@ -617,12 +625,15 @@ class ManimFollowSet(m.Scene):
                         self.cfg.manim_followset_lead[key], m.RIGHT)
 
                     # transform to new contents
-                    sounds.add_sound_to_scene(sounds.SUCCESS, self)
                     self.play(
                         m.Transform(
                             self.cfg.manim_followset_contents[key], new_fs_group),
                     )
 
+            # show success
+            sounds.add_sound_to_scene(sounds.SUCCESS, self)
+            sounds.narrate("Success!", self)
+                                
 # cleans the follow set up after everything is found, so that we don't miss elements
     def clean_follow_set(self, start, pstack):
         pstack.append(start)
