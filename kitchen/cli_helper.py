@@ -285,7 +285,7 @@ def _process_command(inp, cfg) -> None:
     if inp == "\\m":
         display_helper.print_menu()
 
-    elif inp == "\\gary":
+    elif inp == "\\agary":
         sounds._get_narration("Gary is the best supervisor ever.")
     
     elif inp == "\\simon":

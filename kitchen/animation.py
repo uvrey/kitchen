@@ -1323,8 +1323,8 @@ class ManimParseTree(m.Scene):
                             anims = []
                             try:
                                 vertex = g[v_id]
-                                rendered_label = m.MathTex(
-                                    "\\text{"+_to_tex(popped_off)+"}")
+                                rendered_label = m.Tex(
+                                   _to_tex(popped_off), color = m.BLACK)
 
                                 # confirm the path by adding the colour
                                 vertex.fade_to(m.BLUE, 1)
