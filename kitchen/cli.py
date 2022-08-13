@@ -86,6 +86,7 @@ def run() -> None:
     """    
     # set configuration options
     sounds.set_config(sounds.NARR)
+    cli_helper.init_config()
 
     display_helper.info_secho("config settings:\nNarration: Yes")
     display_helper.print_welcome()

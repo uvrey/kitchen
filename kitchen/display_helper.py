@@ -83,6 +83,14 @@ def pretty_print_dict(dict):
     """    
     structure_secho("\n".join("{}\t{}".format(k, v) for k, v in dict.items()))
 
+def pretty_print_config_settings(config):
+    """Displays the
+
+    Args:
+        config (_type_): _description_
+    """    
+    structure_secho("\n".join("\t{}: {}".format(k.capitalize(), v) for k, v in config.items()))
+
 def print_welcome():
     """Helper function to print the welcome screen.
     """    

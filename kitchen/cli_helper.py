@@ -2,11 +2,15 @@
 
 from ast import BoolOp
 import configparser
+from glob import glob
 from pathlib import Path
+from re import L
 from xmlrpc.client import Boolean
 import typer
 import os
 import shutil
+import manim as m
+import subprocess
 
 from kitchen import (
     CFG_WRITE_ERROR, 
@@ -30,6 +34,7 @@ CONFIG_DIR_PATH = Path(typer.get_app_dir(__app_name__))
 CONFIG_FILE_PATH = CONFIG_DIR_PATH / "config.ini"
 CONFIG_SOUND_PATH = CONFIG_DIR_PATH / "add_to_set.wav"
 PARTIALS_PATH = ""
+OUTPUT_CONFIG = None
 
 def init_app(cfg_path: str) -> int:
     """Initialises the application by creating its configuration file and CFG path.
@@ -250,26 +255,21 @@ def _init_parsing_vis_shortcut(inp, cfg) -> int:
         animation.render()       
     return SUCCESS
 
-def _set_partials_path():
-    PARTIALS_PATH =  os.getcwd()+r'\media\videos\1080p60\partial_movie_files'
-    return SUCCESS
+def init_config():
+    global OUTPUT_CONFIG
+    OUTPUT_CONFIG = {"quality": "medium_quality", "preview": True}
+    typer.echo("config initted")
 
-def _partials_exists() -> Boolean:
-    if PARTIALS_PATH != "":
-        return os.path.isdir(PARTIALS_PATH)
-    return False
+def _show_config():
+    global OUTPUT_CONFIG
+    display_helper.info_secho("Current configuration settings:")
+    display_helper.pretty_print_config_settings(OUTPUT_CONFIG)
+    display_helper.info_secho("Options: -q <high | med | low>\n\t -pre = <y | n>\n\t -narration = <y / n>")
 
-def _clear_partial_movie_files():
-    """path could either be relative or absolute. """
-    # check if file or directory exists
-    if os.path.isfile(PARTIALS_PATH) or os.path.islink(PARTIALS_PATH):
-        # remove file
-        os.remove(PARTIALS_PATH)
-    elif os.path.isdir({PARTIALS_PATH}):
-        # remove directory and all its content
-        shutil.rmtree(PARTIALS_PATH)
-    else:
-        raise ValueError("Path {} is not a file or dir.".format(PARTIALS_DIR_1080p))
+def _edit_config(inp):
+    _show_config()
+    typer.echo("input: " + inp)
+
 
 def _process_command(inp, cfg) -> None:
     """Helper function to process a command from the user.
@@ -281,18 +281,14 @@ def _process_command(inp, cfg) -> None:
     Raises:
         typer.Exit: Exits the application when the user requests this. 
     """    
+    global OUTPUT_CONFIG
 
     if inp == "\\m":
         display_helper.print_menu()
 
-    elif inp == "\\agary":
-        sounds._get_narration("Gary is the best supervisor ever.")
-    
-    elif inp == "\\simon":
-        sounds._get_narration("Simon is a great project partner")
-
     elif inp == "\\q":
         raise typer.Exit()
+
     elif inp == "\\dsl":
         # TODO start DSL tool
         pass
@@ -301,9 +297,10 @@ def _process_command(inp, cfg) -> None:
         cfg.show_first_set()
     
     elif inp == "\\vis first" or inp == "\\vfs":
-        animation = anim.ManimFirstSet()
-        animation.setup_manim(cfg)
-        animation.render()
+        with OUTPUT_CONFIG:
+            animation = anim.ManimFirstSet()
+            animation.setup_manim(cfg)
+            animation.render()
       
     elif inp == "\\show follow" or inp == "\\fw":
         cfg.show_follow_set()
@@ -334,8 +331,8 @@ def _process_command(inp, cfg) -> None:
     elif inp == "\\show cfg" or inp == "\\cfg":
         cfg.show_contents()
 
-    elif inp == "\\c":
-        typer.echo("Configuring animation settings")
+    elif inp.strip()[0:2] == "\\c":
+        _edit_config(inp.strip()[2:].strip())
 
     elif inp[0:4] == "\\ll1":
         _init_parsing_ll1_via_cmd(inp, cfg)
