@@ -40,7 +40,6 @@ m.config.include_sound = True
 
 # TODO clean up this file a bit better
 # TODO  Unique filename - Date and time?
-# TODO neaten up animations
 
 def _get_title_mobject(title):
     return m.Tex(title, tex_template=m.TexFontTemplates.french_cursive)
@@ -283,6 +282,13 @@ class ManimFirstSet(m.Scene):
         sounds.add_sound_to_scene(self, sounds.SUCCESS)
         _play_msg_with_other(self, ["Successfully found the first set :)"], raw_msg= "Woohoo! We got the first set!")
 
+    def tear_down(self):
+        # clear first set structures for if the animation is regenerated
+        self.cfg.vis_has_epsilon = False
+        for key in self.cfg.first_set.keys():
+            self.cfg.first_set[key] = []
+            self.cfg.manim_firstset_contents[key] = []
+            self.cfg.manim_firstset_lead[key] = []
 
     # animates a visualisation of the first set
     def vis_first_set(self, keys, start, production, pstack):

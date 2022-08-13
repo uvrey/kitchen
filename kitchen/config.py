@@ -4,7 +4,7 @@ OUTPUT_CONFIG = None
 
 def init_config():
     global OUTPUT_CONFIG
-    OUTPUT_CONFIG = {"quality": "medium_quality", "preview": True, "output_file": ""}
+    OUTPUT_CONFIG = {"quality": "medium_quality", "preview": True, 'flush_cache': True, "output_file": ''}
 
 def _set_quality(inp) -> bool:
     global OUTPUT_CONFIG
