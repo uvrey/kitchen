@@ -1,6 +1,14 @@
-from kitchen import (display_helper, sounds)
+from kitchen import (display_helper, sounds, SUCCESS)
+from datetime import datetime
 
 OUTPUT_CONFIG = None
+
+(
+    FOLLOW_SET,
+    FIRST_SET,
+    PARSETABLE,
+    LL1_PARSING
+) = range(4)
 
 def init_config():
     global OUTPUT_CONFIG
@@ -78,3 +86,24 @@ def edit_config(inp):
     else:
         _show_config()
     return code
+
+def get_time():
+    now = datetime.now()
+    return now.strftime("%d/%m_%H:%M:%S")
+
+def configure_output_file_name(file_type, inp = ""):
+    global OUTPUT_CONFIG
+    file_name = ""
+    if file_type == LL1_PARSING and inp != "":
+        file_name = inp[0:5] + "_ParsingLL1_" + get_time()
+    elif file_type == FOLLOW_SET:
+        file_name = "FollowSet_" + get_time()
+    elif file_type == FIRST_SET:
+        file_name = "FirstSet_" + get_time()
+    elif file_type == PARSETABLE:
+        file_name = "ParseTable_" + get_time()
+    
+    # if clear name given, set new output file name
+    if file_name != "":
+        OUTPUT_CONFIG["output_file"] = file_name
+    return SUCCESS

@@ -285,10 +285,10 @@ class ManimFirstSet(m.Scene):
     def tear_down(self):
         # clear first set structures for if the animation is regenerated
         self.cfg.vis_has_epsilon = False
+        self.cfg.manim_firstset_lead = {}
         for key in self.cfg.first_set.keys():
             self.cfg.first_set[key] = []
-            self.cfg.manim_firstset_contents[key] = []
-            self.cfg.manim_firstset_lead[key] = []
+            self.cfg.manim_firstset_contents[key] = m.VGroup()
 
     # animates a visualisation of the first set
     def vis_first_set(self, keys, start, production, pstack):
@@ -477,6 +477,10 @@ class ManimFollowSet(m.Scene):
         sounds.narrate("Let's find the follow set.", self)
         display_helper.info_secho("Visualising follow set calculation:")
         self.vis_follow_set(True)
+    
+    def tear_down(self):
+        for key in self.cfg.follow_set.keys():
+            self.cfg.follow_set[key] = []
 
     def vis_follow_set(self, is_start_symbol):
 
