@@ -10,7 +10,8 @@ from kitchen import (
      cli_helper, 
      context_free_grammar as cfg, 
      display_helper,
-     sounds)
+     sounds,
+     config)
 
 app = typer.Typer()
 
@@ -86,9 +87,8 @@ def run() -> None:
     """    
     # set configuration options
     sounds.set_config(sounds.NARR)
-    cli_helper.init_config()
+    config.init_config()
 
-    display_helper.info_secho("config settings:\nNarration: Yes")
     display_helper.print_welcome()
     cfg = get_cfg()
     while (True):

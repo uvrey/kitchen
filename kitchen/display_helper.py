@@ -5,6 +5,7 @@ from kitchen import DARK
 import typer
 import anytree
 import manim as m
+from kitchen import sounds
 
 # set mode to dark by default
 MODE = DARK
@@ -75,6 +76,9 @@ def structure_secho(msg):
         fg = typer.colors.YELLOW
     ) 
 
+def show_config_opts():
+    info_secho("Options:\n\t Quality: -q <high | med | low>\n\t Preview: -p <y | n>\n\t Narration: -n <y / n>")
+
 def pretty_print_dict(dict):
     """Prints a nicely-formatted dictionary.
 
@@ -83,13 +87,17 @@ def pretty_print_dict(dict):
     """    
     structure_secho("\n".join("{}\t{}".format(k, v) for k, v in dict.items()))
 
-def pretty_print_config_settings(config):
+def pretty_print_config_settings(config, narr):
     """Displays the
 
     Args:
         config (_type_): _description_
     """    
+    if narr == sounds.NARR: narr_setting = True
+    else: narr_setting = False
+
     structure_secho("\n".join("\t{}: {}".format(k.capitalize(), v) for k, v in config.items()))
+    structure_secho("\tNarration: " + str(narr_setting))
 
 def print_welcome():
     """Helper function to print the welcome screen.
@@ -101,12 +109,8 @@ def print_welcome():
 def print_menu():
     """Helper function to print the application menu.
     """    
-    info_secho(" COMMAND\t\tSHORTCUT\tDETAILS\n")
     general_secho(
-        " \\menu \t\t\t\m\t\t Display menu\n" +
-        " \\config \t\t\\c\t\t Configure animation settings\n" +
         " \\quit \t\t\t\\q\t\t Exit app\n\n"
-
         " \\load <cfg path> \t\\l <path>\t Load new CFG\n" +
         " \\show cfg \t\t\\cfg\t\t Displays the current CFG\n\n" +
 

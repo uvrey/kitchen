@@ -27,9 +27,13 @@ from gtts import gTTS
 id = 0
 config = NARR
 
-def set_config(config_option):
-    config = config_option
+def get_config():
     return config
+
+def set_config(config_option):
+    global config
+    config = config_option
+    return SUCCESS
 
 def _get_narration_path() -> String:
     global id

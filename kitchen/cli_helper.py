@@ -1,6 +1,6 @@
 """ Configuration for the application """
 
-from ast import BoolOp
+from ast import BoolOp, excepthandler
 import configparser
 from glob import glob
 from pathlib import Path
@@ -15,6 +15,7 @@ import subprocess
 from kitchen import (
     CFG_WRITE_ERROR, 
     DIR_ERROR, 
+    ERROR,
     ERRORS, 
     FILE_LOADING_ERROR, 
     FILE_LOADING_EXISTS_ERROR, 
@@ -27,14 +28,13 @@ from kitchen import (
     animation as anim,
     error, 
     parser as p,
-    sounds
+    config
 )
 
 CONFIG_DIR_PATH = Path(typer.get_app_dir(__app_name__))
 CONFIG_FILE_PATH = CONFIG_DIR_PATH / "config.ini"
 CONFIG_SOUND_PATH = CONFIG_DIR_PATH / "add_to_set.wav"
 PARTIALS_PATH = ""
-OUTPUT_CONFIG = None
 
 def init_app(cfg_path: str) -> int:
     """Initialises the application by creating its configuration file and CFG path.
@@ -250,26 +250,11 @@ def _init_parsing_vis_shortcut(inp, cfg) -> int:
     if to_parse == "":
         error.ERR_no_input_given()
     else:
-        animation = anim.ManimParseTree()
-        animation.setup_manim(to_parse, cfg)
-        animation.render()       
+        with m.tempconfig(config.OUTPUT_CONFIG):
+            animation = anim.ManimParseTree()
+            animation.setup_manim(to_parse, cfg)
+            animation.render()       
     return SUCCESS
-
-def init_config():
-    global OUTPUT_CONFIG
-    OUTPUT_CONFIG = {"quality": "medium_quality", "preview": True}
-    typer.echo("config initted")
-
-def _show_config():
-    global OUTPUT_CONFIG
-    display_helper.info_secho("Current configuration settings:")
-    display_helper.pretty_print_config_settings(OUTPUT_CONFIG)
-    display_helper.info_secho("Options: -q <high | med | low>\n\t -pre = <y | n>\n\t -narration = <y / n>")
-
-def _edit_config(inp):
-    _show_config()
-    typer.echo("input: " + inp)
-
 
 def _process_command(inp, cfg) -> None:
     """Helper function to process a command from the user.
@@ -280,8 +265,7 @@ def _process_command(inp, cfg) -> None:
 
     Raises:
         typer.Exit: Exits the application when the user requests this. 
-    """    
-    global OUTPUT_CONFIG
+    """   
 
     if inp == "\\m":
         display_helper.print_menu()
@@ -297,7 +281,7 @@ def _process_command(inp, cfg) -> None:
         cfg.show_first_set()
     
     elif inp == "\\vis first" or inp == "\\vfs":
-        with OUTPUT_CONFIG:
+        with m.tempconfig(config.OUTPUT_CONFIG):
             animation = anim.ManimFirstSet()
             animation.setup_manim(cfg)
             animation.render()
@@ -309,9 +293,10 @@ def _process_command(inp, cfg) -> None:
     elif inp == "\\vis follow" or inp == "\\vfw":
         if not cfg.first_set_calculated:
             cfg.reset_first_set()
-        animation = anim.ManimFollowSet()
-        animation.setup_manim(cfg)
-        animation.render()
+        with m.tempconfig(config.OUTPUT_CONFIG):
+            animation = anim.ManimFollowSet()
+            animation.setup_manim(cfg)
+            animation.render()
 
     elif inp == "\\show parsetable" or inp == "\pt":
         _show_parsetable(cfg)
@@ -319,9 +304,10 @@ def _process_command(inp, cfg) -> None:
     elif inp == "\\vis parsetable" or inp == "\\vpt":
         if not cfg.first_set_calculated:
             cfg.reset_first_set()
-        animation = anim.ManimParseTable()
-        animation.setup_manim(cfg)
-        animation.render()
+        with m.tempconfig(config.OUTPUT_CONFIG):
+            animation = anim.ManimParseTable()
+            animation.setup_manim(cfg)
+            animation.render()
 
     elif inp == "\\l":
         new_path = typer.prompt("New path to CFG")
@@ -332,22 +318,19 @@ def _process_command(inp, cfg) -> None:
         cfg.show_contents()
 
     elif inp.strip()[0:2] == "\\c":
-        _edit_config(inp.strip()[2:].strip())
+        config.edit_config(inp.strip()[2:].strip())
 
     elif inp[0:4] == "\\ll1":
         _init_parsing_ll1_via_cmd(inp, cfg)
 
     elif inp[0:2] == "\\v":
         if not cfg.first_set_calculated:
-            typer.echo("1")
             cfg.reset_first_set()
 
         if not cfg.follow_set_calculated:
-            typer.echo("2")
             cfg.reset_follow_set()
 
         if not cfg.parsetable_calculated:
-            typer.echo("3")
             cfg.setup_parsetable()
             cfg.calculate_parsetable()
 
