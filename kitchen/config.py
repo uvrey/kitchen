@@ -89,7 +89,7 @@ def edit_config(inp):
 
 def get_time():
     now = datetime.now()
-    return now.strftime("%d/%m_%H:%M:%S")
+    return now.strftime("%d-%m_%H-%M-%S")
 
 def configure_output_file_name(file_type, inp = ""):
     global OUTPUT_CONFIG
