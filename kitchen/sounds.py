@@ -56,8 +56,6 @@ def _get_narration(script) -> String:
     return path
 
 def narrate(script, scene) -> int:
-    display_helper.info_secho("trying to narrate: ")
-    display_helper.info_secho(script)
     if config == NARR:
         _new_narration = _get_narration(script)
         if not os.path.isfile(_new_narration):
