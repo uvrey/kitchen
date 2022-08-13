@@ -243,13 +243,14 @@ def _init_parsing_vis_shortcut(inp, cfg) -> int:
     Args:
         inp (str): Input string
 
-    Returns:
+Returns:
         int: Status code
     """    
     to_parse = inp.strip()[2:].strip()
     if to_parse == "":
         error.ERR_no_input_given()
     else:
+        config.OUTPUT_CONFIG["output_file"] = "LL1"
         with m.tempconfig(config.OUTPUT_CONFIG):
             animation = anim.ManimParseTree()
             animation.setup_manim(to_parse, cfg)
@@ -281,6 +282,7 @@ def _process_command(inp, cfg) -> None:
         cfg.show_first_set()
     
     elif inp == "\\vis first" or inp == "\\vfs":
+        config.OUTPUT_CONFIG["output_file"]= "Firstset"
         with m.tempconfig(config.OUTPUT_CONFIG):
             animation = anim.ManimFirstSet()
             animation.setup_manim(cfg)
@@ -293,6 +295,8 @@ def _process_command(inp, cfg) -> None:
     elif inp == "\\vis follow" or inp == "\\vfw":
         if not cfg.first_set_calculated:
             cfg.reset_first_set()
+        
+        config.OUTPUT_CONFIG["output_file"] = "Followset"
         with m.tempconfig(config.OUTPUT_CONFIG):
             animation = anim.ManimFollowSet()
             animation.setup_manim(cfg)
@@ -304,6 +308,8 @@ def _process_command(inp, cfg) -> None:
     elif inp == "\\vis parsetable" or inp == "\\vpt":
         if not cfg.first_set_calculated:
             cfg.reset_first_set()
+        
+        config.OUTPUT_CONFIG["output_file"] = "Parsetable"
         with m.tempconfig(config.OUTPUT_CONFIG):
             animation = anim.ManimParseTable()
             animation.setup_manim(cfg)
