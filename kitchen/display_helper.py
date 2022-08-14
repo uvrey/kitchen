@@ -87,7 +87,7 @@ def pretty_print_dict(dict):
     """    
     structure_secho("\n".join("{}\t{}".format(k, v) for k, v in dict.items()))
 
-def pretty_print_config_settings(config, narr):
+def pretty_print_config_settings(config, narr, theme = ""):
     """Displays the
 
     Args:
@@ -96,7 +96,9 @@ def pretty_print_config_settings(config, narr):
     if narr == sounds.NARR: narr_setting = True
     else: narr_setting = False
 
-    structure_secho("\n".join("\t{}: {}".format(k.capitalize(), v) for k, v in config.items()))
+    structure_secho("\tQuality: " + str(narr_setting))
+    structure_secho("\tPreview: " + str(narr_setting))
+    structure_secho("\tAnimation Theme: " + theme)
     structure_secho("\tNarration: " + str(narr_setting))
 
 def print_welcome():

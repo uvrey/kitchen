@@ -110,6 +110,7 @@ class Stack:
 
         
         if msg != None:
+            sounds.add_sound_to_scene(self.scene, sounds.CLANG)
             self.scene.play(
                 m.LaggedStart(
                     m.FadeIn(t, shift=m.DOWN),
@@ -122,6 +123,7 @@ class Stack:
             )
         else:
             if anim != None:
+                sounds.add_sound_to_scene(self.scene, sounds.CLANG)
                 self.scene.play(
                     m.FadeIn(t, shift=m.DOWN),
                     m.AnimationGroup(*[a for a in anim]),

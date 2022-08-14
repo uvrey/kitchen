@@ -55,7 +55,7 @@ def ERR_too_many_productions_ll1(nt, t):
     raise typer.Abort()
 
 
-def ERR_parsing_error(root, detail=""):
+def ERR_parsing_error(root = None, detail=""):
     if detail != "":
         detail_msg = "." + detail
     else:
@@ -63,7 +63,9 @@ def ERR_parsing_error(root, detail=""):
     err = typer.style("Error:", fg= typer.colors.WHITE, bg=typer.colors.RED)
     pt_state = typer.style("\nCurrent state of parse tree:", fg=typer.colors.RED)
     typer.echo(err + " Parsing failed. " + detail_msg + pt_state)
-    display_helper.print_parsetree(root)
+    
+    if root != None:
+        display_helper.print_parsetree(root)
 
 
 def ERR_no_input_given():
