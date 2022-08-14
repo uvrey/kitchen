@@ -20,9 +20,6 @@ from kitchen import (
     COLOURS,
     error,
     stack, 
-    DARK,
-    LIGHT,
-    SOUND_ERROR, 
     sounds,
     config
 )
@@ -38,9 +35,6 @@ GRID_ITEM_SCALE = 0.9
 
 # set global configs
 m.config.include_sound = True
-
-# TODO clean up this file a bit better
-# TODO  Unique filename - Date and time?
 
 def _get_title_mobject(title):
     return m.Tex(title, tex_template=m.TexFontTemplates.french_cursive)
@@ -154,7 +148,6 @@ def fade_scene(self):
     self.play(
         *[m.FadeOut(mob) for mob in self.mobjects]
     )
-
 
 def row(cfg, nt):
     """Quickly get the row and column index of the parse table contents_summary_
@@ -985,13 +978,11 @@ def create_tokens(tokens):
         token_gp.append(m.MathTex("\\text{"+t+"}"))
     return token_gp
 
-
 def get_parent_id(parent, start_symbol):
     if parent.parent != None:
         return get_vertex_id(parent.id, parent.parent.id, start_symbol)
     else:
         return parent.id
-
 
 def create_v_if_exists(scene, g, start_symbol, vertex_id, v_name, parent_id):
     try:
@@ -1003,7 +994,6 @@ def create_v_if_exists(scene, g, start_symbol, vertex_id, v_name, parent_id):
             g, vertex_id, parent_id, v_name)
         reset_g(scene, g, start_symbol)
 
-
 def get_vertex_id(vertex, parent, start_symbol):
     if vertex == start_symbol:
         return vertex
@@ -1012,7 +1002,6 @@ def get_vertex_id(vertex, parent, start_symbol):
             return start_symbol + "_" + vertex
         else:
             return parent + "_" + vertex
-
 
 def create_vertex(g, vertex_id, parent_id, label, color=m.GRAY,  link=True):
     global m
@@ -1027,7 +1016,6 @@ def create_vertex(g, vertex_id, parent_id, label, color=m.GRAY,  link=True):
             [parent_id, vertex_id], edge_config={"color": config.opp_col()})
     return v
 
-
 def reset_g(self, g, root, anim=[]):
     for a in anim:
         self.play(a)
@@ -1039,7 +1027,6 @@ def reset_g(self, g, root, anim=[]):
             root_vertex=root,
         ),
     )
-
 
 class ManimParseTree(m.Scene):
     # Parse LL(1) in the CLI
