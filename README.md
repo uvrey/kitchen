@@ -13,7 +13,7 @@ To run Kitchen, you will need to install several packages.
 
 **Requirements:**
 - Python3
-- Pip: 
+- Pip
 - Chocolatey: https://chocolatey.org/install
 
 **0. Make sure your package managers are up to date.**
