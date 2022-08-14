@@ -96,8 +96,8 @@ def pretty_print_config_settings(config, narr, theme = ""):
     if narr == sounds.NARR: narr_setting = True
     else: narr_setting = False
 
-    structure_secho("\tQuality: " + str(narr_setting))
-    structure_secho("\tPreview: " + str(narr_setting))
+    structure_secho("\tQuality: " + config["quality"])
+    structure_secho("\tPreview: " + str(config["preview"]))
     structure_secho("\tAnimation Theme: " + theme)
     structure_secho("\tNarration: " + str(narr_setting))
 
