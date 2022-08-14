@@ -85,8 +85,9 @@ def init(
 def run() -> None:
     """Application driver.
     """    
-    # set configuration options
+    # set configuration options and initialise narration directory
     sounds.set_config(sounds.NARR)
+    sounds.init_narr_dir()
     config.init_config()
 
     display_helper.print_welcome()

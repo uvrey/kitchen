@@ -1,6 +1,9 @@
+import shutil
 from tokenize import String
 import manim as m
 import os
+import re
+from pathlib import Path
 from kitchen import SOUND_ERROR, SUCCESS, display_helper
 # Import the required module for text 
 # to speech conversion
@@ -62,6 +65,19 @@ def narrate(script, scene) -> int:
             return SOUND_ERROR
         scene.add_sound(_new_narration)
     return SUCCESS
+
+def init_narr_dir():
+    narration_dir = os.getcwd() + r'\assets\narration'
+    try:
+        Path(narration_dir).mkdir(exist_ok=True)
+    except OSError:
+        display_helper.fail_secho("There was an issue creating the narration directory.")
+        return 
+
+def clear_narr_dir():
+    narration_dir = os.getcwd() + r'\assets\narration'
+    shutil.rmtree(Path(narration_dir))
+    return
 
 def add_sound_to_scene(scene, sound_spec):
     """Adds a sound to a scene based on some specification.

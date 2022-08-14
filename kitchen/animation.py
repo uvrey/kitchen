@@ -253,6 +253,12 @@ def ts_m_epsilon(self):
             ts_m.append(t)
     return ts_m
 
+def clear_narrs():
+    # clear and reinitialise the narration diary
+    if sounds.get_config() == sounds.NARR:
+        sounds.clear_narr_dir()
+        sounds.init_narr_dir()
+
 # initialise the row values for the manim table
 def init_row_contents(self):
     row_vals = []
@@ -297,6 +303,7 @@ class ManimFirstSet(m.Scene):
         for key in self.cfg.first_set.keys():
             self.cfg.first_set[key] = []
             self.cfg.manim_firstset_contents[key] = m.VGroup()
+        clear_narrs()
 
     # animates a visualisation of the first set
     def vis_first_set(self, keys, guide, start, production, pstack):
@@ -492,6 +499,7 @@ class ManimFollowSet(m.Scene):
     def tear_down(self):
         for key in self.cfg.follow_set.keys():
             self.cfg.follow_set[key] = []
+        clear_narrs()
 
     def vis_follow_set(self, is_start_symbol):
 
@@ -501,10 +509,13 @@ class ManimFollowSet(m.Scene):
 
             # draw follow set title
             fw_title = _get_title_mobject("follow set calculation") 
+            guide = get_guide().scale(CFG_SCALE)
+
 
             # set the stage
             self.play(
                 fw_title.animate.to_edge(m.UP),
+                guide.animate.to_edge(m.RIGHT),
                 m.FadeIn(keys)
             )
             
@@ -779,6 +790,9 @@ class ManimParseTable(m.Scene):
         self.ts = sorted(cfg.terminals)
         self.nts = sorted(cfg.nonterminals)
         self.cfg = cfg
+    
+    def tear_down():
+        clear_narrs()
 
     def vis_populate_table(self):
         """Visualises the algorithm which constructs the parsing table
@@ -824,7 +838,7 @@ class ManimParseTable(m.Scene):
         self.mtable.get_col_labels().fade_to(color=m.TEAL, alpha=1)
 
         # add typing sound as the labels are drawn
-        sounds.add_sound_to_scene(sounds.TYPE, self)
+        sounds.add_sound_to_scene(self, sounds.TYPE)
         self.play(
            m.Write((self.mtable).get_labels()),
             run_time=1
@@ -1020,7 +1034,6 @@ def reset_g(self, g, root, anim=[]):
     for a in anim:
         self.play(a)
 
-    sounds.add_sound_to_scene(self, sounds.MOVE)
     self.play(
         g.animate.change_layout(
             "tree",
@@ -1047,6 +1060,7 @@ class ManimParseTree(m.Scene):
     def tear_down(self):
         self.mtable = None
         self.root = None
+        clear_narrs()
         
     def init_m_table(self, row_vals, row_labels, col_labels):
         row_labels = row_labels

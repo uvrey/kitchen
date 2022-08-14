@@ -33,7 +33,6 @@ from kitchen import (
 
 CONFIG_DIR_PATH = Path(typer.get_app_dir(__app_name__))
 CONFIG_FILE_PATH = CONFIG_DIR_PATH / "config.ini"
-CONFIG_SOUND_PATH = CONFIG_DIR_PATH / "add_to_set.wav"
 PARTIALS_PATH = ""
 
 def init_app(cfg_path: str) -> int:
