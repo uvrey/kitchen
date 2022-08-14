@@ -288,8 +288,10 @@ class ManimFirstSet(m.Scene):
 
         keys = get_manim_cfg_group(self)
         keys.scale(CFG_SCALE).to_edge(m.LEFT)
+        # show key for colour coding
+        guide = get_guide().scale(CFG_SCALE)
 
-        self.vis_first_set(keys, self.cfg.start_symbol, self.cfg.start_symbol, [])
+        self.vis_first_set(keys, guide, self.cfg.start_symbol, self.cfg.start_symbol, [])
 
         # success message and sound
         sounds.add_sound_to_scene(self, sounds.YAY)
@@ -304,7 +306,7 @@ class ManimFirstSet(m.Scene):
             self.cfg.manim_firstset_contents[key] = m.VGroup()
 
     # animates a visualisation of the first set
-    def vis_first_set(self, keys, start, production, pstack):
+    def vis_first_set(self, keys, guide, start, production, pstack):
 
         #  global vis_has_epsilon
         pstack.append(production)
@@ -315,13 +317,14 @@ class ManimFirstSet(m.Scene):
         # highlight manim production
         cfg_line = self.manim_production_groups[production][:]
 
-        # add the first set titles to the canvas
+    # add the first set titles to the canvas
         self.cfg.manim_firstset_lead[production] = m.Tex("First(" + production + "):", color = config.opp_col()
                                                     ).align_to(cfg_line, m.UP).shift(m.LEFT)
 
         self.play(
             m.FadeIn(self.cfg.manim_firstset_lead[production]),
             m.FadeToColor(cfg_line, color=config.opp_col()),
+            guide.animate.to_edge(m.LEFT),
         )
 
         # if production does not have a first set
@@ -392,7 +395,7 @@ class ManimFirstSet(m.Scene):
 
 
                                 self.vis_first_set(
-                                    keys, production, current_item, pstack)
+                                    keys, guide, production, current_item, pstack)
                                 if not self.cfg.vis_has_epsilon:
                                     break
 
@@ -473,7 +476,7 @@ class ManimFirstSet(m.Scene):
                 if empty_set_nt != -1:
                     # found a separate first set
                     self.vis_first_set(
-                         keys, empty_set_nt, empty_set_nt, [])
+                         keys, guide, empty_set_nt, empty_set_nt, [])
             else:
                 pstack.pop()
 
@@ -783,7 +786,6 @@ class ManimParseTable(m.Scene):
         self.ts = sorted(cfg.terminals)
         self.nts = sorted(cfg.nonterminals)
         self.cfg = cfg
-
 
     def vis_populate_table(self):
         """Visualises the algorithm which constructs the parsing table
