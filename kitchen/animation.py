@@ -245,7 +245,7 @@ def get_guide():
         guide_group_inner = m.VGroup()
         guide_group_inner.add(m.Square().set_fill(
             square_colors[i], opacity=1).scale(0.5))
-        guide_group_inner.add(m.Tex(labels[i]))
+        guide_group_inner.add(m.Tex(labels[i], color = config.opp_col()))
         guide_group_inner.arrange_in_grid(rows = 1, buff = 0.8)
         guide_group_outer.add(guide_group_inner)
     guide_group_outer.arrange_in_grid(rows = len(labels), buff = 0.8)
@@ -324,7 +324,7 @@ class ManimFirstSet(m.Scene):
         self.play(
             m.FadeIn(self.cfg.manim_firstset_lead[production]),
             m.FadeToColor(cfg_line, color=config.opp_col()),
-            guide.animate.to_edge(m.LEFT),
+            guide.animate.to_edge(m.RIGHT),
         )
 
         # if production does not have a first set
