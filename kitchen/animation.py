@@ -24,12 +24,13 @@ from kitchen import (
     LIGHT,
     SOUND_ERROR, 
     sounds,
+    config
 )
 
 VCONFIG = {"radius": 0.25, "color": m.BLUE, "fill_opacity": 1}
 VCONFIG_TEMP = {"radius": 0.25, "color": m.GRAY}
 LCONFIG = {"vertex_spacing": (0.5, 1)}
-ECONFIG = {"color": display_helper.opp_col()}
+ECONFIG = {"color": config.opp_col()}
 ECONFIG_TEMP = {"color": m.GRAY, "fill_opacity": 0.7}
 V_LABELS = {}
 
@@ -48,29 +49,17 @@ def _to_tex(item):
     tex_item = item.replace("$", "\$").replace("#", "\\epsilon").replace("\\subseteq", "$\\subseteq$").replace("->", "$\\to$")
     return tex_item
 
-def _opp_col():
-    if display_helper.MODE == DARK:
-        return m.WHITE
-    else:
-        return m.BLACK
-
-def _mode_col():
-    if display_helper.MODE == LIGHT:
-        return m.WHITE
-    else:
-        return m.BLACK
-
 def _play_msg_with_other(self, msg, raw_msg= "", anim=[]):
     if msg != []:
         msg_group = m.VGroup()
 
         for ms in msg:
-            msg_txt = m.Tex(_to_tex(ms), color=_opp_col())
+            msg_txt = m.Tex(_to_tex(ms), color=config.opp_col())
             msg_group.add(msg_txt)
         msg_group.arrange(m.DOWN)
         
         # create fading area
-        rect = m.Rectangle(width=20, height=10, color=_mode_col(), fill_opacity=0.9)
+        rect = m.Rectangle(width=20, height=10, color=config.theme_col(), fill_opacity=0.9)
 
         self.play(
             m.FadeIn(rect),
@@ -112,7 +101,7 @@ def _get_tokens_from_input(inp) -> list:
     # Helper function to put a message on the screen
 def notify(self, message, next_to_this):
     # returns a keys group, which is the cfg representation
-    msg_text = m.Text(message, color=_opp_col(), weight=m.BOLD).scale(0.5).next_to(
+    msg_text = m.Text(message, color=config.opp_col(), weight=m.BOLD).scale(0.5).next_to(
         next_to_this, m.RIGHT)
     self.play(
         m.Write(msg_text),
@@ -124,8 +113,8 @@ def notify(self, message, next_to_this):
 
 def fullscreen_notify(self, message):
     err_msg = message
-    err_m_msg = m.Tex(err_msg, color=_opp_col())
-    rect = m.Rectangle(width=20, height=10, color=_mode_col(), fill_opacity=0.85)
+    err_m_msg = m.Tex(err_msg, color=config.opp_col())
+    rect = m.Rectangle(width=20, height=10, color=config.theme_col(), fill_opacity=0.85)
     err_m_msg.move_to(rect.get_center())
     self.play(
         m.FadeIn(rect),
@@ -158,7 +147,7 @@ def get_token_colour(self):
         if not self.token_has_this_colour[index]:
             self.token_has_this_colour[index] = True
             return col
-    return _opp_col()
+    return config.opp_col()
 
 # fades the scene out
 def fade_scene(self):
@@ -332,7 +321,7 @@ class ManimFirstSet(m.Scene):
 
         self.play(
             m.FadeIn(self.cfg.manim_firstset_lead[production]),
-            m.FadeToColor(cfg_line, color=_opp_col()),
+            m.FadeToColor(cfg_line, color=config.opp_col()),
         )
 
         # if production does not have a first set
@@ -426,7 +415,7 @@ class ManimFirstSet(m.Scene):
                         for ps in reversed(pstack):
                             # make sure the production in focus is shaded white
                             self.manim_production_groups[ps].fade_to(
-                                color=_opp_col(), alpha=1)
+                                color=config.opp_col(), alpha=1)
 
                             # begin adding to its first set
                             if first_terminal[0] not in self.cfg.first_set[ps]:
@@ -471,7 +460,7 @@ class ManimFirstSet(m.Scene):
 
                             # reset other colours to white
                             self.cfg.manim_firstset_contents[ps].fade_to(
-                                color=_opp_col(), alpha=1)
+                                color=config.opp_col(), alpha=1)
 
                             # reset all cfg lines to white except the one we are looking at
                             keys.fade_to(color=m.DARK_GRAY, alpha=1)
@@ -755,7 +744,7 @@ class ManimFollowSet(m.Scene):
             # highlight manim production
             keys.fade_to(color=m.GRAY, alpha=1)
             cfg_line = self.manim_production_groups[production][:]
-            anims.append(m.FadeToColor(cfg_line, _opp_col()))
+            anims.append(m.FadeToColor(cfg_line, config.opp_col()))
 
             # add the follow set titles to the canvas
             if self.cfg.manim_followset_lead[production] == None:
@@ -861,7 +850,7 @@ class ManimParseTable(m.Scene):
             # highlight the CFG line
             cfg_line = self.manim_production_groups[key][:]
             self.play(
-                    m.FadeToColor(cfg_line, color=_opp_col())
+                    m.FadeToColor(cfg_line, color=config.opp_col())
             )
 
             for j, item in enumerate(self.cfg.first_set[key], start=0):
@@ -920,13 +909,13 @@ class ManimParseTable(m.Scene):
         t_old = self.mtable.get_entries_without_labels((row, col))
 
         self.play(
-            m.Indicate(t_old, color = _opp_col())
+            m.Indicate(t_old, color = config.opp_col())
         )
 
         # set up new value with colour
         t_new = m.MathTex(new_val).scale(GRID_ITEM_SCALE)
         t_new.move_to(t_old)
-        t_new.fade_to(_opp_col(), alpha=0.2)
+        t_new.fade_to(config.opp_col(), alpha=0.2)
 
         # fade out old value and into new value
         sounds.add_sound_to_scene(self, sounds.CLACK)
@@ -1034,7 +1023,7 @@ def create_vertex(g, vertex_id, parent_id, label, color=m.GRAY,  link=True):
 
     if link:
         g._add_edge(
-            [parent_id, vertex_id], edge_config={"color": _opp_col()})
+            [parent_id, vertex_id], edge_config={"color": config.opp_col()})
     return v
 
 
@@ -1294,7 +1283,7 @@ class ManimParseTree(m.Scene):
                             try:
                                 edge = g.edges[(parent_vertex_id, vertex_id)]
                                 anims.append(
-                                    m.FadeToColor(edge, color=_opp_col()))
+                                    m.FadeToColor(edge, color=config.opp_col()))
                             except:
                                 pass
                         except KeyError:

@@ -5,21 +5,7 @@ from kitchen import DARK
 import typer
 import anytree
 import manim as m
-from kitchen import sounds
-
-# set mode to dark by default
-MODE = DARK
-
-def set_mode(mode):
-    global MODE
-    MODE = mode
-
-def opp_col():
-    global MODE
-    if MODE == DARK:
-        return m.WHITE
-    else:
-        return m.BLACK
+from kitchen import sounds, config
 
 def info_secho(msg):
     """Helper function to echo an informative message. 
@@ -87,7 +73,7 @@ def pretty_print_dict(dict):
     """    
     structure_secho("\n".join("{}\t{}".format(k, v) for k, v in dict.items()))
 
-def pretty_print_config_settings(config, narr, theme = ""):
+def pretty_print_config_settings(output_config, narr, theme = ""):
     """Displays the
 
     Args:
@@ -96,9 +82,9 @@ def pretty_print_config_settings(config, narr, theme = ""):
     if narr == sounds.NARR: narr_setting = True
     else: narr_setting = False
 
-    structure_secho("\tQuality: " + config["quality"])
-    structure_secho("\tPreview: " + str(config["preview"]))
-    structure_secho("\tAnimation Theme: " + theme)
+    structure_secho("\tQuality: " + output_config["quality"])
+    structure_secho("\tPreview: " + str(output_config["preview"]))
+    structure_secho("\tAnimation Theme: " + config.get_theme_name())
     structure_secho("\tNarration: " + str(narr_setting))
 
 def print_welcome():

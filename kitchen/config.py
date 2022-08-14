@@ -1,18 +1,50 @@
-from kitchen import (display_helper, sounds, SUCCESS)
+from kitchen import (display_helper, sounds, SUCCESS, DARK, LIGHT, config)
 from datetime import datetime
+import manim as m
 
 OUTPUT_CONFIG = None
+# set theme to dark by default
+THEME = DARK
 
 (
     FOLLOW_SET,
     FIRST_SET,
     PARSETABLE,
-    LL1_PARSING
+    LL1_PARSING,
 ) = range(4)
 
 def init_config():
     global OUTPUT_CONFIG
-    OUTPUT_CONFIG = {"quality": "medium_quality", "preview": True, 'flush_cache': True, "output_file": ''}
+    OUTPUT_CONFIG = {"quality": "medium_quality", "preview": True, 'flush_cache': True, "output_file": '', 'background_color': m.BLACK}
+
+def set_theme(tm):
+    global THEME, OUTPUT_CONFIG
+    THEME = tm
+    if tm == DARK:
+        OUTPUT_CONFIG["background_color"] = m.BLACK
+    else:
+        OUTPUT_CONFIG["background_color"] = m.WHITE
+
+def opp_col():
+    if config.get_theme() == DARK:
+        return m.WHITE
+    else:
+        return m.BLACK
+
+def theme_col():
+    if THEME == LIGHT:
+        return m.WHITE
+    else:
+        return m.BLACK
+
+def get_theme():
+    return THEME
+
+def get_theme_name():
+    if THEME == LIGHT:
+        return "light"
+    else:
+        return "dark " 
 
 def _set_quality(inp) -> bool:
     global OUTPUT_CONFIG
@@ -25,6 +57,22 @@ def _set_quality(inp) -> bool:
         else:
             OUTPUT_CONFIG["quality"] = qs[opts.index(inp[q_index + 1])]
             display_helper.success_secho("Success: set 'quality' to '" + OUTPUT_CONFIG["quality"] + "'\n")
+            return True
+    except:
+        return False
+
+def _set_theme(inp) -> bool:
+    global OUTPUT_CONFIG
+    global THEME
+    ts = [DARK, LIGHT]
+    opts = ['dark', 'light']
+    try:
+        t_index = inp.index("-t")
+        if inp[t_index + 1] not in opts:
+            display_helper.fail_secho("\t Options: -t <dark | light>")
+        else:
+            set_theme(ts[opts.index(inp[t_index + 1])])
+            display_helper.success_secho("Success: set 'theme' to '" + inp[t_index + 1] + "'\n")
             return True
     except:
         return False
@@ -67,7 +115,8 @@ def _adjust_settings(inp):
     qcode = _set_quality(inp)
     pcode = _set_preview(inp)
     ncode = _set_narration(inp)
-    if not (qcode or pcode or ncode):
+    tcode = _set_theme(inp)
+    if not (qcode or pcode or ncode or tcode):
         display_helper.fail_secho("Invalid configuration.\n")
     return
 

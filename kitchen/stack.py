@@ -4,10 +4,8 @@ from anytree import *
 import re
 
 from kitchen import (
-    RE_NONTERMINAL,
     RE_TERMINAL,
-    RE_PRODUCTION,
-    display_helper,
+    config,
     sounds
 )
 
@@ -23,7 +21,7 @@ class Stack:
         # draws the stack
         self.mstack.set_points_as_corners(
             [left_edge + height*m.UP, left_edge, left_edge + m.RIGHT, (left_edge + m.RIGHT) + height*m.UP])
-        self.mstack.set_stroke(width=2, color=display_helper.opp_col())
+        self.mstack.set_stroke(width=2, color=config.opp_col())
 
     def pop(self, msg, vertex=None, anim=[], matching=False):
         # set up stack in backend
@@ -89,7 +87,7 @@ class Stack:
 
         # set up message
         if msg != None:
-            m_msg = m.Tex(msg, color = display_helper.opp_col()).next_to(self.mstack, m.DOWN)
+            m_msg = m.Tex(msg, color = config.opp_col()).next_to(self.mstack, m.DOWN)
 
         # add to backend stack
         self.stack.append(a)
@@ -118,7 +116,7 @@ class Stack:
             )
 
             self.scene.play(
-                m.FadeToColor(t, color=display_helper.opp_col()),
+                m.FadeToColor(t, color=config.opp_col()),
                 m.FadeOut(m_msg),
             )
         else:
@@ -134,5 +132,5 @@ class Stack:
                 )
 
             self.scene.play(
-                m.FadeToColor(t, color=display_helper._col()),
+                m.FadeToColor(t, color=config.opp_col()),
             )
