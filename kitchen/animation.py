@@ -316,7 +316,7 @@ class ManimFirstSet(m.Scene):
         cfg_line = self.manim_production_groups[production][:]
 
         # add the first set titles to the canvas
-        self.cfg.manim_firstset_lead[production] = m.Tex("First(" + production + "):",
+        self.cfg.manim_firstset_lead[production] = m.Tex("First(" + production + "):", color = config.opp_col()
                                                     ).align_to(cfg_line, m.UP).shift(m.LEFT)
 
         self.play(
@@ -748,8 +748,7 @@ class ManimFollowSet(m.Scene):
 
             # add the follow set titles to the canvas
             if self.cfg.manim_followset_lead[production] == None:
-                self.cfg.manim_followset_lead[production] = m.Tex("Follow(" + production + "):",
-                                                             ).align_to(cfg_line, m.UP).shift(m.LEFT)
+                self.cfg.manim_followset_lead[production] = m.Tex("Follow(" + production + "):", color = config.opp_col()).align_to(cfg_line, m.UP).shift(m.LEFT)
                 # prepare content group
                 self.cfg.manim_followset_contents[production].next_to(
                     self.cfg.manim_followset_lead[production], m.RIGHT)
