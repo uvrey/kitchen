@@ -1457,9 +1457,9 @@ class ManimParseTree(m.Scene):
             return
 
         # fade out the stack and transform the parse tree
-        sounds.narrate("Stack emptied.")
+        sounds.narrate("Stack emptied.", self)
         self.s.write_under_stack("\\text{Stack emptied.}")
-        reset_g(self, g, start_symbol, anim=[m.FadeOut(self.s.mstack)])
+        reset_g(self, g, start_symbol, anim=[m.FadeOut(self.s.mstack), m.FadeOut(self.mtable)])
 
         sounds.add_sound_to_scene(self, sounds.YAY)
         _play_msg_with_other(self, ["Successfully parsed `" + " ".join(original_tokens) +

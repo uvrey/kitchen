@@ -58,6 +58,8 @@ def _set_narration(inp):
                 sounds.set_config(sounds.NO_NARR)
             display_helper.success_secho("Success: set 'narration' to '" + str(narr) + "'\n")
             return True
+        else:
+            display_helper.fail_secho("\t Options: -n <y | n>")          
     except:
         return False   
 
