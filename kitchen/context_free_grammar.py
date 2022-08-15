@@ -377,10 +377,14 @@ class ContextFreeGrammar:
         self.follow_set_calculated = True
 
     def show_follow_set_testing(self) -> None:
-        """Displays the calculated follow set. 
+        """Displays the calculated follow sets for each non-terminal
         """        
         self._calculate_follow_set(True)
-        typer.echo(self.follow_set)
+        nt_follow = {}
+        for key in self.follow_set.keys():
+            if re.match(RE_NONTERMINAL, key):
+                nt_follow[key] = self.follow_set[key]
+        typer.echo(nt_follow)
 
     def reset_follow_set(self) -> None:
         """Resets the first sets in preparation for another calculation

@@ -1,5 +1,5 @@
-# tests/test_kitchen.py
-
+# tests/test_first.py
+""" DO NOT EDIT """
 from typer.testing import CliRunner
 import os
 import pytest
@@ -10,7 +10,7 @@ runner = CliRunner()
 
 @pytest.fixture
 def sample_path():
-    return ".\\samples\\cfgs\\"
+    return ".\\samples\\example_cfgs\\"
 
 @pytest.fixture
 def fs_out_path():

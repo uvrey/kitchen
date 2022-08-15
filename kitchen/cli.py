@@ -145,7 +145,7 @@ def find_fw() -> None:
     cfg.reset_first_set()
     cfg.show_follow_set_testing()
 
-@app.command(name = "pt")
+@app.command(name = "test-pt")
 def find_pt() -> None:
     cfg = get_cfg()
     _check_cfg(cfg)
@@ -160,7 +160,7 @@ def find_pt() -> None:
     cfg.parsetable.print_parse_table()
 
 
-# TODO FIX THIS
+# TODO ADD more tests here
 @app.command(name = "ll1")
 def find_ll1() -> None:
     # TODO add input here

@@ -1,5 +1,5 @@
 # tests/test_kitchen.py
-
+""" DO NOT EDIT """
 from typer.testing import CliRunner
 import os
 import pytest
@@ -15,7 +15,7 @@ def test_version():
 
 @pytest.fixture
 def sample_path():
-    return ".\\samples\\cfgs\\"
+    return ".\\samples\\example_cfgs\\"
 
 
 """ Test initialisation and loading of CFGs """

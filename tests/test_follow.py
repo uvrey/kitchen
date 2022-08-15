@@ -1,5 +1,6 @@
-# tests/test_kitchen.py
-
+# tests/test_follow.py
+""" DO NOT EDIT """
+import difflib
 from typer.testing import CliRunner
 import os
 import pytest
@@ -10,7 +11,7 @@ runner = CliRunner()
 
 @pytest.fixture
 def sample_path():
-    return ".\\samples\\cfgs\\"
+    return ".\\samples\\example_cfgs\\"
 
 @pytest.fixture
 def fw_out_path():
@@ -20,16 +21,16 @@ def fw_out_path():
 """ Test calculation of first sets on existing CFG files """
 @pytest.mark.parametrize("sample_cfg", [
     ("cfg.txt"),
-    # ("cfg_1.txt"),
-    # ("cfg_2.txt"),
-    # ("cfg_3.txt"),
-    # ("cfg_4.txt"),
+    # ("cfg_1.txt"), # need memo
+    # ("cfg_2.txt"), # issue here with follow(B)
+    ("cfg_3.txt"),
+    ("cfg_4.txt"),
     # ("cfg_5.txt"),
-    # ("cfg_6.txt"),
-    # ("cfg_7.txt"),
-    # ("cfg_8.txt"),
-    # ("cfg_9.txt"),
-    # ("cfg_10.txt"),
+    ("cfg_6.txt"),
+    # ("cfg_7.txt"), # issue here with alles
+    ("cfg_8.txt"),
+    # ("cfg_9.txt"), # issue here
+    # ("cfg_10.txt"), # issue here
 ])
 
 def test_fw(sample_path, fw_out_path, sample_cfg):
@@ -66,3 +67,10 @@ def show_differences(out, result):
     print("but got:")
     print(result)
     print("__")
+
+    for i,s in enumerate(difflib.ndiff(result, out)):
+        if s[0]==' ': continue
+        elif s[0]=='-':
+            print(u'Delete "{}" from position {}'.format(s[-1],i))
+        elif s[0]=='+':
+            print(u'Add "{}" to position {}'.format(s[-1],i))    
