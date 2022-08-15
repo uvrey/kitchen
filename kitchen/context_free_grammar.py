@@ -284,6 +284,7 @@ class ContextFreeGrammar:
         try:
             # loop through values which a production leads to
             for p in self.cfg_dict[production]:
+
                 # add the appended production to fstack
                 self.fstack.append(production + " -> " + p)
                 # if a production is/ starts with a non-terminal
@@ -297,7 +298,9 @@ class ContextFreeGrammar:
                         # if a terminal is encountered after the list
                         if re.match(RE_TERMINAL, current_item):
                             for j, ps in enumerate(pstack, start=0):
+                                # add First(Y) - #
                                 if current_item not in self.first_set[ps]:
+                                    typer.echo(ps + " leads to " + current_item)
                                     # add popped element to the parse table
                                     self.firstset_index[ps].append(
                                         self.fstack[j])
@@ -320,17 +323,16 @@ class ContextFreeGrammar:
                         # the non-terminal which led to this may disappear in the original production
                         self.vis_has_epsilon = True
                         # appends this terminal to the first set of previous non-terminals
-                    for j, ps in enumerate(pstack, start=0):
+                    for j, ps in enumerate(reversed(pstack), start=0):
                         # add First(P) - # if down the stack
                         if first_terminal[0] not in self.first_set[ps]:
-                            # FIX THIS
-                            # if ps != production and first_terminal[0] == "#":
-                            #     continue
+                            if ps != production and first_terminal[0] == "#":
+                                continue
                             self.firstset_index[ps].append(self.fstack[j])
-                            self.first_set[ps].append(first_terminal[0])
+                            self.first_set[ps].append(first_terminal[0]) 
+
                     # reset the stack once we have looked at it
                     self.fstack.pop()
-
 
             # by this point, we have recursively found a bunch of first sets
             # so let's find those that are still empty
