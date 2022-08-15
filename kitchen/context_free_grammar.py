@@ -19,8 +19,6 @@ from kitchen import (
     RE_PRODUCTION,
     display_helper,
     error,
-    cli, 
-    animation,
     parse_table as pt)
 
 DEFAULT_CFG_PATH = Path.home().joinpath(
