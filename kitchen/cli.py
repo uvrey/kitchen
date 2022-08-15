@@ -101,6 +101,7 @@ def run() -> None:
 
     display_helper.print_welcome()
     cfg = get_cfg()
+    display_helper.success_secho("CFG loaded successfully.")
     while (True):
         input = typer.prompt("Input")
         cli_helper.handle_input(input, cfg)
@@ -118,7 +119,7 @@ def show_cfg() -> None:
 def find_fs() -> None:
     cfg = get_cfg()
     _check_cfg(cfg)
-    cfg.show_first_set()
+    cfg.show_first_set_testing()
 
 
 @app.command(name = "fw")

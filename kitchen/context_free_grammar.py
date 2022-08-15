@@ -64,7 +64,7 @@ def get_prods(cfg_contents) -> list:
             typer.echo("Error at line " + line + "-> " + pps[0])
             return CFG_ERROR_NT_FORMAT
 
-        tmp_prod.append(re.sub('[\s+]', '', pps[0]))
+        tmp_prod.append(re.sub(r'[\s+]', '', pps[0]))
 
         # split into separate groups (eg. A | B)
         spaced_groups = list(filter(None, pps[1].split("|")))
@@ -144,10 +144,6 @@ class ContextFreeGrammar:
             self.manim_cfg = populate_manim_cfg(self.cfg_dict, self.lead_to)
         else:
             self.prods = ERROR
-        typer.secho(
-            f'CFG loaded :)',
-            fg = typer.colors.GREEN
-        )
 
     def _init_structures(self) -> None:
         """ Creates the structures to be used in the algorithms.
@@ -254,6 +250,11 @@ class ContextFreeGrammar:
         display_helper.info_secho("Showing first set:")
         display_helper.pretty_print_dict(self.first_set)
         self.first_set_calculated = True
+
+    def show_first_set_testing(self) -> None:
+        self._calculate_first_set(self.start_symbol, [])
+        self._clean_first_set()
+        typer.echo(self.first_set) 
 
     def reset_first_set(self) -> None:
         """Resets the first sets in preparation for another calculation

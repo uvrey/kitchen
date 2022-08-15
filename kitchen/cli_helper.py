@@ -302,7 +302,7 @@ def _process_command(inp, cfg) -> None:
             animation.setup_manim(cfg)
             animation.render()
 
-    elif inp == "\\show parsetable" or inp == "\pt":
+    elif inp == "\\show parsetable" or inp == "\\pt":
         _show_parsetable(cfg)
 
     elif inp == "\\vis parsetable" or inp == "\\vpt":
