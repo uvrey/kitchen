@@ -431,7 +431,6 @@ class ManimFirstSet(m.Scene):
                             # add to first set
                             self.cfg.first_set[ps].append(first_terminal[0])
                             # add this terminal and play VGroup of each production in the stack
-                            display_helper.fail_secho("wanting to tex: " + terminal_to_write)
                             new_element = m.Tex(
                                     terminal_to_write, color=m.TEAL).scale(TEXT_SCALE)
                             self.cfg.manim_firstset_contents[ps].add(
