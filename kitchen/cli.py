@@ -78,26 +78,16 @@ def init(
             "-cfg",
             prompt="Please provide the path to your CFG",
             ),
-) -> int:
+) -> None:
     """Initializes the configuration files.
-
     Args:
         cfg_path (str): Path to the CFG file.
     """
-    code = cli_helper.load_app(cfg_path)
-    if code== SUCCESS:
-        typer.secho(f"Initialisation successful!", 
-            fg=typer.colors.GREEN)
-        return code
-    else:
-        typer.secho(
-            f'Loading files failed with "{ERRORS[code]}"',
-            fg=typer.colors.RED,
-        )
-        return ERROR
+    cli_helper.load_app(cfg_path)
+
 
 @app.command(name="init-tests")
-def init(
+def init_tests(
      cfg_path: str = typer.Option(
             ...,
             "--cfg-path",
@@ -110,7 +100,7 @@ def init(
     Args:
         cfg_path (str): Path to the CFG file.
     """
-    code = cli_helper.load_app(cfg_path)
+    code = cli_helper.load_app(cfg_path, testing=True)
     if code== SUCCESS:
         return code
     else:
@@ -141,20 +131,19 @@ def show_cfg() -> None:
     typer.echo(cfg.cfg_contents)
 
 """ Helper functions for testing """
-@app.command(name = "fs")
+@app.command(name = "test-fs")
 def find_fs() -> None:
     cfg = get_cfg()
     _check_cfg(cfg)
     cfg.show_first_set_testing()
 
 
-@app.command(name = "fw")
+@app.command(name = "test-fw")
 def find_fw() -> None:
     cfg = get_cfg()
     _check_cfg(cfg)
     cfg.reset_first_set()
-    cfg.show_follow_set()
-    
+    cfg.show_follow_set_testing()
 
 @app.command(name = "pt")
 def find_pt() -> None:

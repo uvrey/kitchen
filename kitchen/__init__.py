@@ -8,7 +8,7 @@ from pathlib import Path
 __app_name__= "kitchen"
 __version__ = "0.1.0"
 
-RE_TERMINAL = '[a-z][a-z]*|$|#|\+|-|/|\*|\(|\)'
+RE_TERMINAL = '[a-z][a-z]*|$|#|\+|-|/|\*|\(|\)|,'
 RE_NONTERMINAL = '[A-Z][A-Z]*'
 RE_PRODUCTION = '[A-Z][A-Z]*|[a-z][a-z]*|$|#|\+|-|/|\*'
 

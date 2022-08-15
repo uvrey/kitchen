@@ -61,7 +61,7 @@ def get_prods(cfg_contents) -> list:
 
         # check that non-terminal doesn't start productions
         if not re.match(RE_NONTERMINAL, pps[0]):
-            typer.echo("Error at line " + line + "-> " + pps[0])
+            typer.echo("Error at line " + str(line) + "-> " + pps[0])
             return CFG_ERROR_NT_FORMAT
 
         tmp_prod.append(re.sub(r'[\s+]', '', pps[0]))
@@ -282,51 +282,51 @@ class ContextFreeGrammar:
 
         # if production does not have a first set
         try:
-            if self.first_set[production] == []:
-                # loop through values which a production leads to
-                for p in self.cfg_dict[production]:
-                    # add the appended production to fstack
-                    self.fstack.append(production + " -> " + p)
-                    # if a production is/ starts with a non-terminal
-                    if p in self.cfg_dict or p[0].isupper():
-                        # find all the productions which are led by a non-terminal
-                        p_nt = list(
-                            filter(None, re.findall(RE_PRODUCTION, p)))
+            # loop through values which a production leads to
+            for p in self.cfg_dict[production]:
+                # add the appended production to fstack
+                self.fstack.append(production + " -> " + p)
+                # if a production is/ starts with a non-terminal
+                if p in self.cfg_dict or p[0].isupper():
+                    # find all the productions which are led by a non-terminal
+                    p_nt = list(
+                        filter(None, re.findall(RE_PRODUCTION, p)))
 
-                        for index, item in enumerate(p_nt, start=0):
-                            current_item = item.strip()
-                            # if a terminal is encountered after the list
-                            if re.match(RE_TERMINAL, current_item):
-                                for j, ps in enumerate(pstack, start=0):
-                                    if current_item not in self.firstset[ps]:
-                                        # add popped element to the parse table
-                                        self.firstset_index[ps].append(
-                                            self.fstack[j])
-                                        self.first_set[ps].append(current_item)
-                                # reset the fstack
-                                self.fstack.pop()
+                    for index, item in enumerate(p_nt, start=0):
+                        current_item = item.strip()
+                        # if a terminal is encountered after the list
+                        if re.match(RE_TERMINAL, current_item):
+                            for j, ps in enumerate(pstack, start=0):
+                                if current_item not in self.first_set[ps]:
+                                    # add popped element to the parse table
+                                    self.firstset_index[ps].append(
+                                        self.fstack[j])
+                                    self.first_set[ps].append(current_item)
+                            # reset the fstack
+                            self.fstack.pop()
+                            break
+                        else:
+                            self._calculate_first_set(
+                                current_item, pstack)
+                            if not self.vis_has_epsilon:
                                 break
-                            else:
-                                self._calculate_first_set(
-                                    current_item, pstack)
-                                if not self.vis_has_epsilon:
-                                    break
-                        self.vis_has_epsilon = False
-                    else:
-                        # if a production starts with a terminal
-                        first_terminal = list(
-                            filter(None, re.findall(RE_TERMINAL, p)))
+                    self.vis_has_epsilon = False
+                else:
+                    # if a production starts with a terminal
+                    first_terminal = list(
+                        filter(None, re.findall(RE_TERMINAL, p)))
 
-                        if first_terminal[0] == "#":
-                            # the non-terminal which led to this may disappear in the original production
-                            self.vis_has_epsilon = True
-                            # appends this terminal to the first set of previous non-terminals
-                        for j, ps in enumerate(pstack, start=0):
-                            if first_terminal[0] not in self.first_set[ps]:
-                                self.firstset_index[ps].append(self.fstack[j])
-                                self.first_set[ps].append(first_terminal[0])
-                        # reset the stack once we have looked at it
-                        self.fstack.pop()
+                    if first_terminal[0] == "#":
+                        # the non-terminal which led to this may disappear in the original production
+                        self.vis_has_epsilon = True
+                        # appends this terminal to the first set of previous non-terminals
+                    for j, ps in enumerate(pstack, start=0):
+                        if first_terminal[0] not in self.first_set[ps]:
+                            self.firstset_index[ps].append(self.fstack[j])
+                            self.first_set[ps].append(first_terminal[0])
+                    # reset the stack once we have looked at it
+                    self.fstack.pop()
+
 
             # by this point, we have recursively found a bunch of first sets
             # so let's find those that are still empty
@@ -360,6 +360,12 @@ class ContextFreeGrammar:
         display_helper.info_secho('Showing follow set:')
         display_helper.pretty_print_dict(self.follow_set)
         self.follow_set_calculated = True
+
+    def show_follow_set_testing(self) -> None:
+        """Displays the calculated follow set. 
+        """        
+        self._calculate_follow_set(True)
+        typer.echo(self.follow_set)
 
     def reset_follow_set(self) -> None:
         """Resets the first sets in preparation for another calculation
@@ -411,25 +417,24 @@ class ContextFreeGrammar:
                     elif index < len(pps) - 1:
                         next_item = pps[index + 1]
                         # if an item is directly followed by a terminal, it is appended to its follow set
-                        if re.match(RE_TERMINAL, next_item):
+                        if re.match(RE_TERMINAL, next_item) and next_item not in self.follow_set[item]:
                             self.follow_set[item].append(next_item)
                         else:
                             # we add the first of the non-terminal at this next index
                             tmp_follow = self.first_set[next_item]
                             for t in tmp_follow:
-                                if t != "#":
+                                if t != "#" and t not in self.follow_set[item]:
                                     self.follow_set[item].append(t)
                                 else:
                                     # we found an epsilon, so this non-terminal
-                                    self.follow_set[item].append(next_item)
+                                    if next_item not in self.follow_set[item]:
+                                        self.follow_set[item].append(next_item)
 
         # clean the follow set
         start_symbol = list(self.cfg_dict.keys())[0]
         self.is_cleaned = []
         self.is_cleaned = self.get_reset_cleaned_set()
-
-        # TODO fix bug here
-        # self.clean_follow_set(start_symbol, [])
+        self.clean_follow_set(start_symbol, [])
 
     def get_reset_cleaned_set(self) -> Dict:
         """Helper function to obtain a dictionary which holds whether or not the follow sets have been cleaned.
@@ -442,13 +447,16 @@ class ContextFreeGrammar:
             tmp_c[fc] = False
         return tmp_c
 
+
+
     def clean_follow_set(self, start, pstack) -> None:
         """Cleans the follow set after the calculation: Replaces non-terminals with their respective follow sets and removes epsilon elements. 
 
         Args:
             start (String): The start symbol.
             pstack (List): Production stack. 
-        """        
+        """      
+        tmp_nts = []
         pstack.append(start)
 
         # clean up the sets
@@ -459,8 +467,10 @@ class ContextFreeGrammar:
         for index, item in enumerate(items, start=0):
             # we have an item in the set
             if re.match(RE_NONTERMINAL, item):
-                self.clean_follow_set(item, pstack)
+                # temporarily remove the non-terminal from the list to prevent recursion
                 items.remove(item)
+                tmp_nts.append(item)
+                self.clean_follow_set(item, pstack)
             else:
                 # we append the descended terminals to the upwards stacks
                 for p in pstack:

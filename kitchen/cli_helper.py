@@ -47,9 +47,11 @@ def init_app(cfg_path: str) -> int:
     """Initialize the application configuration file."""
     config_code = _init_config_file()
     if config_code != SUCCESS:
+        typer.echo("config file initted")
         return config_code
     cfg_code = _create_cfg_path(cfg_path)
     if cfg_code != SUCCESS:
+        typer.echo("cfg path not good")
         return cfg_code
     return SUCCESS
 
@@ -118,20 +120,26 @@ def _validate_path(paths):
             return FILE_LOADING_EXISTS_ERROR
         return SUCCESS
 
-def load_app(path) -> int:
-    """Loads the application given a CFG path.
 
+def load_app(path, testing = False) -> None:
+    """Loads the application given a CFG path.
     Args:
         path (String): Path to the CFG file.
-
     Raises:
         typer.Exit: When CFG loading is unsuccesful. 
     """    
     app_init_error = init_app(path)
     if app_init_error:
-        return app_init_error
+        if not testing:
+            typer.secho(
+                f'Loading files failed with "{ERRORS[app_init_error]}"',
+                fg=typer.colors.RED,
+            )
+        raise typer.Exit(1)
     else:
-        return SUCCESS
+        if not testing:
+            typer.secho(f"Initialisation successful! The cfg path is " + path, 
+                        fg=typer.colors.GREEN)
 
 def _set_parsetable(cfg) -> int:
     if not cfg.parsetable_calculated:

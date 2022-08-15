@@ -329,144 +329,143 @@ class ManimFirstSet(m.Scene):
 
         # if production does not have a first set
         try:
-            if self.cfg.first_set[production] == []:
 
-                # loop through values which a production leads to
-                for i, p in enumerate(self.cfg.cfg_dict[production], start=0):
+            # loop through values which a production leads to
+            for i, p in enumerate(self.cfg.cfg_dict[production], start=0):
 
-                    # if a production is/ starts with a non-terminal
-                    if p in self.cfg.cfg_dict or p[0].isupper():
+                # if a production is/ starts with a non-terminal
+                if p in self.cfg.cfg_dict or p[0].isupper():
 
-                        # find all the productions which are led by a non-terminal
-                        p_nt = list(
-                            filter(None, re.findall(RE_PRODUCTION, p)))
+                    # find all the productions which are led by a non-terminal
+                    p_nt = list(
+                        filter(None, re.findall(RE_PRODUCTION, p)))
 
-                        for j, item in enumerate(p_nt, start=0):
-                            current_item = item.strip()
+                    for j, item in enumerate(p_nt, start=0):
+                        current_item = item.strip()
 
-                            if j > 1:
-                                prev_element = self.manim_prod_dict[production][i][j-1]
+                        if j > 1:
+                            prev_element = self.manim_prod_dict[production][i][j-1]
 
-                            # if a terminal is encountered after the list
-                            # fade in new terminal and corresponding element of the cfg
-                            if re.match(RE_TERMINAL, current_item):
+                        # if a terminal is encountered after the list
+                        # fade in new terminal and corresponding element of the cfg
+                        if re.match(RE_TERMINAL, current_item):
 
-                                for ps in pstack:
-                                    if current_item not in self.firstset[ps]:
-                                        self.firstset[ps].append(current_item)
-                                        # add this terminal and play VGroup of each production in the stack
-                                        new_element = m.Tex(
-                                            _to_tex(terminal_to_write), color=m.TEAL).scale(TEXT_SCALE)
-                                        self.manim_firstset_contents[ps].add(
-                                            new_element)
-                                        self.manim_firstset_contents[ps].arrange_in_grid(row=1, buff = 0.5).next_to(
-                                            self.manim_firstset_lead[ps], m.RIGHT)
+                            for ps in pstack:
+                                if current_item not in self.firstset[ps]:
+                                    self.firstset[ps].append(current_item)
+                                    # add this terminal and play VGroup of each production in the stack
+                                    new_element = m.Tex(
+                                        _to_tex(terminal_to_write), color=m.TEAL).scale(TEXT_SCALE)
+                                    self.manim_firstset_contents[ps].add(
+                                        new_element)
+                                    self.manim_firstset_contents[ps].arrange_in_grid(row=1, buff = 0.5).next_to(
+                                        self.manim_firstset_lead[ps], m.RIGHT)
 
-                                     # fade in new terminal and corresponding element of the cfg
-                                    cfg_element = self.manim_prod_dict[production][i][j]
-                                    sounds.add_sound_to_scene(self, sounds.CLICK)
-                                    self.play(
-                                        m.FadeIn(new_element),
-                                        m.Circumscribe(cfg_element, color=m.TEAL, shape = m.Circle),
-                                        m.FadeToColor(cfg_element, color=m.TEAL, shape = m.Circle),
-                                    )
-                                break
-                            else:
-                                # highlight the non-terminal
+                                    # fade in new terminal and corresponding element of the cfg
                                 cfg_element = self.manim_prod_dict[production][i][j]
-                                cfg_element.fade_to(color=m.RED, alpha=1)
-                                sounds.add_sound_to_scene( self, sounds.CLICK)
+                                sounds.add_sound_to_scene(self, sounds.CLICK)
                                 self.play(
-                                    m.LaggedStart(
-                                    m.Circumscribe(cfg_element, color=m.RED, shape = m.Circle),
-                                    m.FadeToColor(cfg_element, color = m.RED),
-                                    )
+                                    m.FadeIn(new_element),
+                                    m.Circumscribe(cfg_element, color=m.TEAL, shape = m.Circle),
+                                    m.FadeToColor(cfg_element, color=m.TEAL, shape = m.Circle),
                                 )
-                                if j > 1:
-                                    # fade out the previous non-terminal
-                                    prev_element = self.manim_prod_dict[production][i][j-1]
-                                    prev_element.fade_to(
-                                        color=m.DARK_GRAY, alpha=1)
-                                    prev_element.scale(TEXT_SCALE)
-
-                                # display the message alongside narration
-                                _play_msg_with_other(self, [production + " leads to " + current_item + ",", "so First("+production +
-                                             ") \\subseteq First("+current_item+")"], raw_msg=production + ", leads to another non terminal" + current_item + ", so their first sets will overlap.")
-
-
-                                self.vis_first_set(
-                                    keys, guide, production, current_item, pstack)
-                                if not self.cfg.vis_has_epsilon:
-                                    break
-
-                        self.cfg.vis_has_epsilon = False
-
-                    else:
-                        # if a production starts with a terminal
-                        first_terminal = list(
-                            filter(None, re.findall(RE_TERMINAL, p)))
-
-                        terminal_to_write = ""
-
-                        if first_terminal[0] == "#":
-                            # the non-terminal which led to this may disappear in the original production
-                            self.cfg.vis_has_epsilon = True
-
-                        terminal_to_write = _to_tex(first_terminal[0])
-
-                            # appends this terminal to the first set of previous non-terminals
-                        for ps in reversed(pstack):
-                            # make sure the production in focus is shaded white
-                            self.manim_production_groups[ps].fade_to(
-                                color=config.opp_col(), alpha=1)
-
-                            # begin adding to its first set
-                            if first_terminal[0] not in self.cfg.first_set[ps]:
-                                # add to first set
-                                self.cfg.first_set[ps].append(first_terminal[0])
-                                # add this terminal and play VGroup of each production in the stack
-                                new_element = m.Tex(
-                                     terminal_to_write, color=m.TEAL).scale(TEXT_SCALE)
-                                self.cfg.manim_firstset_contents[ps].add(
-                                    new_element)
-                                self.cfg.manim_firstset_contents[ps].arrange_in_grid(row=1, buff = 0.5).next_to(
-                                    self.cfg.manim_firstset_lead[ps], m.RIGHT)
-
-                            # Notify as to what is happening
-                            msg = []
-                            if len(pstack) > 1 and ps != production:
-                                msg = ["Terminal " + terminal_to_write +
-                                           " is also", "added to First(" + ps + "),", "since " +
-                                           ps + " leads to " + production]
-                                raw_msg = ps + " leads to " + production + ", so we add " + first_terminal[0] + " to both. "
-                            else:
-                                msg = ["Terminal " + terminal_to_write +
-                                           " is ", "added to First(" + ps + ")"]
-                                raw_msg = "Let's add terminal " + first_terminal[0] + "!"
-                            _play_msg_with_other(self, msg, raw_msg)
-
-                            # fade in new terminal and corresponding element of the cfg
-                            cfg_element = self.manim_prod_dict[production][i][0]
-
-                            # adds sound as the new element is added
-                            sounds.add_sound_to_scene(self, sounds.CLICK)
-                            self.add(new_element)
-
+                            break
+                        else:
+                            # highlight the non-terminal
+                            cfg_element = self.manim_prod_dict[production][i][j]
+                            cfg_element.fade_to(color=m.RED, alpha=1)
+                            sounds.add_sound_to_scene( self, sounds.CLICK)
                             self.play(
-                                m.Circumscribe(cfg_element, color=m.TEAL, shape = m.Circle),
-                                m.FadeToColor(cfg_element, color=m.TEAL),
+                                m.LaggedStart(
+                                m.Circumscribe(cfg_element, color=m.RED, shape = m.Circle),
+                                m.FadeToColor(cfg_element, color = m.RED),
+                                )
                             )
+                            if j > 1:
+                                # fade out the previous non-terminal
+                                prev_element = self.manim_prod_dict[production][i][j-1]
+                                prev_element.fade_to(
+                                    color=m.DARK_GRAY, alpha=1)
+                                prev_element.scale(TEXT_SCALE)
 
-                            # notify about user epsilon if we are somewhere in the stack
-                            if first_terminal[0] == "#" and ps != start:
-                                _play_msg_with_other(self, ["\\epsilon found at production " + production + ",", "so " + production + " may disappear :)"], raw_msg = "The production may disappear since it can lead to epsilon.")
+                            # display the message alongside narration
+                            _play_msg_with_other(self, [production + " leads to " + current_item + ",", "so First("+production +
+                                            ") \\subseteq First("+current_item+")"], raw_msg=production + ", leads to another non terminal" + current_item + ", so their first sets will overlap.")
 
-                            # reset other colours to white
-                            self.cfg.manim_firstset_contents[ps].fade_to(
-                                color=config.opp_col(), alpha=1)
 
-                            # reset all cfg lines to white except the one we are looking at
-                            keys.fade_to(color=m.DARK_GRAY, alpha=1)
+                            self.vis_first_set(
+                                keys, guide, production, current_item, pstack)
+                            if not self.cfg.vis_has_epsilon:
+                                break
+
+                    self.cfg.vis_has_epsilon = False
+
+                else:
+                    # if a production starts with a terminal
+                    first_terminal = list(
+                        filter(None, re.findall(RE_TERMINAL, p)))
+
+                    terminal_to_write = ""
+
+                    if first_terminal[0] == "#":
+                        # the non-terminal which led to this may disappear in the original production
+                        self.cfg.vis_has_epsilon = True
+
+                    terminal_to_write = _to_tex(first_terminal[0])
+
+                        # appends this terminal to the first set of previous non-terminals
+                    for ps in reversed(pstack):
+                        # make sure the production in focus is shaded white
+                        self.manim_production_groups[ps].fade_to(
+                            color=config.opp_col(), alpha=1)
+
+                        # begin adding to its first set
+                        if first_terminal[0] not in self.cfg.first_set[ps]:
+                            # add to first set
+                            self.cfg.first_set[ps].append(first_terminal[0])
+                            # add this terminal and play VGroup of each production in the stack
+                            new_element = m.Tex(
+                                    terminal_to_write, color=m.TEAL).scale(TEXT_SCALE)
+                            self.cfg.manim_firstset_contents[ps].add(
+                                new_element)
+                            self.cfg.manim_firstset_contents[ps].arrange_in_grid(row=1, buff = 0.5).next_to(
+                                self.cfg.manim_firstset_lead[ps], m.RIGHT)
+
+                        # Notify as to what is happening
+                        msg = []
+                        if len(pstack) > 1 and ps != production:
+                            msg = ["Terminal " + terminal_to_write +
+                                        " is also", "added to First(" + ps + "),", "since " +
+                                        ps + " leads to " + production]
+                            raw_msg = ps + " leads to " + production + ", so we add " + first_terminal[0] + " to both. "
+                        else:
+                            msg = ["Terminal " + terminal_to_write +
+                                        " is ", "added to First(" + ps + ")"]
+                            raw_msg = "Let's add terminal " + first_terminal[0] + "!"
+                        _play_msg_with_other(self, msg, raw_msg)
+
+                        # fade in new terminal and corresponding element of the cfg
+                        cfg_element = self.manim_prod_dict[production][i][0]
+
+                        # adds sound as the new element is added
+                        sounds.add_sound_to_scene(self, sounds.CLICK)
+                        self.add(new_element)
+
+                        self.play(
+                            m.Circumscribe(cfg_element, color=m.TEAL, shape = m.Circle),
+                            m.FadeToColor(cfg_element, color=m.TEAL),
+                        )
+
+                        # notify about user epsilon if we are somewhere in the stack
+                        if first_terminal[0] == "#" and ps != start:
+                            _play_msg_with_other(self, ["\\epsilon found at production " + production + ",", "so " + production + " may disappear :)"], raw_msg = "The production may disappear since it can lead to epsilon.")
+
+                        # reset other colours to white
+                        self.cfg.manim_firstset_contents[ps].fade_to(
+                            color=config.opp_col(), alpha=1)
+
+                        # reset all cfg lines to white except the one we are looking at
+                        keys.fade_to(color=m.DARK_GRAY, alpha=1)
 
             # by this point, we have recursively found a bunch of first sets
             # so let's find those that are still empty
@@ -582,18 +581,24 @@ class ManimFollowSet(m.Scene):
                         # start processing
                         if index == len(pps) - 1 and item != "#" and item != production:
                             # temporarily append production to let us then iterate over and replace it
-                            self.cfg.follow_set[item].append(production)
-                            self.wait()
-                            self._add_to_follow_vis(
-                                item, production, keys, ["Follow(" + production + ") \\subseteq Follow(" + item + ")"], raw_msg = "The follow set of " + production + " is a subset of that of " + item + " ")
-
+                            if production not in self.cfg.follow_set[item]:
+                                self.cfg.follow_set[item].append(production)
+                                self.wait()
+                                self._add_to_follow_vis(
+                                    item, production, keys, ["Follow(" + production + ") \\subseteq Follow(" + item + ")"], raw_msg = "The follow set of " + production + " is a subset of that of " + item + " ")
+                            else:
+                                _play_msg_with_other(self, [next_item +", is already in Follow(" + item + ")"], raw_msg=item + "is already in the follow set.")                                   
+                        
                         elif index < len(pps) - 1:
                             next_item = pps[index + 1]
                             # if an item is directly followed by a terminal, it is appended to its follow set
                             if re.match(RE_TERMINAL, next_item):
-                                self.cfg.follow_set[item].append(next_item)
-                                self._add_to_follow_vis(
-                                    item, next_item, keys)
+                                if next_item not in self.cfg.follow_set[item]:
+                                    self.cfg.follow_set[item].append(next_item)
+                                    self._add_to_follow_vis(
+                                        item, next_item, keys)
+                                else:
+                                    _play_msg_with_other(self, [next_item +", is already in Follow(" + item + ")"], raw_msg=item + "is already in the follow set.")   
                             else:
                                 # we add the first of the non-terminal at this next index
                                 tmp_follow = self.cfg.first_set[next_item]
@@ -617,20 +622,21 @@ class ManimFollowSet(m.Scene):
 
                                 for t in tmp_follow:
                                     if t != "#":
-                                        self.cfg.follow_set[item].append(t)
-                                        self._add_to_follow_vis(
-                                            item, t, keys, [t + " \\in \{First("+next_item+"\\) - \\epsilon\}"])
+                                        if t not in self.cfg.follow_set[item]:
+                                            self.cfg.follow_set[item].append(t)
+                                            self._add_to_follow_vis(
+                                                item, t, keys, [t + " \\in \{First("+next_item+"\\) - \\epsilon\}"])
                                     else:
                                         # we found an epsilon, so this non-terminal
-                                        self.cfg.follow_set[item].append(next_item)
-                                        self._add_to_follow_vis(
-                                            item, next_item, keys, ["\\epsilon \\subseteq First("+next_item+"),", "so "+next_item+ "may not", "actually appear after "+item], raw_msg = "Epsilon is in the first set of " + item + " so the non terminal "+next_item + " might not actually appear after " + item)
+                                        if next_item not in self.cfg.follow_set[item]:
+                                            self.cfg.follow_set[item].append(next_item)
+                                            self._add_to_follow_vis(
+                                                item, next_item, keys, ["\\epsilon \\subseteq First("+next_item+"),", "so "+next_item+ "may not", "actually appear after "+item], raw_msg = "Epsilon is in the first set of " + item + " so the non terminal "+next_item + " might not actually appear after " + item)
 
             # start cleaning the follow set
             self.is_cleaned = []
             self.is_cleaned = self.cfg.get_reset_cleaned_set()
             self.clean_follow_set(self.cfg.start_symbol, [])
-
             sounds.narrate("Time to simplify the sets.", self)
             self.wait()
 
@@ -670,6 +676,7 @@ class ManimFollowSet(m.Scene):
             )
                                 
 # cleans the follow set up after everything is found, so that we don't miss elements
+# TODO fix later from other work
     def clean_follow_set(self, start, pstack):
         pstack.append(start)
 
