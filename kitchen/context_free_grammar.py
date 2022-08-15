@@ -423,35 +423,28 @@ class ContextFreeGrammar:
 
             # inspect each element in the production
             for p in self.cfg_dict[production]:
-                display_helper.info_secho("looking at " + production)
 
                 # split up the productions which are contained within this list
                 pps = list(filter(None, re.findall(RE_PRODUCTION, p)))
 
                 # examine each production and obtain follow sets
                 for index, item in enumerate(pps, start=0):
-                    display_helper.fail_secho("-> " + item)
 
                     if index == len(pps) - 1 and item != "#" and item != production:
                         # temporarily append production to let us then iterate over and replace it
                         if production not in self.follow_set[item]:
-                            typer.echo("1. " + production + " to " + item)
                             self.follow_set[item].append(production)
 
                     elif index < len(pps) - 1:
                         next_item = pps[index + 1]
                         # if an item is directly followed by a terminal, it is appended to its follow set
                         if re.match(RE_TERMINAL, next_item) and next_item not in self.follow_set[item]:
-                            typer.echo("2. " + next_item + " to " + item)
                             self.follow_set[item].append(next_item)
                         else:
                             # we add the first of the non-terminal at this next index
-                            typer.echo(item + " is followed by " + next_item )
                             tmp_first= self.first_set[next_item]
-                            eps_found = False
                             for t in tmp_first:
                                 if t != "#" and t not in self.follow_set[item]:
-                                    typer.echo("adding " + t + " to " + item + " (from first of " + next_item +")")
                                     self.follow_set[item].append(t)
                                 else:
                                     # we found an epsilon, so this non-terminal may disappear
@@ -469,7 +462,6 @@ class ContextFreeGrammar:
         start_symbol = list(self.cfg_dict.keys())[0]
         self.is_cleaned = []
         self.is_cleaned = self.get_reset_cleaned_set()
-        display_helper.pretty_print_dict(self.follow_set)
         self.clean_follow_set(start_symbol, [])
 
     def get_reset_cleaned_set(self) -> Dict:
