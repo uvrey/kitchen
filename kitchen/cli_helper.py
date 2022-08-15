@@ -118,7 +118,7 @@ def _validate_path(paths):
             return FILE_LOADING_EXISTS_ERROR
         return SUCCESS
 
-def load_app(path) -> None:
+def load_app(path) -> int:
     """Loads the application given a CFG path.
 
     Args:
@@ -133,10 +133,11 @@ def load_app(path) -> None:
             f'Loading files failed with "{ERRORS[app_init_error]}"',
             fg=typer.colors.RED,
         )
-        raise typer.Exit(1)
+        return FILE_LOADING_ERROR
     else:
         typer.secho(f"Initialisation successful! The cfg path is " + path, 
                     fg=typer.colors.GREEN)
+        return SUCCESS
 
 def _set_parsetable(cfg) -> int:
     if not cfg.parsetable_calculated:

@@ -1,5 +1,6 @@
 """ Creates the Kitchen CLI"""
 # kitchen/cli.py
+from sre_constants import SUCCESS
 import typer
 from pathlib import Path
 from typing import Optional
@@ -11,6 +12,7 @@ from kitchen import (
      context_free_grammar as cfg, 
      display_helper,
      sounds,
+     ERROR,
      config)
 
 app = typer.Typer()
@@ -76,13 +78,17 @@ def init(
             "-cfg",
             prompt="Please provide the path to your CFG",
             ),
-) -> None:
+) -> int:
     """Initializes the configuration files.
 
     Args:
         cfg_path (str): Path to the CFG file.
     """
-    cli_helper.load_app(cfg_path)
+    code = cli_helper.load_app(cfg_path)
+    if code== SUCCESS:
+        return code
+    else:
+        return ERROR
 
 @app.command(name="run")
 def run() -> None:
