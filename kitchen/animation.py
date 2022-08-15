@@ -392,9 +392,15 @@ class ManimFirstSet(m.Scene):
                             _play_msg_with_other(self, [production + " leads to " + current_item + ",", "so First("+production +
                                             ") \\subseteq First("+current_item+")"], raw_msg=production + ", leads to another non terminal" + current_item + ", so their first sets will overlap.")
 
-
+                            # ensure we don't add # when unnecessary
+                            had_eps = "#" in self.first_set[current_item]
                             self.vis_first_set(
                                 keys, guide, production, current_item, pstack)
+                            has_eps = "#" in self.first_set[current_item]
+
+                            if not had_eps and has_eps and len(pstack) == 1 and j != len(p_nt) - 1:
+                                self.first_set[production].remove("#")
+
                             if not self.cfg.vis_has_epsilon:
                                 break
 
@@ -422,9 +428,6 @@ class ManimFirstSet(m.Scene):
                         # don't add # if we are down the stack
                         # begin adding to its first set
                         if first_terminal[0] not in self.cfg.first_set[ps]:
-                            # TODO FIX THIS
-                            # if ps != production and first_terminal[0] == "#":
-                            #     continue
 
                             # add to first set
                             self.cfg.first_set[ps].append(first_terminal[0])

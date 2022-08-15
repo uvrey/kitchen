@@ -3,6 +3,7 @@
 
 import configparser
 from itertools import chain
+from math import prod
 from pathlib import Path
 import re
 from typing import Dict
@@ -300,7 +301,6 @@ class ContextFreeGrammar:
                             for j, ps in enumerate(pstack, start=0):
                                 # add First(Y) - #
                                 if current_item not in self.first_set[ps]:
-                                    typer.echo(ps + " leads to " + current_item)
                                     # add popped element to the parse table
                                     self.firstset_index[ps].append(
                                         self.fstack[j])
@@ -309,8 +309,21 @@ class ContextFreeGrammar:
                             self.fstack.pop()
                             break
                         else:
+                            # we should add A without epsilon if we are the top level production
+                            had_eps = "#" in self.first_set[current_item]
                             self._calculate_first_set(
                                 current_item, pstack)
+                            has_eps = "#" in self.first_set[current_item]
+
+                            # we don't include the last epsilon if we 
+                            # 1) found it in the first set of a non-terminal AND
+                            # 2) we didn't have it in this first set beforehand AND
+                            # 3) we are the top level production (ie. not in the middle of recursion)
+                            # 4) we are not the LAST production 
+
+                            if not had_eps and has_eps and len(pstack) == 1 and index != len(p_nt) - 1:
+                                self.first_set[production].remove("#")
+                            
                             if not self.vis_has_epsilon:
                                 break
                     self.vis_has_epsilon = False
@@ -326,8 +339,6 @@ class ContextFreeGrammar:
                     for j, ps in enumerate(reversed(pstack), start=0):
                         # add First(P) - # if down the stack
                         if first_terminal[0] not in self.first_set[ps]:
-                            if ps != production and first_terminal[0] == "#":
-                                continue
                             self.firstset_index[ps].append(self.fstack[j])
                             self.first_set[ps].append(first_terminal[0]) 
 

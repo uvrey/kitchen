@@ -87,17 +87,11 @@ def get_contents(sample_fs, fs_out_path):
     return file.read()
 
 def show_differences(out, result):
-    print("Comparing:")
+    print("Expected:")
     print(out)
-    print("and")
+    print("but got:")
     print(result)
     print("__")
-    for i,s in enumerate(difflib.ndiff(result, out)):
-        if s[0]==' ': continue
-        elif s[0]=='-':
-            print(u'Delete "{}" from position {}'.format(s[-1],i))
-        elif s[0]=='+':
-            print(u'Add "{}" to position {}'.format(s[-1],i))    
 
 
 # TODO follow set, parsing, pt tests
