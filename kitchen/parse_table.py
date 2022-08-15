@@ -1,5 +1,5 @@
 import typer
-from manim import *
+import manim as m
 import re
 from kitchen import (
     RE_TERMINAL,
@@ -96,8 +96,8 @@ class ParsingTable:
         self.mtable = self.init_m_table(
             row_vals, row_labels, col_labels)
 
-        self.mtable.get_row_labels().fade_to(color=RED, alpha=1)
-        self.mtable.get_col_labels().fade_to(color=TEAL, alpha=1)
+        self.mtable.get_row_labels().fade_to(color=m.RED, alpha=1)
+        self.mtable.get_col_labels().fade_to(color=m.TEAL, alpha=1)
 
 
 
@@ -108,7 +108,7 @@ class ParsingTable:
             for j, item in enumerate(self.first_set[key], start=0):
                 # if the first set contains epsilon, may disappear
                 if item == "#":
-                    for f in self.followset[key]:
+                    for f in self.follow_set[key]:
                         if f == "$":
                             prod = key + " -> $"
                         else:

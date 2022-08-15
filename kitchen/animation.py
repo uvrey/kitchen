@@ -40,7 +40,7 @@ def _get_title_mobject(title):
     return m.Tex(title, tex_template=m.TexFontTemplates.french_cursive)
 
 def _to_tex(item):
-    tex_item = item.replace("$", "\$").replace("#", "\\epsilon").replace("\\subseteq", "$\\subseteq$").replace("->", "$\\to$")
+    tex_item = item.replace("(", "\(").replace(")", "\)"). replace("$", "\$").replace("#", "\\epsilon").replace("\\subseteq", "$\\subseteq$").replace("->", "$\\to$")
     return tex_item
 
 def _play_msg_with_other(self, msg, raw_msg= "", anim=[]):
@@ -428,10 +428,10 @@ class ManimFirstSet(m.Scene):
                         # don't add # if we are down the stack
                         # begin adding to its first set
                         if first_terminal[0] not in self.cfg.first_set[ps]:
-
                             # add to first set
                             self.cfg.first_set[ps].append(first_terminal[0])
                             # add this terminal and play VGroup of each production in the stack
+                            display_helper.fail_secho("wanting to tex: " + terminal_to_write)
                             new_element = m.Tex(
                                     terminal_to_write, color=m.TEAL).scale(TEXT_SCALE)
                             self.cfg.manim_firstset_contents[ps].add(
