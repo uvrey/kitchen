@@ -324,8 +324,8 @@ class ContextFreeGrammar:
                         # add First(P) - # if down the stack
                         if first_terminal[0] not in self.first_set[ps]:
                             # FIX THIS
-                            if ps != production and first_terminal[0] == "#":
-                                continue
+                            # if ps != production and first_terminal[0] == "#":
+                            #     continue
                             self.firstset_index[ps].append(self.fstack[j])
                             self.first_set[ps].append(first_terminal[0])
                     # reset the stack once we have looked at it
