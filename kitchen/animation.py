@@ -40,7 +40,7 @@ def _get_title_mobject(title):
     return m.Tex(title, tex_template=m.TexFontTemplates.french_cursive)
 
 def _to_tex(item):
-    tex_item = item.replace("(", "\(").replace(")", "\)"). replace("$", "\$").replace("#", "\\epsilon").replace("\\subseteq", "$\\subseteq$").replace("->", "$\\to$")
+    tex_item = item.replace("$", "\$").replace("#", "\\epsilon").replace("\\subseteq", "$\\subseteq$").replace("->", "$\\to$").replace("(", "$($").replace(")", "$)$")
     return tex_item
 
 def _play_msg_with_other(self, msg, raw_msg= "", anim=[]):
