@@ -60,8 +60,10 @@ def get_prods(cfg_contents) -> list:
         pps = list(filter(None, production.split("->")))
 
         # check that non-terminal doesn't start productions
+        # TODO handle this error properly
         if not re.match(RE_NONTERMINAL, pps[0]):
-            typer.echo("Error at line " + str(line) + "-> " + pps[0])
+            display_helper.fail_secho("CFG Error at line " + str(line) + "-> " + pps[0])
+            raise typer.Exit()
             return CFG_ERROR_NT_FORMAT
 
         tmp_prod.append(re.sub(r'[\s+]', '', pps[0]))
@@ -122,8 +124,6 @@ def populate_manim_cfg(cfg_dict, lead_to) -> Dict:
     except:
         error.ERR_left_recursion_detected()
         return CFG_FILE_ERROR
-
-
 
 class ContextFreeGrammar:
 
@@ -321,7 +321,10 @@ class ContextFreeGrammar:
                         self.vis_has_epsilon = True
                         # appends this terminal to the first set of previous non-terminals
                     for j, ps in enumerate(pstack, start=0):
+                        # add First(P) - # if down the stack
                         if first_terminal[0] not in self.first_set[ps]:
+                            if ps != production and first_terminal[0] == "#":
+                                continue
                             self.firstset_index[ps].append(self.fstack[j])
                             self.first_set[ps].append(first_terminal[0])
                     # reset the stack once we have looked at it

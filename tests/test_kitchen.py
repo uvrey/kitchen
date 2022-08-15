@@ -53,9 +53,9 @@ def test_init(sample, out, sample_path):
     ("cfg_5.txt"),
     ("cfg_6.txt"),
     ("cfg_7.txt"),
-    # ("cfg_8.txt"),
+    ("cfg_8.txt"),
     ("cfg_9.txt"),
-    # ("cfg_10.txt"),
+    ("cfg_10.txt"),
 ])
 
 def test_fs(sample_path, fs_out_path, sample_fs):
