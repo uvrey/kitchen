@@ -635,11 +635,17 @@ class ManimFollowSet(m.Scene):
                                             self._add_to_follow_vis(
                                                 item, t, keys, [t + " \\in \{First("+next_item+"\\) - \\epsilon\}"])
                                     else:
-                                        # we found an epsilon, so this non-terminal
-                                        if next_item not in self.cfg.follow_set[item]:
-                                            self.cfg.follow_set[item].append(next_item)
+
+                                        if index + 1 == len(pps) - 1:
+                                            # if B -> # and A -> aB, then follow(a) = Follow(A) 
+                                            if production not in self.follow_set[item]: 
+                                                self.follow_set[item].append(production)
+                                                self._add_to_follow_vis(
+                                                item, production, keys, ["\\epsilon \\subseteq First("+next_item+"),", "so "+next_item+ "may not", "actually appear after "+item, " From this, Follow(" + item + ") \\subseteq Follow(" + production +")"], raw_msg = "Epsilon is in the first set of " + item + " so the non terminal "+next_item + " might not actually appear after " + item)
+                                        else:
+                                            self.follow_set[item].append(next_item)
                                             self._add_to_follow_vis(
-                                                item, next_item, keys, ["\\epsilon \\subseteq First("+next_item+"),", "so "+next_item+ "may not", "actually appear after "+item], raw_msg = "Epsilon is in the first set of " + item + " so the non terminal "+next_item + " might not actually appear after " + item)
+                                                item, next_item, keys, ["\\epsilon \\subseteq First("+next_item+"),", "so "+next_item+ "may not", "actually appear after "+item], raw_msg = "Epsilon is in the first set of " + item + " so the non-terminal "+next_item + " might not actually appear after " + item)
 
             # start cleaning the follow set
             self.is_cleaned = []
