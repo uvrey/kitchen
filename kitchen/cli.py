@@ -86,6 +86,32 @@ def init(
     """
     code = cli_helper.load_app(cfg_path)
     if code== SUCCESS:
+        typer.secho(f"Initialisation successful!", 
+            fg=typer.colors.GREEN)
+        return code
+    else:
+        typer.secho(
+            f'Loading files failed with "{ERRORS[code]}"',
+            fg=typer.colors.RED,
+        )
+        return ERROR
+
+@app.command(name="init-tests")
+def init(
+     cfg_path: str = typer.Option(
+            ...,
+            "--cfg-path",
+            "-cfg",
+            prompt="Please provide the path to your CFG",
+            ),
+) -> int:
+    """Initializes the configuration files within a testing context.
+
+    Args:
+        cfg_path (str): Path to the CFG file.
+    """
+    code = cli_helper.load_app(cfg_path)
+    if code== SUCCESS:
         return code
     else:
         return ERROR

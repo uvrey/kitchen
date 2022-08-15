@@ -22,15 +22,13 @@ def test_version():
     assert result.exit_code == 0
     assert f"{__app_name__} v{__version__}\n" in result.stdout
 
-
 @pytest.fixture
 def sample_path():
-    return "\\samples\\"
+    return ".\\samples\\"
 
 @pytest.fixture
 def fs_out_path():
-    return "\\samples\\fs\\"
-
+    return ".\\samples\\fs\\"
 
 """ Test initialisation and loading of CFGs """
 @pytest.mark.parametrize("sample, out", [
@@ -48,7 +46,16 @@ def test_init(sample, out, sample_path):
 """ Test calculation of first sets on existing CFG files """
 @pytest.mark.parametrize("sample_fs", [
     ("cfg.txt"),
-    ("cfg_1.txt")
+    ("cfg_1.txt"),
+    ("cfg_2.txt"),
+    ("cfg_3.txt"),
+    ("cfg_4.txt"),
+    ("cfg_5.txt"),
+    ("cfg_6.txt"),
+    ("cfg_7.txt"),
+    ("cfg_8.txt"),
+    ("cfg_9.txt"),
+    ("cfg_10.txt"),
 ])
 
 def test_fs(sample_path, fs_out_path, sample_fs):
@@ -59,10 +66,10 @@ def test_fs(sample_path, fs_out_path, sample_fs):
         sample_fs (str): Name of CFG file
         fs_out_path (str): Path to expected outputs directory
     """    
-    runner.invoke(cli.app, ["init",  "-cfg", sample_path + sample_fs])
+    runner.invoke(cli.app, ["init-tests",  "-cfg", sample_path + sample_fs])
     result = runner.invoke(cli.app, ["fs"])
     out_fs = get_contents(sample_fs, fs_out_path)
-    show_differences(out_fs, result.stdout)
+    # show_differences(out_fs, result.stdout)
     assert out_fs in result.stdout
 
 def get_contents(sample_fs, fs_out_path):
@@ -76,7 +83,6 @@ def get_contents(sample_fs, fs_out_path):
         str: contents of the expected output file corresponding to the first set to be tested
     """    
     filename = os.getcwd() + fs_out_path + sample_fs
-    print("getting file at path: " + filename)
     file = open(filename, 'r')
     return file.read()
 
@@ -93,4 +99,4 @@ def show_differences(out, result):
             print(u'Add "{}" to position {}'.format(s[-1],i))    
 
 
-
+# TODO follow set, parsing, pt tests

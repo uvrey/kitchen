@@ -129,14 +129,8 @@ def load_app(path) -> int:
     """    
     app_init_error = init_app(path)
     if app_init_error:
-        typer.secho(
-            f'Loading files failed with "{ERRORS[app_init_error]}"',
-            fg=typer.colors.RED,
-        )
-        return FILE_LOADING_ERROR
+        return app_init_error
     else:
-        typer.secho(f"Initialisation successful! The cfg path is " + path, 
-                    fg=typer.colors.GREEN)
         return SUCCESS
 
 def _set_parsetable(cfg) -> int:
