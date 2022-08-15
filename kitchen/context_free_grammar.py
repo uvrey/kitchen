@@ -426,7 +426,9 @@ class ContextFreeGrammar:
         start_symbol = list(self.cfg_dict.keys())[0]
         self.is_cleaned = []
         self.is_cleaned = self.get_reset_cleaned_set()
-        self.clean_follow_set(start_symbol, [])
+
+        # TODO fix bug here
+        # self.clean_follow_set(start_symbol, [])
 
     def get_reset_cleaned_set(self) -> Dict:
         """Helper function to obtain a dictionary which holds whether or not the follow sets have been cleaned.

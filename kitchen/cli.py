@@ -60,10 +60,13 @@ def _check_cfg(cfg) -> None:
 
     Raises:
         typer.Abort: Aborts when CFG is invalid.
-    """    
-    if cfg.prods in ERRORS:
-        display_helper.fail_secho('"CFG file invalid with "{ERRORS[cfg.prods]}"')
-        raise typer.Abort()
+    """  
+    pass
+    #typer.echo(cfg.prods)  
+    # TODO fix
+    # if cfg.prods in ERRORS:
+    #     display_helper.fail_secho('"CFG file invalid with "{ERRORS[cfg.prods]}"')
+    #     raise typer.Abort()
 
 @app.command()
 def init(
@@ -103,6 +106,47 @@ def show_cfg() -> None:
     cfg = get_cfg()
     _check_cfg(cfg)
     typer.echo(cfg.cfg_contents)
+
+""" Helper functions for testing """
+@app.command(name = "fs")
+def find_fs() -> None:
+    cfg = get_cfg()
+    _check_cfg(cfg)
+    cfg.show_first_set()
+
+
+@app.command(name = "fw")
+def find_fw() -> None:
+    cfg = get_cfg()
+    _check_cfg(cfg)
+    cfg.reset_first_set()
+    cfg.show_follow_set()
+    
+
+@app.command(name = "pt")
+def find_pt() -> None:
+    cfg = get_cfg()
+    _check_cfg(cfg)
+    cfg.reset_first_set()
+    cfg.reset_follow_set()
+
+    # initialise parsetable
+    cfg.setup_parsetable()
+
+    # calculate parsetable
+    code = cfg.calculate_parsetable()
+    cfg.parsetable.print_parse_table()
+
+
+# TODO FIX THIS
+@app.command(name = "ll1")
+def find_ll1() -> None:
+    # TODO add input here
+    cfg = get_cfg()
+    _check_cfg(cfg)
+    cfg.reset_first_set()
+    cfg.reset_follow_set()
+    # cfg.parser_ll1.parse_ll1(cfg.start_symbol, "a")
 
 @app.callback()
 def main(
