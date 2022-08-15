@@ -255,7 +255,7 @@ class ContextFreeGrammar:
         self._clean_first_set()
         typer.echo(self.first_set) 
 
-    def reset_first_set(self) -> None:
+    def reset_first_set(self, calculate_again = True) -> None:
         """Resets the first sets in preparation for another calculation
         """        
         self.first_set = {}
@@ -266,8 +266,9 @@ class ContextFreeGrammar:
             self.firstset_index[p_seq[0]] = []
 
         # calculate first set
-        self._calculate_first_set(self.start_symbol, [])
-        self.first_set_calculated = True
+        if calculate_again:
+            self._calculate_first_set(self.start_symbol, [])
+            self.first_set_calculated = True
 
     def _calculate_first_set(self, production, pstack) -> None:
         """Recursively calculates the first set and stores it to the internal first set structure
@@ -386,7 +387,7 @@ class ContextFreeGrammar:
                 nt_follow[key] = self.follow_set[key]
         typer.echo(nt_follow)
 
-    def reset_follow_set(self) -> None:
+    def reset_follow_set(self, calculate_again = True) -> None:
         """Resets the first sets in preparation for another calculation
         """        
         # reset the follow set structure and set non-terminal sets to empty
@@ -405,9 +406,10 @@ class ContextFreeGrammar:
             if re.match(RE_TERMINAL, t) and t != "#":
                 self.follow_set[t] = []
 
-        # calculate the follow set
-        self._calculate_follow_set(True)
-        self.follow_set_calculated = True
+        if calculate_again:
+            # calculate the follow set
+            self._calculate_follow_set(True)
+            self.follow_set_calculated = True
 
     def _calculate_follow_set(self, is_start_symbol) -> None:
         """Algorithm for calculating the follow set of a given CFG.

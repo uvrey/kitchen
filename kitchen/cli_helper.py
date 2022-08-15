@@ -1,6 +1,7 @@
 """ Configuration for the application """
 
 from ast import BoolOp, excepthandler
+from cgitb import reset
 import configparser
 from glob import glob
 from pathlib import Path
@@ -284,6 +285,11 @@ def _process_command(inp, cfg) -> None:
         cfg.show_first_set()
     
     elif inp == "\\vis first" or inp == "\\vfs":
+
+        if cfg.first_set_calculated:
+            cfg.reset_first_set(calculate_again = False)
+            cfg.first_set_calculated = False
+
         config.configure_output_file_name(config.FIRST_SET)
         with m.tempconfig(config.OUTPUT_CONFIG):
             animation = anim.ManimFirstSet()
@@ -297,7 +303,12 @@ def _process_command(inp, cfg) -> None:
     elif inp == "\\vis follow" or inp == "\\vfw":
         if not cfg.first_set_calculated:
             cfg.reset_first_set()
-        
+
+        # reset the follow set to be visualised again
+        if cfg.follow_set_calculated:
+            cfg.reset_follow_set(calculate_again = False)
+            cfg.follow_set_calculated = False
+
         config.configure_output_file_name(config.FOLLOW_SET)
         with m.tempconfig(config.OUTPUT_CONFIG):
             animation = anim.ManimFollowSet()
@@ -310,6 +321,8 @@ def _process_command(inp, cfg) -> None:
     elif inp == "\\vis parsetable" or inp == "\\vpt":
         if not cfg.first_set_calculated:
             cfg.reset_first_set()
+
+        # TODO reset parse table if it was already calculated
         
         config.OUTPUT_CONFIG["output_file"] = "Parsetable"
         config.configure_output_file_name(config.PARSETABLE)
