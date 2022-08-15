@@ -25,11 +25,11 @@ def fw_out_path():
     # ("cfg_2.txt"), # issue here with follow(B)
     ("cfg_3.txt"),
     ("cfg_4.txt"),
-    # ("cfg_5.txt"),
+    ("cfg_5.txt"),
     ("cfg_6.txt"),
-    # ("cfg_7.txt"), # issue here with alles
+    ("cfg_7.txt"), 
     ("cfg_8.txt"),
-    # ("cfg_9.txt"), # issue here
+    ("cfg_9.txt"), 
     # ("cfg_10.txt"), # issue here
 ])
 

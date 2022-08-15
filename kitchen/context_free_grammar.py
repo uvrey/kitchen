@@ -429,9 +429,11 @@ class ContextFreeGrammar:
 
                 # examine each production and obtain follow sets
                 for index, item in enumerate(pps, start=0):
+
                     if index == len(pps) - 1 and item != "#" and item != production:
                         # temporarily append production to let us then iterate over and replace it
-                        self.follow_set[item].append(production)
+                        if production not in self.follow_set[item]:
+                            self.follow_set[item].append(production)
 
                     elif index < len(pps) - 1:
                         next_item = pps[index + 1]
