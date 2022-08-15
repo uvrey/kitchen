@@ -419,8 +419,13 @@ class ManimFirstSet(m.Scene):
                         self.manim_production_groups[ps].fade_to(
                             color=config.opp_col(), alpha=1)
 
+                        # don't add # if we are down the stack
                         # begin adding to its first set
                         if first_terminal[0] not in self.cfg.first_set[ps]:
+                            # TODO FIX THIS
+                            if ps != production and first_terminal[0] == "#":
+                                continue
+
                             # add to first set
                             self.cfg.first_set[ps].append(first_terminal[0])
                             # add this terminal and play VGroup of each production in the stack
