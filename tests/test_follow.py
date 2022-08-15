@@ -14,7 +14,7 @@ def sample_path():
 
 @pytest.fixture
 def fw_out_path():
-    return ".\\samples\\fw\\"
+    return ".\\samples\\expected_fw\\"
 
 
 """ Test calculation of first sets on existing CFG files """
