@@ -984,7 +984,7 @@ class ManimParseTable(m.Scene):
 
         # set up new value with colour
         t_new = m.MathTex(_to_math_tex(new_val))
-        t_new.scale_to_fit_width(GRID_ITEM_SCALE)
+        t_new.scale_to_fit_width(GRID_ITEM_SCALE).scale(0.7)
         t_new.move_to(t_old)
         t_new.fade_to(config.opp_col(), alpha=0.2)
 
