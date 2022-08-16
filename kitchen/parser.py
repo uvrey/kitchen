@@ -83,22 +83,23 @@ class ParserLL1:
                     # pops appropriately
                     if self.parents != []:
                         popped = self.parents.pop()
-                        # typer.echo(popped.id + " was just popped off")
-                        # display_helper.info_secho(self.parents)
-                        # typer.echo("____")
+                        typer.echo(popped.id + " was just popped off")
+                        display_helper.info_secho(self.parents)
+                        typer.echo("____")
 
                         # always pop again if an epsilon was encountered
                         if self.parents != []:
                             done = False
                             i = 1
                             while not done:
-                                # typer.echo(str(i) +" = i vs len " + str(len(self.parents)))
+                                typer.echo(str(i) +" = i vs len " + str(len(self.parents)))
                                 if i <= len(self.parents):
                                     pt = self.parents[-i]
-                                    # typer.echo("looking at " + pt.id)
+                                    typer.echo("looking at " + pt.id)
                                     if re.match(RE_NONTERMINAL, pt.id):
                                         # if we have encountered the first set which the production can fall under
                                         if popped.id in self.cfg.first_set[pt.id]:
+                                            typer.echo(popped.id + " is in fs of " + pt.id)
                                             # remove children if they were previously added
                                             if pt.height != 0:
                                                 pt.children = []
@@ -119,17 +120,28 @@ class ParserLL1:
                                             for j in range(i - 1):
                                                 self.parents.pop()
                                             done = True 
+                                    else:
+                                        # NEW!
+                                        typer.echo("check if " + popped.id + " is in follow of " + pt.id)
+                                        typer.echo("?? adding " + popped.id + " with parent " + pt.id )
+                                        # new_node = anytree.Node(
+                                        #         popped.id, parent=pt, id=popped.id)
+                                        #break
+                                        
                                     # NEW                                   
                                     i = i + 1  
                                 else:
                                     # NEW!
                                     typer.echo("esc here?")
                                     typer.echo(str(i) + " vs | len " + str(len(self.parents)))
-                                    typer.echo("adding node " + popped.id + " to parent " + p.id)
+                                    typer.echo("adding node " + popped.id + " to parent " + pt.id)
                                     break
+                            else:
+                                typer.echo ("we have run out of places to check " + popped.id)
                         else:
                             # NEW!
                             # parents are empty, so we add the node
+                            typer.echo("adding " + p + " with parent " + popped.id )
                             new_node = anytree.Node(
                                                 p, parent=popped, id=p)
                            
