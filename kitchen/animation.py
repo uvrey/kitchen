@@ -869,18 +869,18 @@ class ManimParseTable(m.Scene):
 
         # add the guide 
         guide = get_guide(arr_right= True)
-        guide.scale_to_fit_width(CFG_SCALE_WIDTH/4)
+        guide.scale(0.6)
         
         # arrange all items
         all_elements.arrange_in_grid(rows = 1, buff = 1.2)
         all_elements.center()
 
         # scale everything nicely
-        all_elements.scale(0.6)
-
+        all_elements.scale_to_fit_width(CFG_SCALE_WIDTH)
         # make sure elements are showing
-        if all_elements.height > CFG_SCALE_HEIGHT:
+        if all_elements.height > CFG_SCALE_HEIGHT and len(self.ts) > 4:
             all_elements.scale_to_fit_height(CFG_SCALE_HEIGHT)
+
 
         cfg_heading.next_to(keys, m.UP)
 
