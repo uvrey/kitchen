@@ -52,7 +52,7 @@ def ERR_too_many_productions_ll1(nt, t):
     err = typer.style("Error:", fg=typer.colors.WHITE, bg=typer.colors.RED)
     typer.echo(err + " When building the parsing table, [" + nt + ", " + t +
                "] contains more than one production - this CFG is not feasible to parse with LL(1).")
-    raise typer.Abort()
+
 
 
 def ERR_parsing_error(root = None, detail=""):

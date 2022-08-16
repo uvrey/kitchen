@@ -19,6 +19,7 @@ from kitchen import (
     CFG_SCALE,
     CFG_SCALE_HEIGHT,
     COLOURS,
+    ERROR,
     error,
     stack, 
     sounds,
@@ -32,7 +33,7 @@ ECONFIG = {"color": config.opp_col()}
 ECONFIG_TEMP = {"color": m.GRAY, "fill_opacity": 0.7}
 V_LABELS = {}
 
-GRID_ITEM_SCALE = 0.9
+GRID_ITEM_SCALE = 0.4
 
 # set global configs
 m.config.include_sound = True
@@ -867,11 +868,11 @@ class ManimParseTable(m.Scene):
         all_elements.add(guide)
         
         # arrange all items
-        all_elements.arrange_in_grid(rows = 1, buff = 1.2)
+        all_elements.arrange_in_grid(rows = 1, buff = 1)
         all_elements.center()
 
         # scale everything nicely
-        all_elements.scale_to_fit_height(0.96*CFG_SCALE_HEIGHT)
+        all_elements.scale_to_fit_height(0.9*CFG_SCALE_HEIGHT)
         cfg_heading.next_to(keys, m.UP)
 
         sounds.add_sound_to_scene(self, sounds.MOVE)
@@ -920,7 +921,10 @@ class ManimParseTable(m.Scene):
                         _play_msg_with_other(self, ["Following " + prod + "adds #", "to First(" + _to_tex(key) + ")"], raw_msg = "If we follow "+key+"'s production, we find an epsilon. So, we add this production to the parse table in the epsilon column and non terminal " + key + "'s row")
                         self.wait()
 
-                        self.vis_add_to_parsetable( key, f, prod, mprod)
+                        code = self.vis_add_to_parsetable( key, f, prod, mprod)
+                        if code == ERROR:
+                            sounds.add_sound_to_scene(self, sounds.FAIL)
+                            return
                 else:
 
                     # add item to the parse table
@@ -931,8 +935,11 @@ class ManimParseTable(m.Scene):
                     _play_msg_with_other(self, ["Following " + prod + " adds " +
                                  self.cfg.first_set[key][j], " to First(" + key + ")"], raw_msg = "If we follow " + key + "'s production, we encounter terminal " + self.cfg.first_set[key][j] + ". So, let's add this production to the parse table at row " + key + " and column " + self.cfg.first_set[key][j])
  
-                    self.vis_add_to_parsetable(
+                    code = self.vis_add_to_parsetable(
                          key, item, prod, tmp_prod)
+                    if code == ERROR:
+                        sounds.add_sound_to_scene(self, sounds.FAIL)
+                        return
         
         self.wait()
         sounds.add_sound_to_scene(self, sounds.YAY)
@@ -942,7 +949,9 @@ class ManimParseTable(m.Scene):
     def vis_add_to_parsetable(self, nt, t, prod, mprod):
         try:
             if self.pt_dict[nt][t] != None:
+                _play_msg_with_other(self, ["Cannot add entry: There is already a production", "at ParseTable[" + nt +", " + t +"].", "NOTE: This grammar cannot be parsed with LL(1)." ], raw_msg = "There's already an entry, so this grammar is unsuitable for LL(1) parsing.")
                 error.ERR_too_many_productions_ll1(nt, t)
+                return ERROR
             else:
                 self.pt_dict[nt][t] = prod
                 self.swap(row(self.cfg, nt), col(self.cfg, t), mprod)
@@ -950,6 +959,7 @@ class ManimParseTable(m.Scene):
         except KeyError:
             self.pt_dict[nt][t] = prod
             self.swap(row(self.cfg, nt), col(self.cfg, t), mprod)
+        return SUCCESS
 
     # swap a current entry
     def swap(self, row, col, new_val) -> m.MathTable:
@@ -960,6 +970,10 @@ class ManimParseTable(m.Scene):
             col (int): Column of element to be swapped.
             new_val (String): Value to be swapped into the table. 
         """        
+        global GRID_ITEM_SCALE
+        GRID_ITEM_SCALE = self.mtable.width / len(self.cfg.terminals)
+        display_helper.fail_secho(GRID_ITEM_SCALE)
+
         t_old = self.mtable.get_entries_without_labels((row, col))
 
         self.play(
