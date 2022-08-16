@@ -10,10 +10,8 @@ from kitchen import (
 
 def init_input(self, inp) -> int:
     """Helper function to (re-)initialise the input of a Parser.
-
     Args:
         inp (_type_): _description_
-
     Returns:
         _type_: _description_
     """    
@@ -27,10 +25,8 @@ def init_input(self, inp) -> int:
 
 def _get_tokens_from_input(inp) -> list:
     """Obtains the token stream of an input string. 
-
     Args:
         inp (str): Input string
-
     Returns:
         list: Token stream
     """    
@@ -45,11 +41,9 @@ class ParserLL1:
 
     def parse_ll1(self, start_symbol, inp="") -> int:
         """LL(1) Parser, which generates a parse tree and stores this to self.root
-
         Args:
             input (str): Input string to be parsed
             tokens (list): Corresponding token stream
-
         Returns:
             int: Status code
         """      
@@ -175,3 +169,4 @@ class ParserLL1:
                               "'!\nParse tree:")
         display_helper.print_parsetree(self.root)
         return SUCCESS
+

@@ -81,26 +81,8 @@ class ParsingTable:
         """        
         return self.ts.index(t) + 1
 
-    # 
-    def init_ll1_parsetable(self):
-        """Sets up the parse table structure without generating an animation_summary_
-        """        
-        # draw establishing table animations
-        row_labels = self.nts
-        col_labels = self.ts_m_epsilon()
 
-        # gets the row values
-        row_vals = self.get_row_contents()
-
-    # TODO convert this to ManimParsingTable
-        self.mtable = self.init_m_table(
-            row_vals, row_labels, col_labels)
-
-        self.mtable.get_row_labels().fade_to(color=m.RED, alpha=1)
-        self.mtable.get_col_labels().fade_to(color=m.TEAL, alpha=1)
-
-
-    # BUG
+    # BUG BUG BUG
     def populate_table(self):
         """Populates the whole table with the first and follow set, if appropriate
         """
@@ -127,6 +109,8 @@ class ParsingTable:
             t (String): Terminal
             production (String): Production at ParseTable[nt, t]
         """
+        display_helper.pretty_print_dict(self.pt_dict)
+        typer.echo("wanting to add " + production + " to " + nt + ", " + t)
         try:
             if self.pt_dict[nt][t] != None:
                 error.ERR_too_many_productions_ll1(nt, t)
