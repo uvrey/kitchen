@@ -1288,12 +1288,11 @@ class ManimParseTree(m.Scene):
             if tokens == []:
                 sounds.add_sound_to_scene(self, sounds.FAIL)
                 if re.match(RE_TERMINAL, self.s.stack[-1]):
-                    _play_msg_with_other(self, ["Expected `" + self.s.stack[-1] + "'", "Parsing unsuccessful."], raw_msg = "We expected to see " + self.s.stack[-1]  + " so parsing is unsuccessful.")
-                    error.ERR_parsing_error(self.root, "Expected " + self.s.stack[-1])
+                    error.ERR_parsing_error(self.root, "Expected " + self.s.stack[-1]+".")
+                    error.ERR_manim_parsing_error(self.root,  ["Expected `" + self.s.stack[-1] + "'", "Parsing unsuccessful."], raw_msg = "We expected to see " + self.s.stack[-1]  + " so parsing is unsuccessful.")
                 else:
-                    _play_msg_with_other(self, ["Parsing unsuccessful. "], raw_msg = "Parsing unsuccessful.")
                     error.ERR_parsing_error(self.root)
-                error.ERR_manim_parsing_error(self)
+                    error.ERR_manim_parsing_error(self, ["Parsing unsuccessful. "], raw_msg = "Parsing unsuccessful.")
                 return
 
             top = self.s.stack[-1]
@@ -1418,10 +1417,9 @@ class ManimParseTree(m.Scene):
 
                 else:
                     sounds.add_sound_to_scene(self, sounds.FAIL)
-                    _play_msg_with_other(self, ["Invalid input: '" + top + "'"], raw_msg = top + " leads to a parsing error, so this input is not valid." )
-                    error.ERR_parsing_error(
+                    error.ERR_parsing_error(self.root, 
                         "Unexpected token [" + top + "]")
-                    error.ERR_manim_parsing_error(self)
+                    error.ERR_manim_parsing_error(self, ["Invalid input: '" + top + "'"], raw_msg = top + " leads to a parsing error, so this input is not valid." )
                     return
 
             elif re.match(RE_NONTERMINAL, top):
@@ -1545,9 +1543,8 @@ class ManimParseTree(m.Scene):
         # in case parsing finishes but there are still tokens left in the stack
         if len(tokens) > 0:
             sounds.add_sound_to_scene(self, sounds.FAIL)
-            _play_msg_with_other(self, ["The stack is not emptied,", "but parsing has concluded."], raw_msg = "Since the stack is not emptied, parsing is unsuccessful.")
-            error.ERR_parsing_error()
-            error.ERR_manim_parsing_error(self)
+            error.ERR_parsing_error(self.root)
+            error.ERR_manim_parsing_error(self, ["The stack is not emptied,", "but parsing has concluded."], raw_msg = "Since the stack is not emptied, parsing is unsuccessful.")
             return
 
         # fade out the stack and transform the parse tree

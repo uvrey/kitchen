@@ -121,3 +121,11 @@ def print_parsetree(root):
         """        
         for pre, fill, node in anytree.RenderTree(root):
             structure_secho("%s%s" % (pre, node.name))
+
+def to_tex(item):
+    tex_item = item.replace("$", "\$").replace("\epsilon", "$\epsilon$").replace("#", "$\epsilon$").replace("\\subseteq", "$\\subseteq$").replace("->", "$\\to$").replace("(", "$($").replace(")", "$)$")
+    return tex_item
+
+def to_math_tex(item):
+    tex_item = item.replace("$", "\$").replace("#", "\epsilon").replace("->", "\\to")
+    return tex_item

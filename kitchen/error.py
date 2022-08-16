@@ -1,8 +1,9 @@
 # Program for printing error messages
-from kitchen import display_helper
+from typing import Text
+from kitchen import display_helper, config as c, sounds, SUCCESS
 from manim import *
 import typer
-
+import manim as m
 
 def ERR_non_terminal_format(line, t):
     g_err = ERR_get_general_error(line)
@@ -45,14 +46,13 @@ def ERR_key_not_given_in_CFG(p):
 
 def ERR_cfg_loading_error():
     err = typer.style("Error:", fg=typer.colors.WHITE, bg=typer.colors.RED)
-    typer.echo(err + " Production for [" + p + "] not found - check your CFG!")
+    typer.echo(err + " Problem loading CFG.")
     raise typer.Abort()
 
 def ERR_too_many_productions_ll1(nt, t):
     err = typer.style("Error:", fg=typer.colors.WHITE, bg=typer.colors.RED)
     typer.echo(err + " When building the parsing table, [" + nt + ", " + t +
                "] contains more than one production - this CFG is not feasible to parse with LL(1).")
-
 
 
 def ERR_parsing_error(root = None, detail=""):
@@ -73,6 +73,36 @@ def ERR_no_input_given():
     typer.echo(err + " No input provided.")
 
 
-def ERR_manim_parsing_error(scene, message=""):
-    err_msg = "~ Parsing Error ~" + message
-    fullscreen_notify(err_msg)
+def ERR_manim_parsing_error(scene, msg=[], raw_msg = ""):
+    err_msg = m.Tex("Parsing Error", color = m.RED)
+
+    if msg != []:
+        msg_group = m.VGroup()
+
+        for ms in msg:
+            msg_txt = m.Tex(display_helper.to_tex(ms), color=c.opp_col())
+            msg_group.add(msg_txt)
+        msg_group.arrange(m.DOWN)
+        
+        # create fading area
+        rect = m.Rectangle(width=20, height=10, color=c.theme_col(), fill_opacity=0.9)
+
+        scene.play(
+            m.FadeIn(rect),
+        )
+
+        # generate voiceover
+        if raw_msg != "":
+            sounds.narrate(raw_msg, scene)
+
+        scene.play(
+            m.Write(msg_group),
+        )
+
+        scene.wait()
+
+        scene.play(
+            m.FadeOut(msg_group),
+            m.FadeOut(rect),
+        )
+    return SUCCESS
