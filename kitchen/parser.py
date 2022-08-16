@@ -58,9 +58,6 @@ class ParserLL1:
         original_tokens = self.tokens[:]
         self.stack = []
 
-        display_helper.info_secho(self.cfg.first_set)
-        display_helper.info_secho(self.cfg.follow_set)
-
         # add start symbol to the stack
         self.stack.append(start_symbol)
         self.root = anytree.Node(start_symbol, id=start_symbol)
@@ -92,7 +89,7 @@ class ParserLL1:
                             done = False
                             i = 1
                             while not done:
-                                if i < len(self.parents):
+                                if i <= len(self.parents):
                                     p = self.parents[-i]
                                     if re.match(RE_NONTERMINAL, p.id):
                                         # if we have encountered the first set which the production can fall under
@@ -100,7 +97,6 @@ class ParserLL1:
                                             # remove children if they were previously added
                                             if p.height != 0:
                                                 p.children = []
-                                            typer.echo("adding node " + popped.id)
                                             new_node = anytree.Node(
                                                 popped.id, parent=p, id=popped.id)
                                         
