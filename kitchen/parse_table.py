@@ -197,8 +197,9 @@ class ParsingTable:
         """        
         # print heading
         display_helper.info_secho("Parse Table:")
-        
+
         # print column labels
+        typer.echo("\n\n")
         col_label = "\t"
         for t in self.ts:
             col_label += t + "\t"

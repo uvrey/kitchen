@@ -116,7 +116,14 @@ class ParserLL1:
 
             elif re.match(RE_NONTERMINAL, top):
                 try:
+                    typer.echo("looking for entry at " + top + ", " + next)
+
+                    display_helper.pretty_print_dict(self.pt_dict)
                     pt_entry = self.pt_dict[top][next]
+                    typer.echo(pt_entry)
+                    if pt_entry == None:
+                        typer.echo("NOPE")
+                        return
                     prods = pt_entry.split("->")
                     pt = self.stack.pop()
 
