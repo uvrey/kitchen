@@ -104,6 +104,9 @@ class ParsingTable:
                             self.add_to_parsetable(key, f, prod)
                 else:
                     # add item to the parse table
+                    # typer.echo(self.first_set)
+                    # typer.echo(self.firstset_index)
+                    display_helper.info_secho("___")
                     prod = self.firstset_index[key][j]
                     self.add_to_parsetable(key, item, prod)
 
@@ -115,6 +118,7 @@ class ParsingTable:
             t (String): Terminal
             production (String): Production at ParseTable[nt, t]
         """
+        typer.echo("adding " + production + " at " + nt + "," + t)
         try:
             if self.pt_dict[nt][t] != None:
                 error.ERR_too_many_productions_ll1(nt, t)

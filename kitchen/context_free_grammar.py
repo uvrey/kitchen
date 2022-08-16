@@ -307,6 +307,8 @@ class ContextFreeGrammar:
                                 # add First(Y) - #
                                 if current_item not in self.first_set[ps]:
                                     # add production which led to this to the parse table
+                                    typer.echo("WE GOT TO " + current_item + " VIA ")
+                                    typer.echo(self.fstack[j])
                                     self.firstset_index[ps].append(
                                         self.fstack[j])
                                     self.first_set[ps].append(current_item)
@@ -341,14 +343,18 @@ class ContextFreeGrammar:
                         # the non-terminal which led to this may disappear in the original production
                         self.vis_has_epsilon = True
                         # appends this terminal to the first set of previous non-terminals
+                    
+                    typer.echo(self.fstack)
+
                     for j, ps in enumerate(pstack, start=0):
                         # add First(P) - # if down the stack
                         if first_terminal[0] not in self.first_set[ps]:
+                            typer.echo(self.fstack[j])
                             self.firstset_index[ps].append(self.fstack[j])
                             self.first_set[ps].append(first_terminal[0]) 
-
-                    # reset the stack once we have looked at it
-                    self.fstack.pop()
+                            
+                    # NEW reset fstack for the next round
+                    self.fstack = []
 
             # by this point, we have recursively found a bunch of first sets
             # so let's find those that are still empty
