@@ -287,14 +287,16 @@ class ManimFirstSet(m.Scene):
         sounds.narrate("Let's find the first set!", self)
         display_helper.info_secho("Visualising the First Set:")
 
+
         # set title and scaling here since the function is recursive
         fs_title = _get_title_mobject("first set calculation") 
         self.play(fs_title.animate.to_edge(m.UP))
 
         keys = get_manim_cfg_group(self)
-        keys.scale(CFG_SCALE).to_edge(m.LEFT)
+        keys.scale_to_fit_height(CFG_SCALE_HEIGHT/3)
+
         # show key for colour coding
-        guide = get_guide().scale(CFG_SCALE)
+        guide = get_guide().scale_to_fit_height(CFG_SCALE_HEIGHT/4)
 
         self.vis_first_set(keys, guide, self.cfg.start_symbol, self.cfg.start_symbol, [])
 
@@ -861,16 +863,16 @@ class ManimParseTable(m.Scene):
 
         # add the guide 
         guide = get_guide()
-        guide.scale_to_fit_height(CFG_SCALE_HEIGHT/3)
+        guide.scale_to_fit_height(CFG_SCALE_HEIGHT/4)
         all_elements.add(guide)
         
         # arrange all items
-        all_elements.arrange_in_grid(rows = 1, buff = 1.5)
+        all_elements.arrange_in_grid(rows = 1, buff = 1.2)
         all_elements.center()
-        cfg_heading.next_to(keys, m.UP)
 
         # scale everything nicely
-        all_elements.scale_to_fit_height(CFG_SCALE_HEIGHT)
+        all_elements.scale_to_fit_height(0.96*CFG_SCALE_HEIGHT)
+        cfg_heading.next_to(keys, m.UP)
 
         sounds.add_sound_to_scene(self, sounds.MOVE)
         self.play(

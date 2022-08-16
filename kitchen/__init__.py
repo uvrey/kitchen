@@ -1,4 +1,7 @@
-""" Top-level package for Kitchen """
+""" Top-level        cfg_heading.next_to(keys, m.UP/232# # # # 
+        all_elemeall_elements.arrange_in_grid()rows = 1, buff = 1.45
+        # 
+        #  package for Kitchen """
 # kitchen/__init__.py
 from sqlite3 import DateFromTicks
 import manim as m
@@ -14,7 +17,7 @@ RE_PRODUCTION = '[A-Z][A-Z]*|[a-z][a-z]*|$|#|\+|-|/|\*|\(|\)|,'
 
 
 TEXT_SCALE = 1
-CFG_SCALE_HEIGHT = m.config["frame_height"]/2 
+CFG_SCALE_HEIGHT = 6.25*m.config["frame_height"]/10
 CFG_SCALE = 0.7
 COLOURS = [m.BLUE_B, m.TEAL_B, m.GREEN_B, m.YELLOW_B, m.GOLD_B,
                      m.RED_B, m.MAROON_B, m.PURPLE_A, m.LIGHT_PINK, m.LIGHT_BROWN]
