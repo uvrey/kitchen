@@ -1316,10 +1316,11 @@ class ManimParseTree(m.Scene):
                     # pops appropriately
                     if self.parents != []:
                         popped = self.parents.pop()
-                        parent = self.parents[-1]
+                        parent = None
 
                         # always pop again if an epsilon was encountered
                         if self.parents != []:
+                            parent = self.parents[-1]
                             done = False
 
                             i = 1
@@ -1401,9 +1402,9 @@ class ManimParseTree(m.Scene):
                                     1].strip(), color=m.BLUE)
                             reset_g(self, g, start_symbol)
 
-                    # pop off the stack and 'flash'
-                    self.s.pop(anim=anims, vertex=new_vertex, matching=True, msg="\\text{Matched }" +
-                               _to_tex(self.s.stack[-1]) + "\\text{!}")
+                        # pop off the stack and 'flash'
+                        self.s.pop(anim=anims, vertex=new_vertex, matching=True, msg="\\text{Matched }" +
+                                _to_tex(self.s.stack[-1]) + "\\text{!}")
 
 
                     # highlight the token stream line and token that we matched
