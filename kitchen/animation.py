@@ -1421,7 +1421,7 @@ class ManimParseTree(m.Scene):
                     self.play(
                         m.LaggedStart(m.Indicate(m_tok[next], color=self.tok_cols[original_tokens.index(next)], scale_factor=1.5),
                                     m.FadeToColor(
-                            m_tok[next],m.BLUE)),
+                            m_tok[next], self.tok_cols[original_tokens.index(next)])),
                     )
 
                 else:
