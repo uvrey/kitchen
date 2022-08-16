@@ -251,9 +251,10 @@ def get_guide(arr_right = False):
     
     if not arr_right:
         guide_group_outer.arrange_in_grid(rows = len(labels), buff = 0.8)
+        return guide_group_outer.arrange(m.DOWN, aligned_edge=m.LEFT)
     else:
         guide_group_outer.arrange_in_grid(rows = 1, buff = 0.8) 
-    return guide_group_outer.arrange(m.DOWN, aligned_edge=m.LEFT)
+        return guide_group_outer
     
 def ts_m_epsilon(self):
     ts_m = []
@@ -871,7 +872,7 @@ class ManimParseTable(m.Scene):
         guide.scale_to_fit_height(CFG_SCALE_HEIGHT/4)
         
         # arrange all items
-        all_elements.arrange_in_grid(rows = 1, buff = 1)
+        all_elements.arrange_in_grid(rows = 1, buff = 1.2)
         all_elements.center()
 
         # scale everything nicely
