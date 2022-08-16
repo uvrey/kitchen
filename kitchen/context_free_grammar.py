@@ -279,6 +279,11 @@ class ContextFreeGrammar:
             pstack (List): The production stack. 
         """        
         global has_epsilon
+
+        # prevents deep recursion
+        if production in pstack and len(pstack) > 1:
+            return
+
         pstack.append(production)
 
         # if production does not have a first set

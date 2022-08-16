@@ -119,7 +119,6 @@ def _validate_path(paths):
             return FILE_LOADING_EXISTS_ERROR
         return SUCCESS
 
-
 def load_app(path, testing = False) -> None:
     """Loads the application given a CFG path.
     Args:
@@ -283,7 +282,6 @@ def _process_command(inp, cfg) -> None:
         cfg.show_first_set()
     
     elif inp == "\\vis first" or inp == "\\vfs":
-
         if cfg.first_set_calculated:
             cfg.reset_first_set(calculate_again = False)
             cfg.first_set_calculated = False
