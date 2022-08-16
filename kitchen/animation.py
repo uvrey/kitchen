@@ -1386,15 +1386,15 @@ class ManimParseTree(m.Scene):
                             # get existing vertex
                             new_vertex = g[vertex_id]
                             # confirm the path by adding the colour
-                            rendered_label = m.Tex(
-                                top, color = m.BLACK)
-                            new_vertex.fade_to(m.BLUE, 1)
+                            rendered_label = m.MathTex(
+                                _to_math_tex(top), color = m.BLACK)
+                            new_vertex.fade_to(self.tok_cols[original_tokens.index(top)], 1)
                             rendered_label.move_to(new_vertex.get_center())
                             new_vertex.add(rendered_label)
                             
                             sounds.add_sound_to_scene(self, sounds.CLICK)
                             self.play(
-                                m.Circumscribe(new_vertex, color=m.BLUE, shape = m.Circle),
+                                m.Circumscribe(new_vertex, color=self.tok_cols[original_tokens.index(top)], shape = m.Circle),
                             )
                             try:
                                 edge = g.edges[(parent_vertex_id, vertex_id)]
