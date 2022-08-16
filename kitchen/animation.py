@@ -878,7 +878,7 @@ class ManimParseTable(m.Scene):
         # scale everything nicely
         all_elements.scale_to_fit_width(CFG_SCALE_WIDTH)
         # make sure elements are showing
-        if all_elements.height > CFG_SCALE_HEIGHT and len(self.ts) > 4:
+        if all_elements.height > CFG_SCALE_HEIGHT or len(self.ts) > 4:
             all_elements.scale_to_fit_height(CFG_SCALE_HEIGHT)
 
 
@@ -957,7 +957,6 @@ class ManimParseTable(m.Scene):
         return SUCCESS
 
     def vis_add_to_parsetable(self, nt, t, prod, mprod):
-        display_helper.pretty_print_dict(self.pt_dict)
 
         try:
             if self.pt_dict[nt][t] != None:
