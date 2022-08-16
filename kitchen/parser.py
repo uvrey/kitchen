@@ -1,7 +1,5 @@
 """ General parser generator for Kitchen """
 # kitchen/parser.py
-
-from msilib.text import tables
 import typer
 import anytree
 import re
@@ -39,6 +37,14 @@ class ParserLL1:
         init_input(self, inp)
         self.cfg = cfg
         self.pt_dict = cfg.parsetable.pt_dict
+
+    def check_for_epsilons(self):
+        # look for any epsilons that came before and add. 
+        for node in self.root.descendants:
+            if re.match(RE_NONTERMINAL, node.id):
+                if len(node.children) == 0 and "#" in self.cfg.first_set[node.id]:
+                    anytree.Node("#", parent=node, id= "#")
+        return SUCCESS
 
     def parse_ll1(self, start_symbol, inp="") -> int:
         """LL(1) Parser, which generates a parse tree and stores this to self.root
@@ -82,35 +88,27 @@ class ParserLL1:
                 if top == next:
                     tokens.remove(next)
                     p = self.stack.pop()
-                    # typer.echo(p + "was popped off")
 
                     # pops appropriately
                     if self.parents != []:
-                        done = False
                         popped = self.parents.pop()
-                        display_helper.fail_secho("need to link " + popped.id + " to its parent" + popped.tmp_p)
 
                         # reversed so we find the first match
-                        # TODO make sure correct path to root is added too
                         index = len(self.parents) - 1
+
+                        # linking new terminals to the tree
                         for node in reversed(self.parents):
                             typer.echo("looking @ [" + node.id+"] but we want [" + popped.tmp_p+"]")
                             if node.id == popped.tmp_p:
                                 new_node = anytree.Node(popped.id, parent=node, id=popped.id)
                                 break
                             index = index - 1
-                        
-                        # scan through parents to check if a node before this guy led to epsilon
-                        display_helper.success_secho("found our parent node " + popped.id + " at index "+ str(index))
-                        for parent in self.parents[0: index]:
-                            if re.match(RE_NONTERMINAL, parent.id):
-                                if "#" in self.cfg.first_set[parent.id]:
-                                    display_helper.fail_secho(parent.id + " could disappear! \n add eps")
-                                    #new_node = anytree.Node("#", parent=parent, id="eps")
-
-
                     else:
                         display_helper.fail_secho("TODO!")
+
+                    # if we have matched our last token
+                    if len(tokens) == 1:
+                        self.check_for_epsilons()
                 else:
                     error.ERR_parsing_error(self.root,
                         "Unexpected token [" + top + "]")
