@@ -115,7 +115,6 @@ class ParsingTable:
             t (String): Terminal
             production (String): Production at ParseTable[nt, t]
         """
-        typer.echo("adding " + production + " at " + nt + "," + t)
         try:
             if self.pt_dict[nt][t] != None:
                 error.ERR_too_many_productions_ll1(nt, t)
@@ -200,7 +199,6 @@ class ParsingTable:
         display_helper.info_secho("Parse Table:")
 
         # print column labels
-        typer.echo("\n\n")
         col_label = "\t"
         for t in self.ts:
             col_label += t + "\t"

@@ -343,13 +343,10 @@ class ContextFreeGrammar:
                         # the non-terminal which led to this may disappear in the original production
                         self.vis_has_epsilon = True
                         # appends this terminal to the first set of previous non-terminals
-                    
-                    typer.echo(self.fstack)
 
                     for j, ps in enumerate(pstack, start=0):
                         # add First(P) - # if down the stack
                         if first_terminal[0] not in self.first_set[ps]:
-                            typer.echo(self.fstack[j])
                             self.firstset_index[ps].append(self.fstack[j])
                             self.first_set[ps].append(first_terminal[0]) 
                             
