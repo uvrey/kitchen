@@ -951,7 +951,7 @@ class ManimParseTable(m.Scene):
 
     def vis_add_to_parsetable(self, nt, t, prod, mprod):
         display_helper.pretty_print_dict(self.pt_dict)
-        typer.echo("wanting to add " + prod)
+
         try:
             if self.pt_dict[nt][t] != None:
                 _play_msg_with_other(self, ["Cannot add entry: There is already a production", "at ParseTable[" + nt +", " + t +"].", "NOTE: This grammar cannot be parsed with LL(1)." ], raw_msg = "There's already an entry, so this grammar is unsuitable for LL(1) parsing.")

@@ -86,6 +86,7 @@ class ParsingTable:
     def populate_table(self):
         """Populates the whole table with the first and follow set, if appropriate
         """
+
         for i, key in enumerate(self.first_set.keys(), start=0):
             for j, item in enumerate(self.first_set[key], start=0):
                 # if the first set contains epsilon, may disappear
@@ -109,8 +110,6 @@ class ParsingTable:
             t (String): Terminal
             production (String): Production at ParseTable[nt, t]
         """
-        display_helper.pretty_print_dict(self.pt_dict)
-        typer.echo("wanting to add " + production + " to " + nt + ", " + t)
         try:
             if self.pt_dict[nt][t] != None:
                 error.ERR_too_many_productions_ll1(nt, t)

@@ -301,7 +301,7 @@ class ContextFreeGrammar:
                             for j, ps in enumerate(pstack, start=0):
                                 # add First(Y) - #
                                 if current_item not in self.first_set[ps]:
-                                    # add popped element to the parse table
+                                    # add production which led to this to the parse table
                                     self.firstset_index[ps].append(
                                         self.fstack[j])
                                     self.first_set[ps].append(current_item)
@@ -336,7 +336,7 @@ class ContextFreeGrammar:
                         # the non-terminal which led to this may disappear in the original production
                         self.vis_has_epsilon = True
                         # appends this terminal to the first set of previous non-terminals
-                    for j, ps in enumerate(reversed(pstack), start=0):
+                    for j, ps in enumerate(pstack, start=0):
                         # add First(P) - # if down the stack
                         if first_terminal[0] not in self.first_set[ps]:
                             self.firstset_index[ps].append(self.fstack[j])
