@@ -83,13 +83,30 @@ class ParserLL1:
 
                     # pops appropriately
                     if self.parents != []:
+                        done = False
                         popped = self.parents.pop()
-                        # typer.echo(self.parents)
-                        for node in self.parents:
-                            # typer.echo("looking @ [" + node.id+"] but we want [" + popped.tmp_p.strip()+"]")
+                        typer.echo(self.parents)
+                        # reversed so we find the first match
+                        # TODO make sure correct path to root is added too
+                        for node in reversed(self.parents):
+                            typer.echo("looking @ [" + node.id+"] but we want [" + popped.tmp_p+"]")
                             if node.id == popped.tmp_p:
-                                # typer.echo("found parent node")
-                                new_node = anytree.Node(popped.id, parent=node, id=popped.id)
+                                # found the parent node, so we loop up the tree, making sure it is connected to root
+                                typer.echo("found parent node")
+                                parent = node
+                                child = popped.id
+                                done = False
+                                while not done:
+                                    new_node = anytree.Node(child, parent=parent, id=child, connected= True)
+                                    
+                                    if parent.connected or parent.id == self.cfg.start_symbol:
+                                        break
+                                    else:
+                                        child = parent.id
+                                        parent = parent.parent
+
+                                # display_helper.info_secho("adding " + popped.id + " with parent " + node.id)
+                                # new_node = anytree.Node(popped.id, parent=node, id=popped.id)
                                 break
                     else:
                         # TODO
@@ -112,16 +129,16 @@ class ParserLL1:
                     for p in reversed(ps):
                         # add to the tree
                         if top == start_symbol:
-                            new_node = anytree.Node(p, parent=self.root, id=p, tmp_p = self.root.id)
+                            new_node = anytree.Node(p, parent=self.root, id=p, tmp_p = self.root.id, connected=True)
                         else:
                             # add connecting node if it is a non-terminal
                             if re.match(RE_NONTERMINAL, p):
                                 new_node = anytree.Node(
-                                    p, id=p, parent=self.parents[-1], tmp_p=prods[0].strip())
+                                    p, id=p, parent=self.parents[-1], tmp_p=prods[0].strip(), connected=True)
                             else:
                                 if p != "#":
                                     new_node = anytree.Node(
-                                        p, id=p, tmp_p=prods[0].strip())
+                                        p, id=p, tmp_p=prods[0].strip(), connected=False)
                                     
                         # we don't need to match epsilon, and we also only want non-terminals as parent nodes
                         if p != "#":
