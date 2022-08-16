@@ -46,7 +46,7 @@ class ParserLL1:
                     anytree.Node("#", parent=node, id= "#")
         return SUCCESS
 
-    def parse_ll1(self, start_symbol, inp="") -> int:
+    def parse_ll1(self, start_symbol, inp="", testing = False) -> int:
         """LL(1) Parser, which generates a parse tree and stores this to self.root
         Args:
             input (str): Input string to be parsed
@@ -167,10 +167,13 @@ class ParserLL1:
             return PARSING_ERROR
 
         # display the parse tree
-        # TODO change to parsing input specifically rather than tokens
-        display_helper.success_secho("Successfully parsed token stream '" + " ".join(original_tokens) +
-                              "'!\nParse tree:")
-        display_helper.print_parsetree(self.root)
+        if not testing:
+            display_helper.success_secho("Successfully parsed token stream '" + " ".join(original_tokens) +
+                                "'!\nParse tree:")
+            display_helper.print_parsetree(self.root)
+        else:
+            display_helper.success_secho("Success.")
+            display_helper.structure_secho(anytree.RenderTree(self.root, style= anytree.AsciiStyle()).by_attr("id"))
         return SUCCESS
 
     def get_node(self, node_id):

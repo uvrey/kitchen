@@ -57,12 +57,12 @@ def ERR_too_many_productions_ll1(nt, t):
 
 def ERR_parsing_error(root = None, detail=""):
     if detail != "":
-        detail_msg = "." + detail
+        detail_msg = "" + detail
     else:
         detail_msg = detail
-    err = typer.style("Error:", fg= typer.colors.WHITE, bg=typer.colors.RED)
+    err = typer.style("Error: ", fg= typer.colors.WHITE, bg=typer.colors.RED)
     pt_state = typer.style("\nCurrent state of parse tree:", fg=typer.colors.RED)
-    typer.echo(err + " Parsing failed. " + detail_msg + pt_state)
+    typer.echo(err + "Parsing failed. " + detail_msg + pt_state)
     
     if root != None:
         display_helper.print_parsetree(root)

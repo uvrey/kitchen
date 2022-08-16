@@ -351,7 +351,11 @@ class ContextFreeGrammar:
                         if first_terminal[0] not in self.first_set[ps]:
                             self.firstset_index[ps].append(self.fstack[j])
                             self.first_set[ps].append(first_terminal[0]) 
-                            
+
+                    # TODO unpack why fstack works like this for bla but not all others    
+                    # for p in range(len(pstack)):
+                    #     self.fstack.pop()
+
                     # TODO fstack for the next round
                     # display_helper.info_secho("....")
                     # display_helper.structure_secho(pstack)
@@ -369,7 +373,7 @@ class ContextFreeGrammar:
                     self._calculate_first_set(empty_set_nt, [])
             else:
                 pstack.pop()
-                self.fstack.pop()
+                self.fstack = self.fstack[1:]
 
         except KeyError:
             error.ERR_key_not_given_in_CFG(production)

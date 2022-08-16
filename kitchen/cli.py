@@ -8,6 +8,7 @@ from kitchen import (
     __app_name__,
      __version__, 
      ERRORS, 
+     SUCCESS, 
      cli_helper, 
      context_free_grammar as cfg, 
      display_helper,
@@ -159,16 +160,33 @@ def find_pt() -> None:
     code = cfg.calculate_parsetable()
     cfg.parsetable.print_parse_table_testing()
 
-
 # TODO ADD more tests here
-@app.command(name = "ll1")
-def find_ll1() -> None:
-    # TODO add input here
+@app.command(name = "test-ll1")
+def find_ll1(  
+    inp: str = typer.Option(
+            ...,
+            "--input",
+            "-i",
+            prompt="Please an input to be parsed",
+            )) -> None:
     cfg = get_cfg()
     _check_cfg(cfg)
     cfg.reset_first_set()
     cfg.reset_follow_set()
-    # cfg.parser_ll1.parse_ll1(cfg.start_symbol, "a")
+
+    if not cfg.parsetable_calculated:
+        cli_helper._set_parsetable(cfg)
+
+    # set up the cfg parser 
+    code = cli_helper._set_cfg_parser_ll1(inp, cfg)
+
+    # parse the input
+    if code == SUCCESS:
+        cfg.parser_ll1.parse_ll1(cfg.start_symbol, inp, testing=True)
+    else:
+        typer.echo("problem setting up parser")
+    return SUCCESS
+
 
 @app.callback()
 def main(
