@@ -123,9 +123,9 @@ def print_parsetree(root):
             structure_secho("%s%s" % (pre, node.name))
 
 def to_tex(item):
-    tex_item = item.replace("$", "\$").replace("\epsilon", "$\epsilon$").replace("#", "$\epsilon$").replace("\\subseteq", "$\\subseteq$").replace("->", "$\\to$").replace("(", "$($").replace(")", "$)$")
+    tex_item = item.replace(r'$', r'\$').replace(r'\epsilon', r'$\epsilon$').replace("#", r'$\epsilon$').replace("\\subseteq", "$\\subseteq$").replace("->", "$\\to$").replace("(", "$($").replace(")", "$)$")
     return tex_item
 
 def to_math_tex(item):
-    tex_item = item.replace("$", "\$").replace("#", "\epsilon").replace("->", "\\to")
+    tex_item = item.replace(r'$', r'\$').replace("#", r'\epsilon').replace("->", "\\to")
     return tex_item
