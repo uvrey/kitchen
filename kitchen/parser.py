@@ -90,32 +90,35 @@ class ParserLL1:
 
                             i = 1
                             while not done:
-                                p = self.parents[-i]
-                                if re.match(RE_NONTERMINAL, p.id):
-                                    # if we have encountered the first set which the production can fall under
-                                    if popped.id in self.cfg.first_set[p.id]:
-                                        # remove children if they were previously added
-                                        if p.height != 0:
-                                            p.children = []
-                                        new_node = anytree.Node(
-                                            popped.id, parent=p, id=popped.id)
-                                     
-                                        # check for epsilons
-                                        rhs = self.parents[-i + 1:]
-                                        for r in rhs:
-                                            # check that production can actually lead somewhere and is not current prod
-                                            # AND that it hasn't been explored yet
-                                            if re.match(RE_NONTERMINAL, r.id) and r.id != p.id and r.height == 0:
-                                                if "#" in self.firstset[r.id]:
-                                                    new_node = anytree.Node(
-                                                        "#", parent=r, id="eps")
+                                if i < len(self.parents) - 1:
+                                    p = self.parents[-i]
+                                    if re.match(RE_NONTERMINAL, p.id):
+                                        # if we have encountered the first set which the production can fall under
+                                        if popped.id in self.cfg.first_set[p.id]:
+                                            # remove children if they were previously added
+                                            if p.height != 0:
+                                                p.children = []
+                                            new_node = anytree.Node(
+                                                popped.id, parent=p, id=popped.id)
+                                        
+                                            # check for epsilons
+                                            rhs = self.parents[-i + 1:]
+                                            for r in rhs:
+                                                # check that production can actually lead somewhere and is not current prod
+                                                # AND that it hasn't been explored yet
+                                                if re.match(RE_NONTERMINAL, r.id) and r.id != p.id and r.height == 0:
+                                                    if "#" in self.firstset[r.id]:
+                                                        new_node = anytree.Node(
+                                                            "#", parent=r, id="eps")
 
-                                        # pop as many productions off as necessary
-                                        for j in range(i - 1):
-                                            self.parents.pop()
-                                        done = True
+                                            # pop as many productions off as necessary
+                                            for j in range(i - 1):
+                                                self.parents.pop()
+                                            done = True
+                                        else:
+                                            i = i + 1
                                     else:
-                                        i = i + 1
+                                        break
                                 else:
                                     break
 
