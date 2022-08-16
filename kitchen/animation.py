@@ -2,7 +2,6 @@
 # kitchen/animation.py
 
 from pathlib import Path
-from turtle import color
 import manim as m
 import re
 import typer
@@ -238,7 +237,7 @@ def get_manim_cfg_group(self):
     return keys
 
 # helper function to obtain the follow and first set interpretation guide
-def get_guide():
+def get_guide(arr_right = False):
     guide_group_outer = m.VGroup()
     square_colors = [m.TEAL, m.RED]
     labels = ["Terminal", "Non-terminal"]
@@ -249,7 +248,11 @@ def get_guide():
         guide_group_inner.add(m.Tex(labels[i], color = config.opp_col()))
         guide_group_inner.arrange_in_grid(rows = 1, buff = 0.8)
         guide_group_outer.add(guide_group_inner)
-    guide_group_outer.arrange_in_grid(rows = len(labels), buff = 0.8)
+    
+    if not arr_right:
+        guide_group_outer.arrange_in_grid(rows = len(labels), buff = 0.8)
+    else:
+        guide_group_outer.arrange_in_grid(rows = 1, buff = 0.8) 
     return guide_group_outer.arrange(m.DOWN, aligned_edge=m.LEFT)
     
 def ts_m_epsilon(self):
@@ -864,9 +867,8 @@ class ManimParseTable(m.Scene):
         all_elements.add(self.mtable)
 
         # add the guide 
-        guide = get_guide()
+        guide = get_guide(arr_right= True)
         guide.scale_to_fit_height(CFG_SCALE_HEIGHT/4)
-        all_elements.add(guide)
         
         # arrange all items
         all_elements.arrange_in_grid(rows = 1, buff = 1)
@@ -879,7 +881,7 @@ class ManimParseTable(m.Scene):
         sounds.add_sound_to_scene(self, sounds.MOVE)
         self.play(
             ll1_title.animate.to_edge(m.UP),
-            m.FadeIn(guide),
+            guide.animate.to_edge(m.DOWN),
             m.FadeIn(cfg_heading),
             m.LaggedStart(*(m.FadeIn(k, shift=m.UP)
                         for k in keys)),
@@ -973,7 +975,6 @@ class ManimParseTable(m.Scene):
         """        
         global GRID_ITEM_SCALE
         GRID_ITEM_SCALE = self.mtable.width / len(self.cfg.terminals)
-        display_helper.fail_secho(GRID_ITEM_SCALE)
 
         t_old = self.mtable.get_entries_without_labels((row, col))
 
