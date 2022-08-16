@@ -921,7 +921,7 @@ class ManimParseTable(m.Scene):
                         else:
                             mprod = key + " \\to \epsilon"
                             prod = key + " -> #"
-                        _play_msg_with_other(self, ["Following " + prod + "adds #", "to First(" + _to_tex(key) + ")"], raw_msg = "If we follow "+key+"'s production, we find an epsilon. So, we add this production to the parse table in the epsilon column and non terminal " + key + "'s row")
+                        _play_msg_with_other(self, ["Following " + prod + "adds #", " to First(" + _to_tex(key) + ")"], raw_msg = "If we follow "+key+"'s production, we find an epsilon. So, we add this production to the parse table.")
                         self.wait()
 
                         code = self.vis_add_to_parsetable( key, f, prod, mprod)
