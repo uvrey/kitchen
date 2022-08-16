@@ -40,8 +40,13 @@ def _get_title_mobject(title):
     return m.Tex(title, tex_template=m.TexFontTemplates.french_cursive)
 
 def _to_tex(item):
-    tex_item = item.replace("$", "\$").replace("#", "\epsilon").replace("\\subseteq", "$\\subseteq$").replace("->", "$\\to$").replace("(", "$($").replace(")", "$)$").replace("\epsilon", "$\epsilon$")
+    tex_item = item.replace("$", "\$").replace("\epsilon", "$\epsilon$").replace("#", "$\epsilon$").replace("\\subseteq", "$\\subseteq$").replace("->", "$\\to$").replace("(", "$($").replace(")", "$)$")
     return tex_item
+
+def _to_math_tex(item):
+    tex_item = item.replace("$", "\$").replace("#", "\epsilon").replace("->", "\\to")
+    return tex_item
+
 
 def _play_msg_with_other(self, msg, raw_msg= "", anim=[]):
     if msg != []:
@@ -130,7 +135,7 @@ def get_list_scalefactor(list):
 # sets up the ten options for colour coding the tokens
 def set_up_token_colour(self):
     # set default manim colours
-    self.token_has_colour = []
+    self.token_has_this_colour = []
     # set up colour boolean array
     for i in range(10):
         self.token_has_this_colour.append(False)
@@ -942,7 +947,7 @@ class ManimParseTable(m.Scene):
         )
 
         # set up new value with colour
-        t_new = m.MathTex(new_val).scale(GRID_ITEM_SCALE)
+        t_new = m.MathTex(_to_math_tex(new_val)).scale(GRID_ITEM_SCALE)
         t_new.move_to(t_old)
         t_new.fade_to(config.opp_col(), alpha=0.2)
 
@@ -966,8 +971,8 @@ class ManimParseTable(m.Scene):
 
         table = m.MathTable(
             row_vals,
-            row_labels=[m.MathTex(rl) for rl in row_labels],
-            col_labels=[m.MathTex(cl) for cl in col_labels],
+            row_labels=[m.MathTex(_to_math_tex(rl)) for rl in row_labels],
+            col_labels=[m.MathTex(_to_math_tex(cl)) for cl in col_labels],
             include_outer_lines=True)
 
         # Table
@@ -994,8 +999,8 @@ class ManimParseTable(m.Scene):
 
         self.table = m.MathTable(
             [self.xs, self.ys],
-            row_labels=[m.MathTex(rl) for rl in self.row_labels],
-            col_labels=[m.MathTex(cl) for cl in self.col_labels],
+            row_labels=[m.MathTex(_to_math_tex(rl)) for rl in self.row_labels],
+            col_labels=[m.MathTex(_to_math_tex(cl)) for cl in self.col_labels],
             include_outer_lines=True)
 
         # Table
@@ -1071,6 +1076,12 @@ class ManimParseTree(m.Scene):
     def setup_manim(self, inp, cfg):
         self.inp = inp
         self.tokens = _get_tokens_from_input(inp)
+        set_up_token_colour(self)
+        self.tok_cols = []
+
+        for t in self.tokens:
+            self.tok_cols.append(get_token_colour(self))
+
         self.cfg = cfg
         self.nts = sorted(cfg.nonterminals)
         self.ts = sorted(cfg.terminals)
@@ -1089,8 +1100,8 @@ class ManimParseTree(m.Scene):
 
         table = m.MathTable(
             row_vals,
-            row_labels=[m.MathTex(rl) for rl in row_labels],
-            col_labels=[m.MathTex(cl) for cl in col_labels],
+            row_labels=[m.MathTex(_to_math_tex(rl)) for rl in row_labels],
+            col_labels=[m.MathTex(_to_math_tex(cl)) for cl in col_labels],
             include_outer_lines=True)
 
         # Table
@@ -1139,7 +1150,37 @@ class ManimParseTree(m.Scene):
             row_vals.append(row)
         return row_vals
 
+    def _fade_in_mtable(self, highlight = False, row = -1, col = -1):
+        # create fading area
+        rect = m.Rectangle(width=20, height=10, color=config.theme_col(), fill_opacity=0.9)
+        pt_title = _get_title_mobject("Parse table")
+        pt_title.next_to(self.mtable, m.UP)
+
+        self.play(
+            m.FadeIn(rect),
+        )
+
+        self.play(
+            m.FadeIn(pt_title),
+            m.FadeIn(self.mtable)
+        )
+        self.wait()
+
+        if highlight:
+            t =  self.mtable.get_entries_without_labels(row, col)
+            self.play(
+                m.Indicate(t, color = m.BLUE),
+                m.Circumscribe(t, color = m.BLUE),
+            )
+
+        self.play(
+            m.FadeOut(self.mtable),
+            m.FadeOut(rect),
+        )
+
 # Parse LL(1) in the CLI
+
+
 
     def vis_parse_ll1(self, input, tokens):
         global V_LABELS
@@ -1149,6 +1190,7 @@ class ManimParseTree(m.Scene):
         # set up the stack and the parsing table
         self.s = stack.Stack(self, m.DR, 5)
         self.init_m_ll1_parsetable()
+        self.mtable.scale_to_fit_height(m.config["frame_height"]/2)
         V_LABELS = {}
 
         # add start symbol to the stack
@@ -1184,10 +1226,10 @@ class ManimParseTree(m.Scene):
             m_tok_gp.animate.to_edge(m.UR).shift(m.DOWN+m.LEFT),
             self.s.mstack.animate.to_edge(m.LEFT).shift(
                 m.DOWN+m.RIGHT).align_to(self.mtable.get_center),
-            self.mtable.animate.to_edge(m.DOWN).to_edge(m.RIGHT).scale(0.6)
         )
 
-        # TODO custom colour for terminals!
+        self._fade_in_mtable()
+
         # create our first label
         V_LABELS[start_symbol] = start_symbol
         g = m.Graph([start_symbol], [], vertex_config=VCONFIG,
@@ -1263,7 +1305,7 @@ class ManimParseTree(m.Scene):
                                                     if r.id != start_symbol:
                                                         parent_id = r.parent.id + "_" + r.id
                                                     v = create_vertex(
-                                                        g, vertex_id, parent_id, "\epsilon")
+                                                        g, vertex_id, parent_id, "\epsilon", color = self.tok_cols[original_tokens.index(next)])
                                                     reset_g(
                                                         self, g, start_symbol)
 
@@ -1345,11 +1387,7 @@ class ManimParseTree(m.Scene):
                     _play_msg_with_other(self, ["We must find the entry at ParseTable["+top+"]["+next+"]"], raw_msg = "Let's consider the parse table entry at non-terminal " + top + "'s row and terminal " + next + "'s column.")
 
                     # highlight parse table row
-                    t =  self.mtable.get_entries_without_labels((row(self.cfg, top), col(self.cfg, next)))
-                    self.play(
-                        m.Indicate(t, color = m.BLUE),
-                        m.Circumscribe(t, color = m.BLUE),
-                    )
+                    self._fade_in_mtable(highlight  = True, row = row(self.cfg, top), col = col(self.cfg, next))
                     
                     #  copy the cfg_line rather than manipulate it directly
                     cfg_line = self.manim_production_groups[prods[0].strip(
