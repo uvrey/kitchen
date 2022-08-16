@@ -952,6 +952,7 @@ class ManimParseTable(m.Scene):
                         return
         
         self.wait()
+        self.wait()
         sounds.add_sound_to_scene(self, sounds.YAY)
         sounds.narrate("The parse table is complete. Yay!", self)
         return SUCCESS
