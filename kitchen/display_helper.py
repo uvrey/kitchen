@@ -120,7 +120,7 @@ def print_parsetree(root):
             root (_type_): _description_
         """        
         for pre, fill, node in anytree.RenderTree(root):
-            structure_secho("%s%s" % (pre, node.name))
+            structure_secho("%s%s" % (pre, node.id))
 
 def to_tex(item):
     tex_item = item.replace(r'$', r'\$').replace(r'\epsilon', r'$\epsilon$').replace("#", r'$\epsilon$').replace("\\subseteq", "$\\subseteq$").replace("->", "$\\to$").replace("(", "$($").replace(")", "$)$")

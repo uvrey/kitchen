@@ -197,7 +197,7 @@ class ParsingTable:
         """        
         # print heading
         display_helper.info_secho("Parse Table:")
-
+        
         # print column labels
         col_label = "\t"
         for t in self.ts:
@@ -206,7 +206,7 @@ class ParsingTable:
 
         # print rows and contents
         for nt in self.pt_dict.keys():
-            row = nt + ":\t"
+            row = nt + ":"
             for t in self.ts:
                 try:
                     if self.pt_dict[nt][t] != None:

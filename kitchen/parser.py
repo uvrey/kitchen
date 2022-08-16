@@ -1,6 +1,7 @@
 """ General parser generator for Kitchen """
 # kitchen/parser.py
 
+from msilib.text import tables
 import typer
 import anytree
 import re
@@ -75,6 +76,8 @@ class ParserLL1:
             top = self.stack[-1]
             next = tokens[0]
 
+            display_helper.print_parsetree(self.root)
+
             if re.match(RE_TERMINAL, top) or top == "$":
                 if top == next:
                     tokens.remove(next)
@@ -85,31 +88,28 @@ class ParserLL1:
                     if self.parents != []:
                         done = False
                         popped = self.parents.pop()
-                        typer.echo(self.parents)
+                        display_helper.fail_secho("need to link " + popped.id + " to its parent" + popped.tmp_p)
+
                         # reversed so we find the first match
                         # TODO make sure correct path to root is added too
+                        index = len(self.parents) - 1
                         for node in reversed(self.parents):
                             typer.echo("looking @ [" + node.id+"] but we want [" + popped.tmp_p+"]")
                             if node.id == popped.tmp_p:
-                                # found the parent node, so we loop up the tree, making sure it is connected to root
-                                typer.echo("found parent node")
-                                parent = node
-                                child = popped.id
-                                done = False
-                                while not done:
-                                    new_node = anytree.Node(child, parent=parent, id=child, connected= True)
-                                    
-                                    if parent.connected or parent.id == self.cfg.start_symbol:
-                                        break
-                                    else:
-                                        child = parent.id
-                                        parent = parent.parent
-
-                                # display_helper.info_secho("adding " + popped.id + " with parent " + node.id)
-                                # new_node = anytree.Node(popped.id, parent=node, id=popped.id)
+                                new_node = anytree.Node(popped.id, parent=node, id=popped.id)
                                 break
+                            index = index - 1
+                        
+                        # scan through parents to check if a node before this guy led to epsilon
+                        display_helper.success_secho("found our parent node " + popped.id + " at index "+ str(index))
+                        for parent in self.parents[0: index]:
+                            if re.match(RE_NONTERMINAL, parent.id):
+                                if "#" in self.cfg.first_set[parent.id]:
+                                    display_helper.fail_secho(parent.id + " could disappear! \n add eps")
+                                    #new_node = anytree.Node("#", parent=parent, id="eps")
+
+
                     else:
-                        # TODO
                         display_helper.fail_secho("TODO!")
                 else:
                     error.ERR_parsing_error(self.root,
@@ -122,28 +122,39 @@ class ParserLL1:
                     prods = pt_entry.split("->")
                     pt = self.stack.pop()
 
+                    typer.echo("Adding to productions of " + prods[0].strip())
+
                     # add sequence of productions to the stack
                     ps = list(filter(None, re.findall(
                         RE_PRODUCTION, prods[1])))
+                    nodes_to_append = []
 
+                    # this is the direction we push to the stack
                     for p in reversed(ps):
                         # add to the tree
                         if top == start_symbol:
+                            # typer.echo("linking " + p + " and " + self.root.id)
                             new_node = anytree.Node(p, parent=self.root, id=p, tmp_p = self.root.id, connected=True)
                         else:
                             # add connecting node if it is a non-terminal
+                            
                             if re.match(RE_NONTERMINAL, p):
+                                # typer.echo("** linking " + p + " to parent " + self.parents[-1].id)
                                 new_node = anytree.Node(
-                                    p, id=p, parent=self.parents[-1], tmp_p=prods[0].strip(), connected=True)
+                                    p, id=p, parent=self.parents[-1], tmp_p=prods[0].strip(),  connected=True)
                             else:
                                 if p != "#":
                                     new_node = anytree.Node(
-                                        p, id=p, tmp_p=prods[0].strip(), connected=False)
+                                        p, id=p,  tmp_p=prods[0].strip(), connected=False)
                                     
                         # we don't need to match epsilon, and we also only want non-terminals as parent nodes
                         if p != "#":
                             self.stack.append(p)
-                            self.parents.append(new_node)
+                            nodes_to_append.append(new_node)
+
+                    # NEW! only append parents once whole list has been processed
+                    for t in nodes_to_append:
+                        self.parents.append(t)
 
                 except KeyError:
                     error.ERR_parsing_error(self.root,
@@ -162,3 +173,9 @@ class ParserLL1:
         display_helper.print_parsetree(self.root)
         return SUCCESS
 
+    def get_node(self, node_id):
+        for node in self.root.children:
+            if node_id == self.root:
+                return node
+        return None
+    
