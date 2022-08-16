@@ -83,44 +83,53 @@ class ParserLL1:
                     # pops appropriately
                     if self.parents != []:
                         popped = self.parents.pop()
+                        typer.echo(popped.id + " was just popped off")
+                        display_helper.info_secho(self.parents)
+                        typer.echo("____")
 
                         # always pop again if an epsilon was encountered
                         if self.parents != []:
                             done = False
                             i = 1
                             while not done:
+                                typer.echo(str(i) +" = i vs len " + str(len(self.parents)))
                                 if i <= len(self.parents):
-                                    p = self.parents[-i]
-                                    if re.match(RE_NONTERMINAL, p.id):
+                                    pt = self.parents[-i]
+                                    typer.echo("looking at " + pt.id)
+                                    if re.match(RE_NONTERMINAL, pt.id):
                                         # if we have encountered the first set which the production can fall under
-                                        if popped.id in self.cfg.first_set[p.id]:
+                                        if popped.id in self.cfg.first_set[pt.id]:
                                             # remove children if they were previously added
-                                            if p.height != 0:
-                                                p.children = []
+                                            if pt.height != 0:
+                                                pt.children = []
                                             new_node = anytree.Node(
-                                                popped.id, parent=p, id=popped.id)
+                                                popped.id, parent=pt, id=popped.id)
                                         
                                             # check for epsilons
                                             rhs = self.parents[-i + 1:]
                                             for r in rhs:
                                                 # check that production can actually lead somewhere and is not current prod
                                                 # AND that it hasn't been explored yet
-                                                if re.match(RE_NONTERMINAL, r.id) and r.id != p.id and r.height == 0:
-                                                    if "#" in self.firstset[r.id]:
+                                                if re.match(RE_NONTERMINAL, r.id) and r.id != pt.id and r.height == 0:
+                                                    if "#" in self.cfg.first_set[r.id]:
                                                         new_node = anytree.Node(
                                                             "#", parent=r, id="eps")
 
                                             # pop as many productions off as necessary
                                             for j in range(i - 1):
                                                 self.parents.pop()
-                                            done = True
-                                        else:
-                                            i = i + 1
-                                    else:
-                                        typer.echo("we found a " + popped.id)
-                                        break
+                                            done = True                                    
+                                    i = i + 1  
                                 else:
+                                    typer.echo("esc here?")
+                                    typer.echo(str(i) + " vs | len " + str(len(self.parents)))
+                                    typer.echo("adding node " + popped.id + " to parent " + p.id)
                                     break
+                        else:
+                            typer.echo("parents are empty, but no new node was added.")
+                            typer.echo("poppped = " + p +", parent = " + popped.id)
+                            new_node = anytree.Node(
+                                                p, parent=popped, id=p)
                            
                 else:
                     error.ERR_parsing_error(self.root,
