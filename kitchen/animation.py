@@ -869,14 +869,14 @@ class ManimParseTable(m.Scene):
 
         # add the guide 
         guide = get_guide(arr_right= True)
-        guide.scale_to_fit_height(CFG_SCALE_WIDTH/4)
+        guide.scale_to_fit_width(CFG_SCALE_WIDTH/4)
         
         # arrange all items
         all_elements.arrange_in_grid(rows = 1, buff = 1.2)
         all_elements.center()
 
         # scale everything nicely
-        all_elements.scale_to_fit_width(CFG_SCALE_WIDTH)
+        all_elements.scale(0.6)
 
         # make sure elements are showing
         if all_elements.height > CFG_SCALE_HEIGHT:
@@ -884,6 +884,7 @@ class ManimParseTable(m.Scene):
 
         cfg_heading.next_to(keys, m.UP)
 
+        # play start of scene
         sounds.add_sound_to_scene(self, sounds.MOVE)
         self.play(
             ll1_title.animate.to_edge(m.UP),
