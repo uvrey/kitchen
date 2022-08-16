@@ -1289,10 +1289,10 @@ class ManimParseTree(m.Scene):
                 sounds.add_sound_to_scene(self, sounds.FAIL)
                 if re.match(RE_TERMINAL, self.s.stack[-1]):
                     _play_msg_with_other(self, ["Expected `" + self.s.stack[-1] + "'", "Parsing unsuccessful."], raw_msg = "We expected to see " + self.s.stack[-1]  + " so parsing is unsuccessful.")
-                    error.ERR_parsing_error("Expected " + self.s.stack[-1])
+                    error.ERR_parsing_error(self.root, "Expected " + self.s.stack[-1])
                 else:
                     _play_msg_with_other(self, ["Parsing unsuccessful. "], raw_msg = "Parsing unsuccessful.")
-                    error.ERR_parsing_error()
+                    error.ERR_parsing_error(self.root)
                 error.ERR_manim_parsing_error(self)
                 return
 
