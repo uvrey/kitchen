@@ -1356,7 +1356,7 @@ class ManimParseTree(m.Scene):
                                                     if r.id != start_symbol:
                                                         parent_id = r.parent.id + "_" + r.id
                                                     v = create_vertex(
-                                                        g, vertex_id, parent_id, "\epsilon", color = self.tok_cols[original_tokens.index(next)])
+                                                        g, vertex_id, parent_id, "\epsilon", color = m.BLUE)
                                                     reset_g(
                                                         self, g, start_symbol)
 
@@ -1404,9 +1404,10 @@ class ManimParseTree(m.Scene):
                                 pass
                         except KeyError:
                             # create and add new vertex
+                            
                             new_vertex = create_vertex(
                                 g, vertex_id, parent_vertex_id, vertex_id.split("_")[
-                                    1].strip(), color=m.BLUE)
+                                    1].strip(), color=self.tok_cols[original_tokens.index(next)])
                             reset_g(self, g, start_symbol)
 
                         # pop off the stack and 'flash'
@@ -1418,7 +1419,7 @@ class ManimParseTree(m.Scene):
                     sounds.add_sound_to_scene(sounds.YAY, self)
                     self.play(m.ApplyWave(m_tok_gp))
                     self.play(
-                        m.LaggedStart(m.Indicate(m_tok[next], color=m.BLUE, scale_factor=1.5),
+                        m.LaggedStart(m.Indicate(m_tok[next], color=self.tok_cols[original_tokens.index(next)], scale_factor=1.5),
                                     m.FadeToColor(
                             m_tok[next],m.BLUE)),
                     )

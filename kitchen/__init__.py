@@ -20,7 +20,7 @@ TEXT_SCALE = 1
 CFG_SCALE_HEIGHT = 6.25*m.config["frame_height"]/10
 CFG_SCALE_WIDTH = 0.8*m.config["frame_width"]
 CFG_SCALE = 0.7
-COLOURS = [m.BLUE_B, m.TEAL_B, m.GREEN_B, m.YELLOW_B, m.GOLD_B,
+COLOURS = [m.BLUE_A, m.TEAL_B, m.GREEN_B, m.YELLOW_B, m.GOLD_B,
                      m.RED_B, m.MAROON_B, m.PURPLE_A, m.LIGHT_PINK, m.LIGHT_BROWN]
 
 (
