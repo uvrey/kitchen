@@ -14,6 +14,7 @@ RE_PRODUCTION = '[A-Z][A-Z]*|[a-z][a-z]*|$|#|\+|-|/|\*|\(|\)|,'
 
 
 TEXT_SCALE = 1
+CFG_SCALE_HEIGHT = m.config["frame_height"]/2 
 CFG_SCALE = 0.7
 COLOURS = [m.BLUE_B, m.TEAL_B, m.GREEN_B, m.YELLOW_B, m.GOLD_B,
                      m.RED_B, m.MAROON_B, m.PURPLE_A, m.LIGHT_PINK, m.LIGHT_BROWN]

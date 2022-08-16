@@ -322,7 +322,12 @@ def _process_command(inp, cfg) -> None:
         if not cfg.first_set_calculated:
             cfg.reset_first_set()
 
-        # TODO reset parse table if it was already calculated
+        if not cfg.follow_set_calculated:
+            cfg.reset_follow_set()
+
+        if cfg.parsetable_calculated:
+            # re-initialise parsetable
+            cfg.setup_parsetable()
         
         config.OUTPUT_CONFIG["output_file"] = "Parsetable"
         config.configure_output_file_name(config.PARSETABLE)

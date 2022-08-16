@@ -208,13 +208,14 @@ class ContextFreeGrammar:
             tmp.append(splitp)
 
         # add only terminals to list, as well as create empty follow set for them
+        # append $ to terminals by default
+        self.terminals.append("$")
         for t in set(list(chain(*tmp))):
             if re.match(RE_TERMINAL, t) and t != "#":
                 self.terminals.append(t)
                 self.follow_set[t] = []
                 self.manim_followset_contents[t] = m.VGroup()
-            elif t == "#":
-                self.terminals.append(t)
+
 
         # set start symbol
         self.start_symbol = list(self.cfg_dict.keys())[0]

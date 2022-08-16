@@ -100,7 +100,7 @@ class ParsingTable:
         self.mtable.get_col_labels().fade_to(color=m.TEAL, alpha=1)
 
 
-
+    # BUG
     def populate_table(self):
         """Populates the whole table with the first and follow set, if appropriate
         """
@@ -132,7 +132,6 @@ class ParsingTable:
                 error.ERR_too_many_productions_ll1(nt, t)
             else:
                 self.pt_dict[nt][t] = production
-
         except KeyError:
             self.pt_dict[nt][t] = production
 

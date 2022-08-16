@@ -17,6 +17,7 @@ from kitchen import (
     display_helper,
     TEXT_SCALE,
     CFG_SCALE,
+    CFG_SCALE_HEIGHT,
     COLOURS,
     error,
     stack, 
@@ -516,7 +517,7 @@ class ManimFollowSet(m.Scene):
     def vis_follow_set(self, is_start_symbol):
 
             # Set up CFG keys
-            keys = get_manim_cfg_group(self).to_edge(m.LEFT).scale(CFG_SCALE)
+            keys = get_manim_cfg_group(self).to_edge(m.LEFT).scale_to_fit_height(CFG_SCALE_HEIGHT)
             keys.fade_to(m.GRAY, 1).to_edge(m.LEFT)
 
             # draw follow set title
@@ -817,7 +818,7 @@ class ManimParseTable(m.Scene):
         self.nts = sorted(cfg.nonterminals)
         self.cfg = cfg
     
-    def tear_down():
+    def tear_down(self):
         clear_narrs()
 
     def vis_populate_table(self):
@@ -830,25 +831,18 @@ class ManimParseTable(m.Scene):
         self.pt_dict = {}
         self.init_pt_dict()
 
+        all_elements = m.VGroup()
+
         # set up the title
         ll1_title = _get_title_mobject("LL(1) parsing: parse table")
         sounds.narrate("Let's find the parse table for this grammar.", self)
-        keys = get_manim_cfg_group(self)
-        keys.to_edge(m.LEFT).scale(CFG_SCALE)
+        keys = get_manim_cfg_group(self).scale_to_fit_height(CFG_SCALE_HEIGHT/3)
+        all_elements.add(keys)
 
         # show key for colour coding
-        guide = get_guide().scale(CFG_SCALE)
         cfg_heading = m.Tex("Context-Free Grammar", tex_template = m.TexFontTemplates.french_cursive).next_to(keys, m.UP).align_to(keys.get_center)
-        cfg_heading.scale(0.5)
-
-        sounds.add_sound_to_scene(self, sounds.MOVE)
-        self.play(
-            ll1_title.animate.to_edge(m.UP),
-            guide.animate.to_edge(m.RIGHT),
-            m.FadeIn(cfg_heading),
-            m.LaggedStart(*(m.FadeIn(k.scale(CFG_SCALE), shift=m.UP)
-                        for k in keys)),
-        )
+        cfg_heading.scale(0.5).next_to(keys, m.UP)
+        all_elements.add(cfg_heading)
 
         # draw establishing table animations
         row_labels = self.nts
@@ -857,11 +851,30 @@ class ManimParseTable(m.Scene):
         # build up the row values
         row_vals = init_row_contents(self)
 
+        # add the table
         self.mtable = self.init_m_table(
             row_vals, row_labels, col_labels)
-
         self.mtable.get_row_labels().fade_to(color=m.RED, alpha=1)
         self.mtable.get_col_labels().fade_to(color=m.TEAL, alpha=1)
+        self.mtable.next_to(keys, m.RIGHT)
+        all_elements.add(self.mtable)
+
+        # add the guide
+        guide = get_guide().next_to(self.mtable, m.RIGHT).scale_to_fit_height(CFG_SCALE_HEIGHT/4)
+        keys.to_edge(m.LEFT)
+        all_elements.center()
+
+        # scale everything nicely
+        all_elements.scale_to_fit_height(CFG_SCALE_HEIGHT)
+
+        sounds.add_sound_to_scene(self, sounds.MOVE)
+        self.play(
+            ll1_title.animate.to_edge(m.UP),
+            guide.animate.to_edge(m.RIGHT),
+            m.FadeIn(cfg_heading),
+            m.LaggedStart(*(m.FadeIn(k, shift=m.UP)
+                        for k in keys)),
+        )
 
         # add typing sound as the labels are drawn
         sounds.add_sound_to_scene(self, sounds.TYPE)
@@ -1161,7 +1174,6 @@ class ManimParseTree(m.Scene):
             m.FadeIn(rect),
         )
 
-
         if first_time:
             sounds.narrate("Here is the parse table for this grammar", self)
 
@@ -1186,9 +1198,6 @@ class ManimParseTree(m.Scene):
         )
 
 # Parse LL(1) in the CLI
-
-
-
     def vis_parse_ll1(self, input, tokens):
         global V_LABELS
         global VCONFIG
