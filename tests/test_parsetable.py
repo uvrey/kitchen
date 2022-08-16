@@ -22,7 +22,7 @@ def pt_out_path():
 @pytest.mark.parametrize("sample_cfg", [
     ("cfg.txt"),
     # ("cfg_1.txt"), # need memo
-    # ("cfg_2.txt"), # issue here with follow(B) ans done
+    # ("cfg_2.txt"), # issue here with follow(B) and done
     # ("cfg_3.txt"),
     # ("cfg_4.txt"),
     # ("cfg_5.txt"),
