@@ -876,6 +876,11 @@ class ManimParseTable(m.Scene):
 
         # scale everything nicely
         all_elements.scale_to_fit_width(CFG_SCALE_WIDTH)
+
+        # make sure elements are showing
+        if all_elements.height > CFG_SCALE_HEIGHT:
+            all_elements.scale_to_fit_height(CFG_SCALE_HEIGHT)
+
         cfg_heading.next_to(keys, m.UP)
 
         sounds.add_sound_to_scene(self, sounds.MOVE)
