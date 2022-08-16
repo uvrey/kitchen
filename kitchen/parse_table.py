@@ -88,15 +88,11 @@ class ParsingTable:
     def populate_table(self):
         """Populates the whole table with the first and follow set, if appropriate
         """
-       # If the First(α) contains ε and Follow(A) contains $ 
-       # as terminal, then make entry A –> α in the table for the $.
-        display_helper.pretty_print_dict(self.pt_dict)
 
         for i, key in enumerate(self.first_set.keys(), start=0):
             for j, item in enumerate(self.first_set[key], start=0):
                 # if the first set contains epsilon, it may disappear. So, we need to add elements in the follow set too.
                 if item == "#":
-                    display_helper.info_secho(self.follow_set[key])
                     for f in self.follow_set[key]:
                         
                         if f == "$":
@@ -119,7 +115,6 @@ class ParsingTable:
             t (String): Terminal
             production (String): Production at ParseTable[nt, t]
         """
-        typer.echo("adding " + production + " to parse table at " + nt + ", " + t)
         try:
             if self.pt_dict[nt][t] != None:
                 error.ERR_too_many_productions_ll1(nt, t)
