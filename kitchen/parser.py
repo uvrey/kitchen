@@ -58,6 +58,9 @@ class ParserLL1:
         original_tokens = self.tokens[:]
         self.stack = []
 
+        display_helper.info_secho(self.cfg.first_set)
+        display_helper.info_secho(self.cfg.follow_set)
+
         # add start symbol to the stack
         self.stack.append(start_symbol)
         self.root = anytree.Node(start_symbol, id=start_symbol)
@@ -78,7 +81,7 @@ class ParserLL1:
             if re.match(RE_TERMINAL, top) or top == "$":
                 if top == next:
                     tokens.remove(next)
-                    self.stack.pop()
+                    p = self.stack.pop()
 
                     # pops appropriately
                     if self.parents != []:
@@ -87,10 +90,9 @@ class ParserLL1:
                         # always pop again if an epsilon was encountered
                         if self.parents != []:
                             done = False
-
                             i = 1
                             while not done:
-                                if i < len(self.parents) - 1:
+                                if i < len(self.parents):
                                     p = self.parents[-i]
                                     if re.match(RE_NONTERMINAL, p.id):
                                         # if we have encountered the first set which the production can fall under
@@ -98,6 +100,7 @@ class ParserLL1:
                                             # remove children if they were previously added
                                             if p.height != 0:
                                                 p.children = []
+                                            typer.echo("adding node " + popped.id)
                                             new_node = anytree.Node(
                                                 popped.id, parent=p, id=popped.id)
                                         
@@ -118,10 +121,11 @@ class ParserLL1:
                                         else:
                                             i = i + 1
                                     else:
+                                        typer.echo("we found a " + popped.id)
                                         break
                                 else:
                                     break
-
+                           
                 else:
                     error.ERR_parsing_error(self.root,
                         "Unexpected token [" + top + "]")
