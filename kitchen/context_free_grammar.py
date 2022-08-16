@@ -371,10 +371,10 @@ class ContextFreeGrammar:
         """Displays the calculated follow set. 
         """        
         if not self.follow_set_calculated:
+            typer.echo("finding fw")
             self._calculate_follow_set(True)
             self.follow_set_calculated = True
 
-        display_helper.info_secho('Showing follow set:')
         display_helper.pretty_print_dict(self.follow_set)
         self.follow_set_calculated = True
 

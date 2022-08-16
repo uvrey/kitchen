@@ -145,11 +145,11 @@ def load_app(path, testing = False) -> None:
 def _set_parsetable(cfg) -> int:
     if not cfg.parsetable_calculated:
     # reset cfg structures before we begin if needed
-        if not cfg.follow_set_calculated:
-            cfg.reset_follow_set()
-
         if not cfg.first_set_calculated:
             cfg.reset_first_set()
+
+        if not cfg.follow_set_calculated:
+            cfg.reset_follow_set()
 
         # initialise parsetable
         cfg.setup_parsetable()
@@ -297,9 +297,12 @@ def _process_command(inp, cfg) -> None:
             animation.render()
       
     elif inp == "\\show follow" or inp == "\\fw":
+        if not cfg.first_set_calculated:
+            cfg.reset_first_set()
+            cfg.first_set_calculated = True
+
         cfg.show_follow_set()
         
-
     elif inp == "\\vis follow" or inp == "\\vfw":
         if not cfg.first_set_calculated:
             cfg.reset_first_set()

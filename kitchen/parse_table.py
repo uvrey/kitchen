@@ -82,24 +82,30 @@ class ParsingTable:
         return self.ts.index(t) + 1
 
 
-    # BUG BUG BUG
+# Find First(α) and for each terminal in First(α), make entry A –> α in the table.
+# If First(α) contains ε (epsilon) as terminal than, find the Follow(A) and for each terminal in Follow(A), make entry A –> α in the table.
+# If the First(α) contains ε and Follow(A) contains $ as terminal, then make entry A –> α in the table for the $. 
     def populate_table(self):
         """Populates the whole table with the first and follow set, if appropriate
         """
-
        # If the First(α) contains ε and Follow(A) contains $ 
        # as terminal, then make entry A –> α in the table for the $.
+        display_helper.pretty_print_dict(self.pt_dict)
 
         for i, key in enumerate(self.first_set.keys(), start=0):
             for j, item in enumerate(self.first_set[key], start=0):
-                # if the first set contains epsilon, may disappear
+                # if the first set contains epsilon, it may disappear. So, we need to add elements in the follow set too.
                 if item == "#":
+                    display_helper.info_secho(self.follow_set[key])
                     for f in self.follow_set[key]:
+                        
                         if f == "$":
-                            prod = key + " -> $"
+                            # make A->a in column of "$"
+                            prod = key + " -> " + item
+                            self.add_to_parsetable(key, "$", prod)
                         else:
-                            prod = key + " -> #"
-                        self.add_to_parsetable(key, f, prod)
+                            prod = key + "-> " + item
+                            self.add_to_parsetable(key, f, prod)
                 else:
                     # add item to the parse table
                     prod = self.firstset_index[key][j]
@@ -113,6 +119,7 @@ class ParsingTable:
             t (String): Terminal
             production (String): Production at ParseTable[nt, t]
         """
+        typer.echo("adding " + production + " to parse table at " + nt + ", " + t)
         try:
             if self.pt_dict[nt][t] != None:
                 error.ERR_too_many_productions_ll1(nt, t)
@@ -182,7 +189,6 @@ class ParsingTable:
                 ts_m.append(t)
         return ts_m
 
-
     def dbg_ll1(self):
         typer.echo(self.stack)
         typer.echo(self.parents)
@@ -204,14 +210,16 @@ class ParsingTable:
         display_helper.structure_secho(col_label)
 
         # print rows and contents
-        for nts in self.nts:
-            row = nts + ":\t"
+        for nt in self.pt_dict.keys():
+            row = nt + ":\t"
             for t in self.ts:
-                if t in self.first_set[nts]:
-                    term_index = self.first_set[nts].index(t)
-                    row += re.sub(r'\s+', '',
-                                  self.firstset_index[nts][term_index]) + "\t"
-                else:
+                try:
+                    if self.pt_dict[nt][t] != None:
+                        row += re.sub(r'\s+', '',
+                                    self.pt_dict[nt][t]) + "\t"
+                    else:
+                        row += "\t"
+                except:
                     row += "\t"
             display_helper.structure_secho(row)
 
