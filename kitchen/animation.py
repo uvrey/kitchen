@@ -836,13 +836,13 @@ class ManimParseTable(m.Scene):
         # set up the title
         ll1_title = _get_title_mobject("LL(1) parsing: parse table")
         sounds.narrate("Let's find the parse table for this grammar.", self)
-        keys = get_manim_cfg_group(self).scale_to_fit_height(CFG_SCALE_HEIGHT/3)
+        keys = get_manim_cfg_group(self)
+        keys.scale_to_fit_height(CFG_SCALE_HEIGHT/3)
         all_elements.add(keys)
 
         # show key for colour coding
         cfg_heading = m.Tex("Context-Free Grammar", tex_template = m.TexFontTemplates.french_cursive).next_to(keys, m.UP).align_to(keys.get_center)
-        cfg_heading.scale(0.5).next_to(keys, m.UP)
-        all_elements.add(cfg_heading)
+        cfg_heading.scale(0.6)
 
         # draw establishing table animations
         row_labels = self.nts
@@ -856,13 +856,18 @@ class ManimParseTable(m.Scene):
             row_vals, row_labels, col_labels)
         self.mtable.get_row_labels().fade_to(color=m.RED, alpha=1)
         self.mtable.get_col_labels().fade_to(color=m.TEAL, alpha=1)
-        self.mtable.next_to(keys, m.RIGHT)
+        self.mtable.scale_to_fit_height(CFG_SCALE_HEIGHT)
         all_elements.add(self.mtable)
 
-        # add the guide
-        guide = get_guide().next_to(self.mtable, m.RIGHT).scale_to_fit_height(CFG_SCALE_HEIGHT/4)
-        keys.to_edge(m.LEFT)
+        # add the guide 
+        guide = get_guide()
+        guide.scale_to_fit_height(CFG_SCALE_HEIGHT/3)
+        all_elements.add(guide)
+        
+        # arrange all items
+        all_elements.arrange_in_grid(rows = 1, buff = 1.5)
         all_elements.center()
+        cfg_heading.next_to(keys, m.UP)
 
         # scale everything nicely
         all_elements.scale_to_fit_height(CFG_SCALE_HEIGHT)
@@ -870,7 +875,7 @@ class ManimParseTable(m.Scene):
         sounds.add_sound_to_scene(self, sounds.MOVE)
         self.play(
             ll1_title.animate.to_edge(m.UP),
-            guide.animate.to_edge(m.RIGHT),
+            m.FadeIn(guide),
             m.FadeIn(cfg_heading),
             m.LaggedStart(*(m.FadeIn(k, shift=m.UP)
                         for k in keys)),
