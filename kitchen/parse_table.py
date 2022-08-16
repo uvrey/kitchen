@@ -104,9 +104,6 @@ class ParsingTable:
                             self.add_to_parsetable(key, f, prod)
                 else:
                     # add item to the parse table
-                    # typer.echo(self.first_set)
-                    # typer.echo(self.firstset_index)
-                    display_helper.info_secho("___")
                     prod = self.firstset_index[key][j]
                     self.add_to_parsetable(key, item, prod)
 

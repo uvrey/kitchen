@@ -1493,6 +1493,7 @@ class ManimParseTree(m.Scene):
                     # add sequence of productions to the stack
                     ps = list(filter(None, re.findall(
                         RE_PRODUCTION, prods[1])))
+                    nodes_to_append = []
 
                     _play_msg_with_other(self, [_to_tex(popped_off) + " is a non-terminal,", "so we can replace it with", "its sub-productions: ",  prods[1]], raw_msg="Let's replace " + popped_off + " with its sub productions")
 
@@ -1533,7 +1534,11 @@ class ManimParseTree(m.Scene):
                         if p != "#" and p != "$":
                             new_prod = prods[0].strip() + " -> " + p
                             self.s.push(p, _to_tex(new_prod))
-                            self.parents.append(new_node)
+                            nodes_to_append.append(new_node)
+
+                        # TODO NEW! only append parents once whole list has been processed
+                        for t in nodes_to_append:
+                            self.parents.append(t)
 
                     self.play(
                         m.FadeOut(cfg_line)

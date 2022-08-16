@@ -89,6 +89,7 @@ class ParserLL1:
                     tokens.remove(next)
                     p = self.stack.pop()
 
+                    # ALL NEW TODO
                     # pops appropriately
                     if self.parents != []:
                         popped = self.parents.pop()
@@ -98,17 +99,22 @@ class ParserLL1:
 
                         # linking new terminals to the tree
                         for node in reversed(self.parents):
-                            typer.echo("looking @ [" + node.id+"] but we want [" + popped.tmp_p+"]")
                             if node.id == popped.tmp_p:
                                 new_node = anytree.Node(popped.id, parent=node, id=popped.id)
                                 break
                             index = index - 1
+
+                        # pop off as many as needed
+                        for j in range(index - 1):
+                            self.parents.pop()
+
                     else:
                         display_helper.fail_secho("TODO!")
 
                     # if we have matched our last token
                     if len(tokens) == 1:
                         self.check_for_epsilons()
+                    
                 else:
                     error.ERR_parsing_error(self.root,
                         "Unexpected token [" + top + "]")
@@ -157,7 +163,7 @@ class ParserLL1:
                             self.stack.append(p)
                             nodes_to_append.append(new_node)
 
-                    # NEW! only append parents once whole list has been processed
+                    # TODO NEW! only append parents once whole list has been processed
                     for t in nodes_to_append:
                         self.parents.append(t)
 

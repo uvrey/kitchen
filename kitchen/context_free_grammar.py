@@ -353,7 +353,7 @@ class ContextFreeGrammar:
                             self.firstset_index[ps].append(self.fstack[j])
                             self.first_set[ps].append(first_terminal[0]) 
                             
-                    # NEW reset fstack for the next round
+                    # TODO NEW reset fstack for the next round
                     self.fstack = []
 
             # by this point, we have recursively found a bunch of first sets
