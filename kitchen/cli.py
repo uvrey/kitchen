@@ -157,7 +157,7 @@ def find_pt() -> None:
 
     # calculate parsetable
     code = cfg.calculate_parsetable()
-    cfg.parsetable.print_parse_table()
+    cfg.parsetable.print_parse_table_testing()
 
 
 # TODO ADD more tests here

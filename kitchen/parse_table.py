@@ -218,4 +218,11 @@ class ParsingTable:
                     row += "\t"
             display_helper.structure_secho(row)
 
+    def print_parse_table_testing(self):
+        """Prints the parse table for testing purposes
+        """        
+        # print heading
+        typer.echo(self.pt_dict)
+
+
   

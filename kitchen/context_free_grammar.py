@@ -292,6 +292,7 @@ class ContextFreeGrammar:
             for p in self.cfg_dict[production]:
 
                 # add the appended production to fstack
+                # TODO check this thing
                 self.fstack.append(production + " -> " + p)
                 # if a production is/ starts with a non-terminal
                 if p in self.cfg_dict or p[0].isupper():
@@ -307,8 +308,8 @@ class ContextFreeGrammar:
                                 # add First(Y) - #
                                 if current_item not in self.first_set[ps]:
                                     # add production which led to this to the parse table
-                                    typer.echo("WE GOT TO " + current_item + " VIA ")
-                                    typer.echo(self.fstack[j])
+                                    # typer.echo("WE GOT TO " + current_item + " VIA ")
+                                    # typer.echo(self.fstack[j])
                                     self.firstset_index[ps].append(
                                         self.fstack[j])
                                     self.first_set[ps].append(current_item)
@@ -344,14 +345,20 @@ class ContextFreeGrammar:
                         self.vis_has_epsilon = True
                         # appends this terminal to the first set of previous non-terminals
 
+                    # typer.echo("state of fstack: len -> " + str(len(self.fstack)) + " vs pstack " + str(len(pstack)))
                     for j, ps in enumerate(pstack, start=0):
                         # add First(P) - # if down the stack
                         if first_terminal[0] not in self.first_set[ps]:
                             self.firstset_index[ps].append(self.fstack[j])
                             self.first_set[ps].append(first_terminal[0]) 
                             
-                    # TODO NEW reset fstack for the next round
-                    self.fstack = []
+                    # TODO fstack for the next round
+                    # display_helper.info_secho("....")
+                    # display_helper.structure_secho(pstack)
+                    # typer.echo(self.firstset_index)
+                    # display_helper.structure_secho(self.first_set)
+                    # typer.echo(self.fstack)
+                    # display_helper.success_secho("....")
 
             # by this point, we have recursively found a bunch of first sets
             # so let's find those that are still empty
@@ -362,6 +369,7 @@ class ContextFreeGrammar:
                     self._calculate_first_set(empty_set_nt, [])
             else:
                 pstack.pop()
+                self.fstack.pop()
 
         except KeyError:
             error.ERR_key_not_given_in_CFG(production)
