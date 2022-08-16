@@ -18,6 +18,7 @@ from kitchen import (
     TEXT_SCALE,
     CFG_SCALE,
     CFG_SCALE_HEIGHT,
+    CFG_SCALE_WIDTH,
     COLOURS,
     ERROR,
     error,
@@ -872,7 +873,7 @@ class ManimParseTable(m.Scene):
         all_elements.center()
 
         # scale everything nicely
-        all_elements.scale_to_fit_height(0.9*CFG_SCALE_HEIGHT)
+        all_elements.scale_to_fit_width(CFG_SCALE_WIDTH)
         cfg_heading.next_to(keys, m.UP)
 
         sounds.add_sound_to_scene(self, sounds.MOVE)
@@ -981,7 +982,7 @@ class ManimParseTable(m.Scene):
         )
 
         # set up new value with colour
-        t_new = m.MathTex(_to_math_tex(new_val)).scale(GRID_ITEM_SCALE)
+        t_new = m.MathTex(_to_math_tex(new_val)).scale_to_height(GRID_ITEM_SCALE)
         t_new.move_to(t_old)
         t_new.fade_to(config.opp_col(), alpha=0.2)
 
