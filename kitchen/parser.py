@@ -79,72 +79,21 @@ class ParserLL1:
                 if top == next:
                     tokens.remove(next)
                     p = self.stack.pop()
+                    # typer.echo(p + "was popped off")
 
                     # pops appropriately
                     if self.parents != []:
                         popped = self.parents.pop()
-                        typer.echo(popped.id + " was just popped off")
-                        display_helper.info_secho(self.parents)
-                        typer.echo("____")
-
-                        # always pop again if an epsilon was encountered
-                        if self.parents != []:
-                            done = False
-                            i = 1
-                            while not done:
-                                typer.echo(str(i) +" = i vs len " + str(len(self.parents)))
-                                if i <= len(self.parents):
-                                    pt = self.parents[-i]
-                                    typer.echo("looking at " + pt.id)
-                                    if re.match(RE_NONTERMINAL, pt.id):
-                                        # if we have encountered the first set which the production can fall under
-                                        if popped.id in self.cfg.first_set[pt.id]:
-                                            typer.echo(popped.id + " is in fs of " + pt.id)
-                                            # remove children if they were previously added
-                                            if pt.height != 0:
-                                                pt.children = []
-                                            new_node = anytree.Node(
-                                                popped.id, parent=pt, id=popped.id)
-                                        
-                                            # check for epsilons
-                                            rhs = self.parents[-i + 1:]
-                                            for r in rhs:
-                                                # check that production can actually lead somewhere and is not current prod
-                                                # AND that it hasn't been explored yet
-                                                if re.match(RE_NONTERMINAL, r.id) and r.id != pt.id and r.height == 0:
-                                                    if "#" in self.cfg.first_set[r.id]:
-                                                        new_node = anytree.Node(
-                                                            "#", parent=r, id="eps")
-
-                                            # pop as many productions off as necessary
-                                            for j in range(i - 1):
-                                                self.parents.pop()
-                                            done = True 
-                                    else:
-                                        # NEW!
-                                        typer.echo("check if " + popped.id + " is in follow of " + pt.id)
-                                        typer.echo("?? adding " + popped.id + " with parent " + pt.id )
-                                        # new_node = anytree.Node(
-                                        #         popped.id, parent=pt, id=popped.id)
-                                        #break
-                                        
-                                    # NEW                                   
-                                    i = i + 1  
-                                else:
-                                    # NEW!
-                                    typer.echo("esc here?")
-                                    typer.echo(str(i) + " vs | len " + str(len(self.parents)))
-                                    typer.echo("adding node " + popped.id + " to parent " + pt.id)
-                                    break
-                            else:
-                                typer.echo ("we have run out of places to check " + popped.id)
-                        else:
-                            # NEW!
-                            # parents are empty, so we add the node
-                            typer.echo("adding " + p + " with parent " + popped.id )
-                            new_node = anytree.Node(
-                                                p, parent=popped, id=p)
-                           
+                        # typer.echo(self.parents)
+                        for node in self.parents:
+                            # typer.echo("looking @ [" + node.id+"] but we want [" + popped.tmp_p.strip()+"]")
+                            if node.id == popped.tmp_p:
+                                # typer.echo("found parent node")
+                                new_node = anytree.Node(popped.id, parent=node, id=popped.id)
+                                break
+                    else:
+                        # TODO
+                        display_helper.fail_secho("TODO!")
                 else:
                     error.ERR_parsing_error(self.root,
                         "Unexpected token [" + top + "]")
@@ -154,7 +103,7 @@ class ParserLL1:
                 try:
                     pt_entry = self.pt_dict[top][next]
                     prods = pt_entry.split("->")
-                    p = self.stack.pop()
+                    pt = self.stack.pop()
 
                     # add sequence of productions to the stack
                     ps = list(filter(None, re.findall(
@@ -163,17 +112,17 @@ class ParserLL1:
                     for p in reversed(ps):
                         # add to the tree
                         if top == start_symbol:
-                            new_node = anytree.Node(p, parent=self.root, id=p)
+                            new_node = anytree.Node(p, parent=self.root, id=p, tmp_p = self.root.id)
                         else:
                             # add connecting node if it is a non-terminal
                             if re.match(RE_NONTERMINAL, p):
                                 new_node = anytree.Node(
-                                    p, id=p, parent=self.parents[-1])
+                                    p, id=p, parent=self.parents[-1], tmp_p=prods[0].strip())
                             else:
                                 if p != "#":
                                     new_node = anytree.Node(
-                                        p, id=p)
-
+                                        p, id=p, tmp_p=prods[0].strip())
+                                    
                         # we don't need to match epsilon, and we also only want non-terminals as parent nodes
                         if p != "#":
                             self.stack.append(p)
