@@ -1150,9 +1150,10 @@ class ManimParseTree(m.Scene):
             row_vals.append(row)
         return row_vals
 
-    def _fade_in_mtable(self, highlight = False, row = -1, col = -1):
+    def _fade_in_mtable(self, highlight = False, row = -1, col = -1, first_time = False):
         # create fading area
         rect = m.Rectangle(width=20, height=10, color=config.theme_col(), fill_opacity=0.9)
+
         pt_title = _get_title_mobject("Parse table")
         pt_title.next_to(self.mtable, m.UP)
 
@@ -1160,10 +1161,15 @@ class ManimParseTree(m.Scene):
             m.FadeIn(rect),
         )
 
+
+        if first_time:
+            sounds.narrate("Here is the parse table for this grammar", self)
+
         self.play(
             m.FadeIn(pt_title),
             m.FadeIn(self.mtable)
         )
+        self.wait()
         self.wait()
 
         if highlight:
@@ -1175,6 +1181,7 @@ class ManimParseTree(m.Scene):
 
         self.play(
             m.FadeOut(self.mtable),
+            m.FadeOut(pt_title),
             m.FadeOut(rect),
         )
 
@@ -1220,6 +1227,9 @@ class ManimParseTree(m.Scene):
             m_tok[t] = tex
         m_tok_gp.arrange(m.RIGHT)
 
+        # show the parsing table
+        self._fade_in_mtable(first_time=True)
+
         # set the stage
         self.play(
             ll1_title.animate.to_edge(m.UP),
@@ -1227,8 +1237,6 @@ class ManimParseTree(m.Scene):
             self.s.mstack.animate.to_edge(m.LEFT).shift(
                 m.DOWN+m.RIGHT).align_to(self.mtable.get_center),
         )
-
-        self._fade_in_mtable()
 
         # create our first label
         V_LABELS[start_symbol] = start_symbol
