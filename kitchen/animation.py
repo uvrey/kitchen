@@ -1209,7 +1209,9 @@ class ManimParseTree(m.Scene):
         self.wait()
 
         if highlight:
-            t =  self.mtable.get_entries_without_labels(row, col)
+            typer.echo("row and col: " + str(row) +", " + str(col))
+            tmp_tab = self.mtable
+            t =  self.mtable.get_entries_without_labels([row, col])
             self.play(
                 m.Indicate(t, color = m.BLUE),
                 m.Circumscribe(t, color = m.BLUE),
