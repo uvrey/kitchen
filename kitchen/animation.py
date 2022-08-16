@@ -1437,7 +1437,7 @@ class ManimParseTree(m.Scene):
                     _play_msg_with_other(self, ["We must find the entry at ParseTable["+top+"]["+next+"]"], raw_msg = "Let's consider the parse table entry at non-terminal " + top + "'s row and terminal " + next + "'s column.")
 
                     # highlight parse table row
-                    self._fade_in_mtable(highlight  = True, row = row(self.cfg, top), col = col(self.cfg, next))
+                    self._fade_in_mtable(highlight  = True, row = row(self.nts, top), col = col(self.ts, next))
                     
                     #  copy the cfg_line rather than manipulate it directly
                     cfg_line = self.manim_production_groups[prods[0].strip(

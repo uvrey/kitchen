@@ -48,11 +48,9 @@ def init_app(cfg_path: str) -> int:
     """Initialize the application configuration file."""
     config_code = _init_config_file()
     if config_code != SUCCESS:
-        typer.echo("config file initted")
         return config_code
     cfg_code = _create_cfg_path(cfg_path)
     if cfg_code != SUCCESS:
-        typer.echo("cfg path not good")
         return cfg_code
     return SUCCESS
 
