@@ -869,7 +869,7 @@ class ManimParseTable(m.Scene):
 
         # add the guide 
         guide = get_guide(arr_right= True)
-        guide.scale_to_fit_height(CFG_SCALE_HEIGHT/4)
+        guide.scale_to_fit_height(CFG_SCALE_WIDTH/4)
         
         # arrange all items
         all_elements.arrange_in_grid(rows = 1, buff = 1.2)

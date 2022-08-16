@@ -87,7 +87,8 @@ class ParsingTable:
         """Populates the whole table with the first and follow set, if appropriate
         """
 
-       # If the First(α) contains ε and Follow(A) contains $ as terminal, then make entry A –> α in the table for the $.
+       # If the First(α) contains ε and Follow(A) contains $ 
+       # as terminal, then make entry A –> α in the table for the $.
 
         for i, key in enumerate(self.first_set.keys(), start=0):
             for j, item in enumerate(self.first_set[key], start=0):
