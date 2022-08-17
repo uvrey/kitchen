@@ -32,7 +32,6 @@ LCONFIG = {"vertex_spacing": (0.5, 1)}
 ECONFIG = {"color": config.opp_col()}
 ECONFIG_TEMP = {"color": m.GRAY, "fill_opacity": 0.7}
 V_LABELS = {}
-
 GRID_ITEM_SCALE = 0.4
 
 # set global configs
@@ -48,7 +47,6 @@ def _to_tex(item):
 def _to_math_tex(item):
     tex_item = item.replace("$", "\$").replace("#", "\epsilon").replace("->", "\\to")
     return tex_item
-
 
 def _play_msg_with_other(self, msg, raw_msg= "", anim=[]):
     if msg != []:

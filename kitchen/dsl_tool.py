@@ -1,5 +1,4 @@
-"""
-DSL Design Tool
+"""DSL Design Tool
 
 This script prompts the user for a DSL specification file and an input 
 script written in that DSL. It then generates a lexing, parsing, and 
@@ -12,33 +11,55 @@ See Also
 dslSpecsTemplate
 """
 
-from kitchen import SUCCESS
-
-# Configurable variables.
+#-----------------------------------------------------------------------------
+#                     === User configurable parameters ===
+#
+# Change these to modify the default behavior of dsltool (if you wish)
+#-----------------------------------------------------------------------------
 defInfoFileName = "dslSpecs"
 defInFileName   = "dslInput"
 defGccFileName  = "dsl"
 defOutFileName  = "dsl"
-gccPath         = "gcc"
+gccPath         = "module.gcc"
+genPath         = "gen"
+outPath         = "out"
+#-----------------------------------------------------------------------------
 
 # Important disclaimer for generated files.
-disclaimer  = "# !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n"
-disclaimer += "# ------------------- This is an automatically generated file. -------------------\n"
-disclaimer += "# -------------------------------- Do NOT edit. ----------------------------------\n"
-disclaimer += "# !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n"
+disclaimer = (
+"""# !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+# ------------- This is an automatically generated file. -------------
+# ---------------------------- Do NOT edit ---------------------------
+# !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"""
+)
 
+# Imports for generated files.
+imports = (
+"""import os
+import sys
+
+ROOT = os.path.abspath (
+  os.path.join (
+    os.path.dirname (__file__), 
+    os.pardir
+  )
+)
+sys.path.append (ROOT)"""
+)
+
+# Useful for type hinting.
+from typing import List, Dict, Tuple
 
 class FileFormatError (OSError):
-    """
-    Raised when the specification file is formatted incorrectly.
+    """Raised when the specification file is formatted incorrectly.
     """
     def __init__ (
       self, 
-      lineNo,
-      expected,
-      actual):
-        """
-        Creates a FileFormatError for the given specification file.
+      lineNo   : int,
+      expected : str,
+      actual   : str
+    ) -> None:
+        """Creates a FileFormatError for the given specification file.
         
         Parameters
         ----------
@@ -60,11 +81,8 @@ class FileFormatError (OSError):
 
 
 class FileInfo:
-    """
-    A helper class used to store information from a file and read it
+    """A helper class used to store information from a file and read it
     iteratively.
-    
-    ...
     
     Attributes
     ----------
@@ -88,9 +106,11 @@ class FileInfo:
         When the given file does not exist.
     """
     
-    def __init__ (self, infoFileName):
-        """
-        Read all information from the file and store it in a list.
+    def __init__ (
+      self, 
+      infoFileName : str
+    ) -> None:
+        """Read all information from the file and store it in a list.
         
         Parameters
         ----------
@@ -105,9 +125,8 @@ class FileInfo:
         
         infoFile.close ()
         
-    def readLine (self):
-        """
-        Returns a new line of text from the file contents.
+    def readLine (self) -> str:
+        """Returns a new line of text from the file contents.
         
         If you want to read a previous line of text, just decrement the
         counter attribute.
@@ -133,9 +152,8 @@ class FileInfo:
         else:
             raise EOFError
     
-    def readList (self):
-        """
-        Returns a new line of tokens from the file contents.
+    def readList (self) -> List [str]:
+        """Returns a new line of tokens from the file contents.
         
         The tokens are strings within the line, separated by 
         whitespace.
@@ -144,7 +162,7 @@ class FileInfo:
         
         Returns
         -------
-        [str]
+        List [str]
             The next line of tokens.
         """
 
@@ -153,10 +171,10 @@ class FileInfo:
 
     def testInput (
       self,
-      expected,
-      actual):
-        """
-        Tests a given input from the file against its expectation.
+      expected : str,
+      actual   : str
+    ) -> None:
+        """Tests a given input from the file against its expectation.
     
         Parameters
         ----------
@@ -173,24 +191,24 @@ class FileInfo:
             
 
 def lex (
-  tokenSpecs, 
-  reserved,
-  inputFileName, 
-  outputFileName,
-  gccFileName):
-    """
-    Generates a PLY lexing script for a specified DSL.
+  reserved       : Dict [str, str],
+  tokenSpecs     : List [Tuple [str, str, bool, bool]], 
+  inputFileName  : str, 
+  outputFileName : str,
+  gccFileName    : str
+) -> None:
+    """Generates a PLY lexing script for a specified DSL.
     
     Parameters
     ----------
-    tokenSpecs     : [(str, str, bool, bool)]
+    reserved       : Dict [str, str]
+        A dictionary of reserved words, with their names as keys and 
+        their symbol as values.
+    tokenSpecs     : List [Tuple [str, str, bool, bool]]
         A list of tuples of form (token, spec, check, ignore), 
         specifying the token name, the regex of that token, whether 
         that token can contain a reserved word, and whether that token 
         should be ignored.
-    reserved       : dict
-        A dictionary of reserved words, with their names as keys and 
-        their symbol as values.
     inputFileName  : str
         The name of the file written in the DSL that you wish to lex.
     outputFileName : str
@@ -201,11 +219,12 @@ def lex (
         "_gcclex.py").
     """
     
-    lexFileName    = gccFileName    + "_gcclex.py"
-    lexOutFileName = outputFileName + "_outlex"
+    lexFileName    = "{}/{}_gcclex.py".format (genPath, gccFileName)
+    lexOutFileName = "{}/{}_outlex"   .format (outPath, outputFileName) 
     
     lexFile = open (lexFileName, 'w')
-    lexFile.write (disclaimer + "\n")
+    lexFile.write (disclaimer + "\n\n")
+    lexFile.write (imports    + "\n\n")
     
     # Import the lexer.
     lexFile.write ("import {}.ply.lex as lex\n".format (gccPath))
@@ -282,28 +301,39 @@ def lex (
 
 
 def yacc (
-  productions, 
-  inputFileName, 
-  outputFileName, 
-  gccFileName):
-    """
-    Generates a PLY parsing script for a specified DSL.
+  productions    : List [Tuple [
+    str, 
+    List [List [str]], 
+    str, 
+    List [int]
+  ]], 
+  inputFileName  : str, 
+  outputFileName : str, 
+  gccFileName    : str
+) -> None:
+    """Generates a PLY parsing script for a specified DSL.
     
     Parameters
     ----------
-    productions     : [(str, [[str]], str, [int])]
+    productions    : List [Tuple [str, 
+      List [List [str]], 
+      str, 
+      List [int]
+    ]]
         A list of tuples of form (non_terminal, symbolss, flag, order), 
         specifying the starting symbol, a list of possible productions
         of that symbol (where each production is a list of symbols in 
-        order), token name, the regex of that token, a string flag that
-        will be relevant to the semantic analyser (e.g. denoting an 
-        operator), and a list of the indexes (numbered from 1, 0
-        refers to the starting symbol) of each symbol you wish to be
-        preserved in the AST.
-        For example, in the production:
-        ("START", [["CARRY", "ON"], ["or", "end"]], "flag", [1, 2]),
-        the resulting AST will be:
-        ("flag", "CARRY", "ON") or ("flag", "or", "end").
+        order), a string flag that will be relevant to the semantic 
+        analyser (e.g. denoting an operator), and a list of the indexes 
+        of each symbol you wish to be preserved in the AST. Symbols at
+        the listed indexes are saved in the abstract syntax tree in the 
+        order they appear. 
+        For example:
+               0              1       2    3      
+          P EXPRESSION -> EXPRESSION plus TERM
+          F OPERATOR
+          I 2 1 3
+          ...results in an AST entry of (OPERATOR, plus, p [1], p [3]).
     inputFileName  : str
         The name of the file written in the DSL that you wish to parse.
     outputFileName : str
@@ -314,12 +344,13 @@ def yacc (
         "_gccyacc.py").
     """   
     
-    lexFileName     = gccFileName    + "_gcclex"
-    yaccFileName    = gccFileName    + "_gccyacc.py"
-    yaccOutFileName = outputFileName + "_outyacc"
+    lexFileName     = "{}.{}_gcclex"    .format (genPath, gccFileName)
+    yaccFileName    = "{}/{}_gccyacc.py".format (genPath, gccFileName)
+    yaccOutFileName = "{}/{}_outyacc"   .format (outPath, outputFileName)
     
     yaccFile = open (yaccFileName, 'w')
-    yaccFile.write (disclaimer + "\n")
+    yaccFile.write (disclaimer + "\n\n")
+    yaccFile.write (imports    + "\n\n")
     
     # Import the parser.
     yaccFile.write ("import {}.ply.yacc as yacc\n".format (gccPath))
@@ -418,30 +449,40 @@ def yacc (
     
     yaccFile.close ()
 
+
 def sem (
-  booleans, 
-  datatypes, 
-  operators, 
-  outputFileName,
-  gccFileName):
-    """
-    Generates a semantic analysis script for a specified DSL.
+  datatypes      : List [Tuple [str, str]], 
+  booleans       : Tuple [str, str, str, str],  
+  operators      : List [Tuple [
+    str, 
+    int, 
+    List [List [str]], 
+    str
+  ]], 
+  outputFileName : str,
+  gccFileName    : str
+) -> None:
+    """Generates a semantic analysis script for a specified DSL.
     
     The semantic analysis script calls the lexing and parsing scripts,
     so it can be run as a full compiler.
     
     Parameters
     ----------
-    booleans  : (str, str)
-        The string literals corresponding to the boolean values (True,
-        False) in the DSL.
-    datatypes : [(str, str, str)]
+    datatypes      : List [Tuple [str, str]]
         A list of accepted datatypes in the DSL of form (typeName, 
-        typeAlias, typeString), specifying the symbol of that datatype,
-        the flag used to denote its literals within the AST, and its
-        corresponding supported type string (only "BOOLEAN", "STRING",
-        or "NUMERIC" are accepted).
-    operators : [(str, int, [[str]], str)]
+        typeAlias), specifying the symbol of that datatype and the flag
+        used to denote its literals within the AST.
+    booleans       : Tuple [str, str, str, str]
+        A tuple corresponding to the boolean true and false literals, 
+        the name of the boolean datatype, and the boolean literal flag
+        used in the AST.
+    operators      : List [Tuple [
+      str, 
+      int, 
+      List [List [str]], 
+      str
+    ]]
         A list of accepted operators in the dsl of form (opSymbol, 
         numArgs, opTypess, opString), specifying the symbol of that 
         operator, the number of arguments it takes, a list of symbols
@@ -464,12 +505,13 @@ def sem (
         followed by "_gccsem.py").
     """
     
-    yaccFileName   = gccFileName    + "_gccyacc"
-    semFileName    = gccFileName    + "_gccsem.py"
-    semOutFileName = outputFileName + "_outsem.py"
+    yaccFileName   = "{}.{}_gccyacc"  .format (genPath, gccFileName)
+    semFileName    = "{}/{}_gccsem.py".format (genPath, gccFileName)
+    semOutFileName = "{}/{}_outsem.py".format (outPath, outputFileName)
     
     semFile = open (semFileName, 'w')
-    semFile.write (disclaimer + "\n")
+    semFile.write (disclaimer + "\n\n")
+    semFile.write (imports    + "\n\n")
     
     # Import the semantic analyser.
     semFile.write ("import {}.sem as sem\n".format (gccPath))
@@ -479,20 +521,11 @@ def sem (
     semFile.write ("from {} import ast\n".format (yaccFileName))
     semFile.write ("\n")
 
-    # Specify the user-given boolean variables.
-    # boolString = booleans = (\"{}\", \"{}\")\n"
-    boolString  = "booleans = (\"{}\", ".format (booleans [0])
-    boolString += "\"{}\")\n"           .format (booleans [1])
-    semFile.write (boolString)
-    semFile.write ("\n")
-        
     # Specify the user-given datatypes.
     dtsString = "datatypes = [\n"
     
-    for (typeName, typeAlias, typeString) in datatypes:
-        # dtString = "    (\"{}\", \"{}\", \"{}\"),\n"
+    for (typeName, typeAlias) in datatypes:
         dtString  = "    (\"{}\", ".format (typeName)
-        dtString += "\"{}\", "     .format (typeString)
         dtString += "\"{}\"),\n"   .format (typeAlias)
         
         dtsString += dtString
@@ -502,6 +535,30 @@ def sem (
     dtsString += "\n]\n\n"
     
     semFile.write (dtsString)
+
+    # Specify the user-given boolean variables.
+    trueVar     = "True"    
+    if (booleans [0] != "default"):
+        trueVar     = booleans [0]
+
+    falseVar    = "False"
+    if (booleans [1] != "default"):
+        falseVar    = booleans [1]
+
+    boolName    = "bool"
+    if (booleans [2] != "default"):
+        boolName    = booleans [2]
+
+    boolLiteral = ""
+    if (booleans [0] != "default"):
+        boolLiteral = booleans [3]
+    
+    boolString  = "booleans = (\"{}\", ".format (trueVar    )
+    boolString += "\"{}\","             .format (falseVar   )
+    boolString += "\"{}\","             .format (boolName   )
+    boolString += "\"{}\")\n\n"         .format (boolLiteral)
+    
+    semFile.write (boolString)
     
     # Specify the user-given operators.
     opsString = "operators = [\n"
@@ -545,7 +602,7 @@ def sem (
     semFile.write ("\n")
     
     # Output the pythonCode.
-    semFile.write ("outputFile = open (\"{}\", \"w\")\n".format (semOutFileName))
+    semFile.write ('outputFile = open ("{}", "w")\n'.format (semOutFileName))
     semFile.write ("outputFile.write (pythonCode)\n")
     semFile.write ("outputFile.close ()\n")
     semFile.write ("\n")
@@ -553,96 +610,168 @@ def sem (
     semFile.close ()
 
 
-def build (
-  infoFileName,
-  inputFileName,
-  gccFileName,
-  outFileName):
-    """
-    Reads a specification file and builds a set of compiling scripts
-    based on it.
-    
-    The generated scripts are for lexing, parsing, and semantic 
-    analysis.
+def readReserved (
+  fi : FileInfo
+) -> Dict [str, str]:
+    """Reads a specification file and builds a dictionary of reserved 
+    words.
     
     Parameters
     ----------
-    infoFileName  : str
-        The name of the DSL specification file.
-    inputFileName : str
-        The name of the file written in the DSL that the user wishes
-        to transpile to Python.
-    gccFileName   : str
-        The prefix of the names of the output compiling scripts (to be 
-        followed by "_gcclex.py", "_gccyacc.py", and "_gccsem.py"
-        respectively.
-    outFileName   : str
-        The prefix of the names of the output files of those scripts
-        (to be followed by "_outlex", "_outyacc", and "_outsem.py"
-        respectively.
+    fi            : FileInfo
+        The extracted information from the DSL specification file.
         
+    Returns
+    -------
+    Dict [str, str]
+        The dictionary of reserved words in the DSL.
+
     Raises
     ------
-    FileNotFoundError
-        When the specification file does not exist.
     FileFormatError
         When the specification file is formatted incorrectly.
+        
+    See Also
+    --------
+    lex
     """
     
-    fi          = FileInfo (infoFileName)
-    tokenSpecs  = []
-    reserved    = {}
-    productions = []
-    nextLine    = ""
-    nextList    = []
+    fi.testInput ("RESERVED", fi.readLine ())
     
-    # Specification document heading.
-    fi.testInput ("LANGUAGE SPECIFICATION DOCUMENT", fi.readLine ())
-    fi.testInput ("-", fi.readLine ())
+    reserved   = {}
+    nextList   = fi.readList ()
+    
+    while (nextList [0] [0] != "-"):
+    
+        if (len (nextList) != 3):
+            raise FileFormatError (
+              fi.counter,
+              "R ... ...",
+              " ".join (nextList)
+            )
         
-    # Read in tokens.  
+        fi.testInput ("R", nextList [0])
+            
+        name = nextList [1]
+        word = repr (nextList [2])
+        reserved.update ({name : word})
+
+        nextList = fi.readList ()
+    
+    return reserved
+
+
+def readTokens (
+  fi : FileInfo
+) -> List [Tuple [str, str, bool, bool]]:
+    """Reads a specification file and builds a list of tokens and their 
+    specifications.
+    
+    Parameters
+    ----------
+    fi            : FileInfo
+        The extracted information from the DSL specification file.
+
+    Returns
+    -------
+    List [Tuple [str, str, bool, bool]]
+        The list of tokens and specifications in the DSL.
+
+    Raises
+    ------
+    FileFormatError
+        When the specification file is formatted incorrectly.
+        
+    See Also
+    --------
+    lex
+    """
+     
     fi.testInput ("TOKENS", fi.readLine ())
     
-    nextList = fi.readList ()
+    tokenSpecs = []
+    nextList   = fi.readList ()
         
     while (nextList [0] [0] != "-"):
+    
         if (len (nextList) != 3):
             raise FileFormatError (
               fi.counter,
               "... ... ...",
               " ".join (nextList)
             )
-            
-        token  = nextList [1].strip ()
-        spec   = repr (nextList [2].strip ())
+        
+        header = nextList [0].upper ()    
+        token  = nextList [1]
+        regex  = repr (nextList [2])
         check  = False
         ignore = False
         
-        if (nextList [0].upper () == "R"):
-            reserved.update ({token : spec})
+        if (header == "C"):
+            check = True
+        elif (header == "I"):
+            ignore = True                       
         else:
-            if (nextList [0].upper () == "C"):
-                check = True
-            elif (nextList [0].upper () == "I"):
-                ignore = True                       
-            else:
-                fi.testInput ("T", nextList [0])
+            fi.testInput ("T", header)
         
-            tokenSpecs.append ((token, spec, check, ignore))
+        tokenSpecs.append ((token, regex, check, ignore))
             
         nextList = fi.readList ()
+    
+    return tokenSpecs
+    
+    
+def readProductions (
+  fi : FileInfo
+) -> List [Tuple [
+  str, 
+  List [List [str]], 
+  str, 
+  List [int]
+]]:
+    """Reads a specification file and builds a list of productions and 
+    production rules for an AST.
+    
+    Parameters
+    ----------
+    fi            : FileInfo
+        The extracted information from the DSL specification file.
 
-    lex (tokenSpecs, reserved, inputFileName, outFileName, gccFileName)
+    Returns
+    -------
+    List [Tuple [str, 
+      List [List [str]], 
+      str, 
+      List [int]
+    ]]
+        The list of production rules of the DSL.
         
-    # Read in CFG.
+    Raises
+    ------
+    FileFormatError
+        When the specification file is formatted incorrectly.
+        
+    See Also
+    --------
+    yacc        
+    """
+    
     fi.testInput ("PRODUCTIONS", fi.readLine ())
     
-    nextList = fi.readList ()
-         
+    productions = []
+    nextList    = fi.readList ()
+
     while (nextList [0] [0] != "-"):
+        if (len (nextList) < 3):
+            raise FileFormatError (
+              fi.counter,
+              "P ... -> (...)*",
+              " ".join (nextList)
+            )
+
         fi.testInput ("P", nextList [0])
         
-        terminal = nextList [1]
+        non_terminal = nextList [1]
         allProds = []
         nextProd = []
         
@@ -661,6 +790,7 @@ def build (
         fi.testInput ("F", nextList [0])
         
         flag = ""
+        
         try:
             flag = nextList [1]
         except IndexError:
@@ -674,54 +804,175 @@ def build (
         if (allProds == [[]]):
             indices.append (1)
             
-        productions.append ((terminal, allProds, flag, indices))
+        productions.append ((non_terminal, allProds, flag, indices))
     
         nextList = fi.readList ()
+        
+    return productions
 
-    yacc (productions, inputFileName, outFileName, gccFileName)
 
-    # Read in boolean literals.
-    fi.testInput ("BOOLEANS", fi.readLine ())
+def readDatatypes (
+  fi : FileInfo
+) -> Tuple [str, str]:
+    """Reads a specification file and builds a list of datatypes.
     
-    nextList = fi.readList ()
-    fi.testInput ("T", nextList [0])
-    trueVar = nextList [1]
+    Parameters
+    ----------
+    fi            : FileInfo
+        The extracted information from the DSL specification file.
     
-    nextList = fi.readList ()
-    fi.testInput ("F", nextList [0])
-    falseVar = nextList [1]
+    Returns
+    -------
+    Tuple [str, str]
+        The list of datatypes used in that DSL.
+
+    Raises
+    ------
+    FileFormatError
+        When the specification file is formatted incorrectly.
+
+    See Also
+    --------
+    sem        
+    """
     
-    booleans = (trueVar, falseVar)
-    
-    fi.testInput ("-", fi.readLine ())
-            
-    # Read in datatypes.
     fi.testInput ("DATATYPES", fi.readLine ())
+    
     datatypes = []
-    
     nextList  = fi.readList ()
-    
+
     while (nextList [0] [0] != "-"):
+        # Read in the type name.
         fi.testInput ("N", nextList [0])
         typeName = nextList [1]
-    
+        
+        # Read in the literal flag.
         nextList = fi.readList ()
         fi.testInput ("L", nextList [0])
         typeAlias = nextList [1]
             
-        nextList = fi.readList ()
-        fi.testInput ("T", nextList [0])
-        typeString = nextList [1]
-        
-        datatypes.append ((typeName, typeAlias, typeString))
+        datatypes.append ((typeName, typeAlias))
         
         nextList  = fi.readList ()
+        
+    return datatypes   
+
+
+def readBooleans (
+  fi : FileInfo
+) -> Tuple [str, str, str, str]:
+    """Reads a specification file to determine boolean specifications.
     
-    # Read in operators.
-    fi.testInput ("OPERATORS", fi.readLine ())
-    operators = []
+    Parameters
+    ----------
+    fi            : FileInfo
+        The extracted information from the DSL specification file.
+
+    Return
+    ------
+    Tuple [str, str, str, str]
+        The boolean specifications of the DSL.
+
+    Raises
+    ------
+    FileFormatError
+        When the specification file is formatted incorrectly.
+
+    See Also
+    --------
+    sem                
+    """
     
+    fi.testInput ("BOOLEANS", fi.readLine ())    
+
+    # Read in the true literal.
     nextList = fi.readList ()
+    if (len (nextList) < 2):
+        raise FileFormatError (
+          fi.counter,
+          "T ... ",
+          " ".join (nextList)
+        )
+    fi.testInput ("T", nextList [0])
+    trueVar     = nextList [1]
+
+    # Read in the false literal.
+    nextList = fi.readList ()
+    if (len (nextList) < 2):
+        raise FileFormatError (
+          fi.counter,
+          "F ... ",
+          " ".join (nextList)
+        )
+    fi.testInput ("F", nextList [0])
+    falseVar    = nextList [1]
+
+    # Read in the boolean datatype name.
+    nextList = fi.readList ()        
+    if (len (nextList) < 2):
+        raise FileFormatError (
+          fi.counter,
+          "N ... ",
+          " ".join (nextList)
+        )
+    fi.testInput ("n", nextList [0])
+    boolName    = nextList [1]
+
+    # Read in the boolean literal flag.
+    nextList = fi.readList ()        
+    if (len (nextList) < 2):
+        raise FileFormatError (
+          fi.counter,
+          "L ... ",
+          " ".join (nextList)
+        )
+    fi.testInput ("L", nextList [0])
+    boolLiteral = nextList [1]
+    
+    fi.testInput ("-", fi.readLine ())    
+    return (trueVar, falseVar, boolName, boolLiteral)
+    
+    
+def readOperators (
+  fi : FileInfo
+) -> List [Tuple [
+  str, 
+  int, 
+  List [List [str]], 
+  str
+]]:
+    """Reads a specification file to determine operators and their 
+    execution instructions.
+    
+    Parameters
+    ----------
+    fi            : FileInfo
+        The extracted information from the DSL specification file.
+
+    Return
+    ------
+    List [Tuple [
+      str, 
+      int, 
+      List [List [str]], 
+      str
+    ]]
+        The operators and their execution instructions of the DSL.
+
+    Raises
+    ------
+    FileFormatError
+        When the specification file is formatted incorrectly.
+
+    See Also
+    --------
+    sem                
+    """
+    
+    fi.testInput ("OPERATORS", fi.readLine ())
+    
+    operators = []
+    nextList  = fi.readList ()
 
     while (nextList [0] [0] != "-"):
         # Read in operator symbol.
@@ -759,11 +1010,69 @@ def build (
                
         nextList = fi.readList ()
         
-    sem (booleans, datatypes, operators, outFileName, gccFileName)
+    return operators
 
-def main ():
+
+def build (
+  infoFileName  : str,
+  inputFileName : str,
+  gccFileName   : str,
+  outFileName   : str
+) -> None:
+    """Reads a specification file and builds a set of compiling scripts
+    based on it.
+    
+    The generated scripts are for lexing, parsing, and semantic 
+    analysis.
+    
+    Parameters
+    ----------
+    infoFileName  : str
+        The name of the DSL specification file.
+    inputFileName : str
+        The name of the file written in the DSL that the user wishes
+        to transpile to Python.
+    gccFileName   : str
+        The prefix of the names of the output compiling scripts (to be 
+        followed by "_gcclex.py", "_gccyacc.py", and "_gccsem.py"
+        respectively.
+    outFileName   : str
+        The prefix of the names of the output files of those scripts
+        (to be followed by "_outlex", "_outyacc", and "_outsem.py"
+        respectively.
+        
+    Raises
+    ------
+    FileNotFoundError
+        When the specification file does not exist.
+    FileFormatError
+        When the specification file is formatted incorrectly.
     """
-    Prompts the user for the names of input and output files they want
+    
+    fi          = FileInfo (infoFileName)
+    
+    # Specification document heading.
+    fi.testInput ("LANGUAGE SPECIFICATION DOCUMENT", fi.readLine ())
+    fi.testInput ("-", fi.readLine ())
+    
+    # Read lexer specifications.
+    reserved    = readReserved    (fi)    
+    tokens      = readTokens      (fi)
+    lex (reserved, tokens, inputFileName, outFileName, gccFileName)
+    
+    # Read parser specifications.
+    productions = readProductions (fi)    
+    yacc (productions, inputFileName, outFileName, gccFileName)
+    
+    # Read sematic analyser specifications.
+    datatypes   = readDatatypes   (fi)
+    booleans    = readBooleans    (fi)
+    operators   = readOperators   (fi)
+    sem (datatypes, booleans, operators, outFileName, gccFileName)
+
+
+def main () -> None:
+    """Prompts the user for the names of input and output files they want
     to build a compiler matching.
     
     If the input given is blank, default file names are used instead.
@@ -806,7 +1115,10 @@ def main ():
             outputFileName = prompt
         
     build (infoFileName, inputFileName, gccFileName, outputFileName)
-    return SUCCESS
     
 if (__name__ == "__main__"):
     main ()
+
+
+
+

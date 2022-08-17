@@ -1,6 +1,5 @@
 """ Creates the Kitchen CLI"""
 # kitchen/cli.py
-from sre_constants import SUCCESS
 import typer
 from pathlib import Path
 from typing import Optional

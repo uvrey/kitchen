@@ -46,13 +46,37 @@ class Specification:
         self.cfg = cfg
 
         # associate spec regex with token types
-        self._populate_matches()
+        self.read_to_spec()
 
-    def _populate_matches(self):
-        # get these tokens from here
-        for t in self.cfg.terminals:
-            if t != "$" and t != "#":
-                self.token_spec[t] = r'[a-z][a-z]*'
+    def read_to_spec(self):
+        contents = self.spec_contents.split("\n")
+        read_toks = False
+        for line in contents:
+            if len(line) > 0 and line.strip()[0] != "#":
+                if line == "Tokens:":
+                    read_toks = True
+                else:
+                    if read_toks:
+                        if line.strip() == "---":
+                            return
+                        else:
+                            self._process_regex_spec(line)
+    
+    def _process_regex_spec(self, line):
+        split = line.split(" ")
+        cleaned_specs = _clean_inp_stream(split)
+        typer.echo(cleaned_specs)
+        try:
+            t = cleaned_specs[1]
+            regex = cleaned_specs[2]
+            # add regex for each terminal
+            if t in self.cfg.terminals:
+                self.token_spec[t] = regex
+            else:
+                display_helper.info_secho("Note: " + t + " is defined in specificiation but does not appear in CFG.")
+        except:
+            display_helper.fail_secho("Some error with regex spec file occurred.")
+            return
 
     def show_contents(self):
         display_helper.structure_secho(self.spec_contents)
@@ -69,7 +93,6 @@ class Specification:
         for c in cleaned_stream:
             tokens.append(self._match(c))
         
-        # TODO notify here
         if len(tokens) != len(cleaned_stream):
             display_helper.fail_secho("Could not match all tokens.")
             return None
