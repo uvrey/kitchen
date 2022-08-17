@@ -29,13 +29,19 @@ def get_spec(cfg):
     else:
         return None
     
+def _clean_inp_stream(inps):
+    cleaned = []
+    for i in inps:
+        cleaned.append(i.strip())
+    return cleaned
+
 class Specification:
     def __init__(self, spec_path, cfg):
         # TODO read in as yaml
         # store token/ regex sequences etc. 
         self.path = spec_path
         self.spec_contents = spec_path.read_text()
-        self.match_token = {}
+        self.token_spec = {}
         self.cfg = cfg
 
     def _populate_matches(self):
@@ -43,3 +49,11 @@ class Specification:
 
     def show_contents(self):
         display_helper.structure_secho(self.spec_contents)
+
+    def get_tokens_from_input(self, inp):
+        tokens = []
+        inp_stream = inp.strip().split(" ")
+        cleaned_stream = _clean_inp_stream(inp_stream)
+        # TODO match tokens to regex here
+        return []
+
