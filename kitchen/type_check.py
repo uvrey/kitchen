@@ -59,6 +59,7 @@ generate tree PNG for export
 update menu
 PT table spacing on large outputs
 notify about LL(1) grammar ambiguity from parse table stage.
+Neaten up cli_helper parsing code
 """ 
 
 """

@@ -38,17 +38,6 @@ def get_cfg_path(config_file: Path) -> Path:
     config_parser.read(config_file)
     return Path(config_parser["General"]["cfg_path"])
 
-
-def get_spec_path(config_file: Path) -> Path:
-    """Obtains the path to the currently-loaded language specification file
-
-    Returns:
-        Path: Path to the CFG file.
-    """    
-    config_parser = configparser.ConfigParser()
-    config_parser.read(config_file)
-    return Path(config_parser["General"]["spec_path"])
-
 def get_prods(cfg_contents) -> list:
     """Obtains a list of productions given the contents of a CFG.
 
@@ -515,8 +504,6 @@ class ContextFreeGrammar:
         for fc in self.follow_set.keys():
             tmp_c[fc] = False
         return tmp_c
-
-
 
     def clean_follow_set(self, start, pstack) -> None:
         """Cleans the follow set after the calculation: Replaces non-terminals with their respective follow sets and removes epsilon elements. 

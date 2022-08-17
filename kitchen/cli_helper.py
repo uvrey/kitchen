@@ -196,7 +196,7 @@ def _show_parsetable(cfg) -> None:
         cfg.parsetable.print_parse_table()
     return code
 
-def handle_input(inp, cfg) -> None:
+def handle_input(inp, cfg, spec) -> None:
     """Handles user input by performing commands or otherwise parsing using the default method, LL(1)
 
     Args:
@@ -204,13 +204,13 @@ def handle_input(inp, cfg) -> None:
       cfg (ContextFreeGrammar): ContextFreeGrammar Object based on loaded CFG.     
     """    
     if inp.strip()[0] == "\\":
-        _process_command(inp, cfg)
+        _process_command(inp, cfg, spec)
     else:
-        code = _init_parsing_ll1(inp.strip(), cfg)
+        code = _init_parsing_ll1(inp.strip(), cfg, spec)
         if code == AMBIGUOUS_ERROR:
             error.ERR_ambiguous_grammar()
 
-def _init_parsing_ll1_via_cmd(inp, cfg) -> int:
+def _init_parsing_ll1_via_cmd(inp, cfg, spec) -> int:
     """Initialises LL(1) parsing via the command \\ll1 <input>
 
     Args:
@@ -221,18 +221,26 @@ def _init_parsing_ll1_via_cmd(inp, cfg) -> int:
         int: _description_
     """    
     config = inp.strip()[4:7].strip()
+    # parse \ll1 \v <input>
     if config == "\\v":
         to_parse = inp.strip()[7:].strip()
         if to_parse == "":
             error.ERR_no_input_given()
         else:
-           # kitchen.generate_parse_ll1(to_parse)
-           pass
+            if to_parse == "":
+                error.ERR_no_input_given()
+            else:
+                config.configure_output_file_name(config.LL1_PARSING, to_parse)
+                with m.tempconfig(config.OUTPUT_CONFIG):
+                    animation = anim.ManimParseTree()
+                    animation.setup_manim(to_parse, cfg)
+                    animation.render()       
     else:
+        # parse \ll1 <input>
         _init_parsing_ll1(inp[4:].strip(), cfg)
     return SUCCESS
 
-def _init_parsing_ll1(inp, cfg) -> int:
+def _init_parsing_ll1(inp, cfg, spec) -> int:
     """Initialise parsing using LL(1) by associating the CFG with its own LL(1) Parser object.
 
     Args:
@@ -289,7 +297,7 @@ def _prepare_to_parse(cfg):
         else:
             return AMBIGUOUS_ERROR
 
-def _init_parsing_vis_shortcut(inp, cfg) -> int:
+def _init_parsing_vis_shortcut(inp, cfg, spec) -> int:
     """Initialises the visualisation of LL(1) parsing on some input, via the app shortcut '\\v <input>'.
 
     Args:
@@ -310,7 +318,7 @@ Returns:
             animation.render()       
     return SUCCESS
 
-def _process_command(inp, cfg) -> None:
+def _process_command(inp, cfg, spec) -> None:
     """Helper function to process a command from the user.
 
     Args:
@@ -401,6 +409,12 @@ def _process_command(inp, cfg) -> None:
     elif inp == "\\show cfg" or inp == "\\cfg":
         cfg.show_contents()
 
+    elif inp == "\\show spec" or inp == "\\spec":
+        if spec != None:
+            spec.show_contents()
+        else:
+            display_helper.fail_secho("No specification provided.")
+
     elif inp.strip()[0:2] == "\\c":
         config.edit_config(inp.strip()[2:].strip())
 
@@ -409,14 +423,14 @@ def _process_command(inp, cfg) -> None:
         if code == AMBIGUOUS_ERROR:
             error.ERR_ambiguous_grammar()
         else:
-            _init_parsing_ll1_via_cmd(inp, cfg)
+            _init_parsing_ll1_via_cmd(inp, cfg, spec)
 
     elif inp[0:2] == "\\v":
         code = _prepare_to_parse(cfg)
         if code == AMBIGUOUS_ERROR:
             error.ERR_ambiguous_grammar()
         else:
-            _init_parsing_vis_shortcut(inp, cfg)
+            _init_parsing_vis_shortcut(inp, cfg, spec)
     
     else:
         display_helper.fail_secho('Invalid command')

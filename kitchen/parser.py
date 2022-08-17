@@ -22,21 +22,24 @@ def init_input(self, inp) -> int:
         self.tokens = _get_tokens_from_input(inp)
     return SUCCESS
 
-def _get_tokens_from_input(inp) -> list:
+
+# TODO read the spec file and match
+def _get_tokens_from_input(inp, spec = None) -> list:
     """Obtains the token stream of an input string. 
     Args:
         inp (str): Input string
     Returns:
         list: Token stream
     """    
+    # TODO 
     return list(filter(None, inp.split(" ")))
 
-
 class ParserLL1:
-    def __init__(self, inp, cfg):
+    def __init__(self, inp, cfg, spec = None):
         init_input(self, inp)
         self.cfg = cfg
         self.pt_dict = cfg.parsetable.pt_dict
+        self.spec = spec
 
     def check_for_epsilons(self):
         # look for any epsilons that came before and add. 

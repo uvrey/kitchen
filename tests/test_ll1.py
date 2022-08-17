@@ -17,7 +17,6 @@ def sample_path():
 def ll1_out_path():
     return ".\\samples\\expected_ll1\\"
 
-
 """ Test calculation of first sets on existing CFG files """
 @pytest.mark.parametrize("sample_cfg, input_str", [
     ("cfg.txt", "c"),

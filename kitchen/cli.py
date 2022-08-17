@@ -16,6 +16,7 @@ from kitchen import (
      display_helper,
      sounds,
      ERROR,
+     lang_spec,
      config)
 
 app = typer.Typer()
@@ -120,11 +121,14 @@ def run() -> None:
     config.init_config()
 
     display_helper.print_welcome()
+
     cfg = get_cfg()
+    spec = lang_spec.get_spec(cfg)
+
     display_helper.success_secho("CFG loaded successfully.")
     while (True):
         input = typer.prompt("Input")
-        cli_helper.handle_input(input, cfg)
+        cli_helper.handle_input(input, cfg, spec)
 
 @app.command(name="show-cfg")
 def show_cfg() -> None:
@@ -140,7 +144,6 @@ def find_fs() -> None:
     cfg = get_cfg()
     _check_cfg(cfg)
     cfg.show_first_set_testing()
-
 
 @app.command(name = "test-fw")
 def find_fw() -> None:
@@ -189,7 +192,6 @@ def find_ll1(
     else:
         typer.echo("problem setting up parser")
     return SUCCESS
-
 
 @app.callback()
 def main(
