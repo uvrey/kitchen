@@ -81,7 +81,6 @@ class ParserLL1:
 
             top = self.stack[-1]
             next = tokens[0]
-            display_helper.info_secho(self.stack)
 
             if re.match(RE_TERMINAL, top) or top == "$":
                 if top == next:
