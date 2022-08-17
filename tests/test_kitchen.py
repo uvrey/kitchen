@@ -21,9 +21,9 @@ def sample_path():
 """ Test initialisation and loading of CFGs """
 @pytest.mark.parametrize("sample, out", [
     ("cfg.txt", ""),
-    ("cfg_101010.txt", "Loading files failed with \"file does not exist\""),
+    ("cfg_101010.txt", "Loading the CFG file failed with \"file does not exist\""),
     ("cfg_2.txt", ""),
-    ("cfgXT.txt", "Loading files failed with \"file does not exist\""),
+    ("cfgXT.txt", "Loading the CFG file failed with \"file does not exist\""),
     ("cfg_4.txt", ""),
 ])
 
