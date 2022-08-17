@@ -1291,7 +1291,7 @@ class ManimParseTree(m.Scene):
         )
 
 # Parse LL(1) in the CLI
-    def vis_parse_ll1(self, tokens):
+    def vis_parse_ll1(self, input, tokens):
         global V_LABELS
         global VCONFIG
         global m
@@ -1321,6 +1321,7 @@ class ManimParseTree(m.Scene):
         keys = get_manim_cfg_group(self).to_edge(m.DOWN)
 
         # create the input group here
+        # BUG inputs could have the same names as each other
         m_tok = {}
         m_tok_gp = m.VGroup()
         m_tok_gp.add(m.Tex("Token stream: ")).scale(0.7)
@@ -1328,11 +1329,11 @@ class ManimParseTree(m.Scene):
             try:
                 tex = m.MathTex("\\text{"+t.value+"}")
                 m_tok_gp.add(tex)
-                m_tok[t.value] = tex
+                m_tok[t.type] = tex
             except:
                 tex = m.MathTex("\\text{"+t+"}")
                 m_tok_gp.add(tex)
-                m_tok[t] = tex
+                m_tok[t.type] = tex
         m_tok_gp.arrange(m.RIGHT)
 
         # show the parsing table
@@ -1488,8 +1489,7 @@ class ManimParseTree(m.Scene):
                     self.play(m.ApplyWave(m_tok_gp))
                     self.play(
                         m.LaggedStart(m.Indicate(m_tok[next], color=self.tok_cols[lang_spec.get_index_by_token_type(original_tokens, next)], scale_factor=1.5),
-                                    m.FadeToColor(
-                            m_tok[next], self.tok_cols[lang_spec.get_index_by_token_type(original_tokens, next)])),
+                                   m.FadeToColor(m_tok[next], color=self.tok_cols[lang_spec.get_index_by_token_type(original_tokens, next)])),
                     )
 
                 else:
