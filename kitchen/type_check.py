@@ -17,32 +17,26 @@ class SymbolTable:
     def traverse_tree(self):
         pass
 
+"""
+DONE
+investigate fstack weirdness :)
+get BLA working on current test cases (ll(1) subsets should work) :)
+warn when they are ambiguous :)
+"""
 
 """
 TODO - DEVELOPMENT
 match raw input with regex expressions
 get regex spec from app/ with simon's help
 
-investigate fstack weirdness :)
-
-get BLA working on current test cases (ll(1) subsets should work)
 get PT test cases written
-Fix manim parsing by adding improved algorithm  
 
 MANIM
 check epsilon bug in LL(1) parsing video
 long names look weird in parsing vids
+Fix manim parsing by adding improved algorithm  
 
 GRAMMARS
-warn when they are ambiguous
-extension: detect LR recursion etc
- Valid LL(1) Grammars
-
-For any production S -> A | B, it must be the case that:
-
-    For no terminal t could A and B derive strings beginning with t
-    At most one of A and B can derive the empty string
-    if B can derive the empty string, then A does not derive any string beginning with a terminal in Follow(A)
 
 SEMANTIC ANALYSIS
 based on BLA, with help from the assignment
@@ -67,7 +61,6 @@ PT table spacing on large outputs
 notify about LL(1) grammar ambiguity from parse table stage.
 """ 
 
-
 """
 TODO - ADMIN
 complete documentation
@@ -83,17 +76,25 @@ USER TESTING
 - conduct tests
 """ 
 
-""" 
+""" *********************************************************
 EXTENSIONS
 - lecturer-supplied audio
 - LALR/ shift reduce/ recursive descent parsing
 - proof of accuracy - algorithm analysis
 - Reload CFGs within the app
+- extension: detect LR recursion etc
 """
 
 """ 
-FEATURES
+NOTES
+Valid LL(1) Grammars
 
+For any production S -> A | B, it must be the case that:
+
+    For no terminal t could A and B derive strings beginning with t
+    At most one of A and B can derive the empty string
+    if B can derive the empty string, then A does not derive any 
+    string beginning with a terminal in Follow(A)
 """
 
 """ 
