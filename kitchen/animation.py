@@ -38,8 +38,6 @@ GRID_ITEM_SCALE = 0.4
 # set global configs
 m.config.include_sound = True
 
-
-
 def _get_title_mobject(title):
     return m.Tex(title, tex_template=m.TexFontTemplates.french_cursive)
 
@@ -103,8 +101,7 @@ def _get_tokens_from_input(inp, spec = None) -> list:
         display_helper.info_secho("Note:\tNo language specification has been provided, so the given \n\tinput will be interpreted as tokens directly.")
         return list(filter(None, inp.split(" ")))
 
-
-    # Helper function to put a message on the screen
+# Helper function to put a message on the screen
 def notify(self, message, next_to_this):
     # returns a keys group, which is the cfg representation
     msg_text = m.Text(message, color=config.opp_col(), weight=m.BOLD).scale(0.5).next_to(
@@ -297,7 +294,6 @@ class ManimFirstSet(m.Scene):
     def construct(self):
         sounds.narrate("Let's find the first set!", self)
         display_helper.info_secho("Visualising the First Set:")
-
 
         # set title and scaling here since the function is recursive
         fs_title = _get_title_mobject("first set calculation") 
@@ -1135,7 +1131,6 @@ def map_token_lists(self, lhs, rhs):
     map_group.arrange(m.DOWN, aligned_edge = m.LEFT)
     return map_group
 
-
  # TODO: MAKE TOKENS AS OBJECTS WHEN NO INP SPEC PROVIDED!   
 class ManimParseTree(m.Scene):
     # Parse LL(1) in the CLI
@@ -1159,10 +1154,8 @@ class ManimParseTree(m.Scene):
         self.nts = sorted(cfg.nonterminals)
         self.ts = sorted(cfg.terminals)
 
-
     def construct(self):
-        self.intro()
-        #self.vis_parse_ll1(self.inp, self.tokens)
+        self.vis_parse_ll1(self.inp, self.tokens)
     
     def tear_down(self):
         self.mtable = None
@@ -1298,7 +1291,7 @@ class ManimParseTree(m.Scene):
         )
 
 # Parse LL(1) in the CLI
-    def vis_parse_ll1(self, input, tokens):
+    def vis_parse_ll1(self, tokens):
         global V_LABELS
         global VCONFIG
         global m
@@ -1320,6 +1313,7 @@ class ManimParseTree(m.Scene):
 
         # initialise a way to track the parent nodes
         self.parents = []
+        self.intro()
 
         # draw LL(1) representation title
         ll1_title = _get_title_mobject("LL(1) parsing")
@@ -1331,9 +1325,14 @@ class ManimParseTree(m.Scene):
         m_tok_gp = m.VGroup()
         m_tok_gp.add(m.Tex("Token stream: ")).scale(0.7)
         for t in tokens:
-            tex = m.MathTex("\\text{"+t+"}")
-            m_tok_gp.add(tex)
-            m_tok[t] = tex
+            try:
+                tex = m.MathTex("\\text{"+t.value+"}")
+                m_tok_gp.add(tex)
+                m_tok[t.value] = tex
+            except:
+                tex = m.MathTex("\\text{"+t+"}")
+                m_tok_gp.add(tex)
+                m_tok[t] = tex
         m_tok_gp.arrange(m.RIGHT)
 
         # show the parsing table
@@ -1370,14 +1369,17 @@ class ManimParseTree(m.Scene):
                 return
 
             top = self.s.stack[-1]
-            next = tokens[0]
+            try:
+                next = tokens[0].type
+            except:
+                next = tokens[0]
 
             # draw initial node if top is start symbol
             if re.match(RE_TERMINAL, top) or top == "$":
 
                 if top == next:
                     anims = []
-                    tokens.remove(next)
+                    tokens = tokens[1:]
 
                     sounds.narrate("The next token " + next + " matches the top of the stack!", self)
                     self.wait()
@@ -1454,13 +1456,13 @@ class ManimParseTree(m.Scene):
                             # confirm the path by adding the colour
                             rendered_label = m.MathTex(
                                 _to_math_tex(top), color = m.BLACK)
-                            new_vertex.fade_to(self.tok_cols[original_tokens.index(top)], 1)
+                            new_vertex.fade_to(self.tok_cols[lang_spec.get_index_by_token_type(original_tokens, top)], 1)
                             rendered_label.move_to(new_vertex.get_center())
                             new_vertex.add(rendered_label)
                             
                             sounds.add_sound_to_scene(self, sounds.CLICK)
                             self.play(
-                                m.Circumscribe(new_vertex, color=self.tok_cols[original_tokens.index(top)], shape = m.Circle),
+                                m.Circumscribe(new_vertex, color=self.tok_cols[lang_spec.get_index_by_token_type(original_tokens, top)], shape = m.Circle),
                             )
                             try:
                                 edge = g.edges[(parent_vertex_id, vertex_id)]
@@ -1473,7 +1475,7 @@ class ManimParseTree(m.Scene):
                             
                             new_vertex = create_vertex(
                                 g, vertex_id, parent_vertex_id, vertex_id.split("_")[
-                                    1].strip(), color=self.tok_cols[original_tokens.index(next)])
+                                    1].strip(), color=self.tok_cols[lang_spec.get_index_by_token_type(original_tokens, next)])
                             reset_g(self, g, start_symbol)
 
                         # pop off the stack and 'flash'
@@ -1485,9 +1487,9 @@ class ManimParseTree(m.Scene):
                     sounds.add_sound_to_scene(sounds.YAY, self)
                     self.play(m.ApplyWave(m_tok_gp))
                     self.play(
-                        m.LaggedStart(m.Indicate(m_tok[next], color=self.tok_cols[original_tokens.index(next)], scale_factor=1.5),
+                        m.LaggedStart(m.Indicate(m_tok[next], color=self.tok_cols[lang_spec.get_index_by_token_type(original_tokens, next)], scale_factor=1.5),
                                     m.FadeToColor(
-                            m_tok[next], self.tok_cols[original_tokens.index(next)])),
+                            m_tok[next], self.tok_cols[lang_spec.get_index_by_token_type(original_tokens, next)])),
                     )
 
                 else:
@@ -1633,10 +1635,10 @@ class ManimParseTree(m.Scene):
         reset_g(self, g, start_symbol, anim=[m.FadeOut(self.s.mstack)])
 
         sounds.add_sound_to_scene(self, sounds.YAY)
-        _play_msg_with_other(self, ["Successfully parsed `" + " ".join(original_tokens) +
+        _play_msg_with_other(self, ["Successfully parsed `" + lang_spec.get_token_types(original_tokens) +
                                 "'!"], raw_msg= "Parsing successful! That was a valid input.")
 
-        display_helper.success_secho("Successfully parsed '" + " ".join(original_tokens) +
+        display_helper.success_secho("Successfully parsed '" + lang_spec.get_token_types(original_tokens) +
                               "'!\nParse tree:")
         display_helper.print_parsetree(self.root)
         return SUCCESS

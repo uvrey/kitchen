@@ -32,6 +32,8 @@ TODO - DEVELOPMENT
 
 get PT test cases written
 
+TESTING
+pass the funnt things
 MANIM
 check epsilon bug in LL(1) parsing video
 long names look weird in parsing vids

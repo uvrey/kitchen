@@ -122,7 +122,15 @@ class Specification:
             return None
         return tokens
 
+def get_index_by_token_type(tokens, t):
+    typer.echo("we want " + t + " in " + get_token_types(tokens))
 
+    for i, t in enumerate(tokens, start = 0):
+        try:
+            if tokens.type == t:
+                return i
+        except:
+            return tokens.index(t)
 
 def get_token_types(toks, as_list = False):
     """Creates list of token types or returns the list itself if it is empty
