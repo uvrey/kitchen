@@ -136,7 +136,6 @@ class ParserLL1:
                     error.ERR_parsing_error(self.root,
                         "Unexpected token [" + top + "]")
                     return PARSING_ERROR
-
             elif re.match(RE_NONTERMINAL, top):
                 try:
                     pt_entry = self.pt_dict[top][next]
@@ -175,7 +174,7 @@ class ParserLL1:
                     for t in nodes_to_append:
                         self.parents.append(t)
 
-                except KeyError:
+                except:
                     error.ERR_parsing_error(self.root,
                         "ParseTable[" + top + ", " + next + "] is empty.")
                     return PARSING_ERROR

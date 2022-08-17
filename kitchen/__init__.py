@@ -45,8 +45,9 @@ COLOURS = [m.BLUE_A, m.TEAL_B, m.GREEN_B, m.YELLOW_B, m.GOLD_B,
     INPUT_TOO_LONG,
     ERROR,
     PARSING_ERROR,
-    SOUND_ERROR
-) = range(16)
+    SOUND_ERROR,
+    AMBIGUOUS_ERROR,
+) = range(17)
 
 ERRORS = {
     DIR_ERROR: "config directory error",

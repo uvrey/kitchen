@@ -136,6 +136,7 @@ class ContextFreeGrammar:
         self._cfg_path = cfg_path
         self.cfg_contents = cfg_path.read_text()
         self.prods = get_prods(self.cfg_contents)
+        self.is_ambiguous = False
 
         # initialise the stuctures of the cfg
         if self.prods != None:
@@ -313,6 +314,9 @@ class ContextFreeGrammar:
                                     self.firstset_index[ps].append(
                                         self.fstack[j])
                                     self.first_set[ps].append(current_item)
+                                else:
+                                    self.is_ambiguous = True
+                                    
                             # reset the fstack
                             self.fstack.pop()
                             break
@@ -351,6 +355,8 @@ class ContextFreeGrammar:
                         if first_terminal[0] not in self.first_set[ps]:
                             self.firstset_index[ps].append(self.fstack[j])
                             self.first_set[ps].append(first_terminal[0]) 
+                        else:
+                            self.is_ambiguous = True
 
                     # TODO unpack why fstack works like this for bla but not all others    
                     # for p in range(len(pstack)):

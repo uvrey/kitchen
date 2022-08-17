@@ -88,6 +88,7 @@ EXTENSIONS
 - lecturer-supplied audio
 - LALR/ shift reduce/ recursive descent parsing
 - proof of accuracy - algorithm analysis
+- Reload CFGs within the app
 """
 
 """ 

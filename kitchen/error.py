@@ -72,6 +72,9 @@ def ERR_no_input_given():
     err = typer.style("Error:", fg=typer.colors.WHITE, bg=typer.colors.RED)
     typer.echo(err + " No input provided.")
 
+def ERR_ambiguous_grammar():
+    err = typer.style("Error:", fg=typer.colors.WHITE, bg=typer.colors.RED)
+    typer.echo(err + "\t The provided grammar contains ambiguity. \n\t This means that for some production S -> A | B, the same terminal t may be derived by A and B.\n\t From this, we can't generate an LL(1) parsing table/ apply LL(1) parsing to it.")
 
 def ERR_manim_parsing_error(scene, msg=[], raw_msg = ""):
     err_msg = m.Tex("Parsing Error", color = m.RED)

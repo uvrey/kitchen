@@ -1,11 +1,12 @@
-from optparse import AmbiguousOptionError
+
 import typer
 import manim as m
 import re
 from kitchen import (
     RE_TERMINAL,
     display_helper,
-    error
+    error,
+    RE_PRODUCTION,
 )
 
 class ParsingTable:
@@ -81,6 +82,18 @@ class ParsingTable:
         """        
         return self.ts.index(t) + 1
 
+    # def _check_for_ambiguity(self):
+    #     for key in self.cfg_dict.keys():
+    #         if len(self.cfg_dict[key]) > 1:
+    #             self._check_fs(self.cfg_dict[key])
+    #     return False
+    
+    # def _check_fs(self, p_nt):
+    #     first_set = []
+    #     for p in p_nt:
+    #         p_nt = list(filter(None, re.findall(RE_PRODUCTION, p)))
+    #         display_helper.success_secho("Sending this to fs")
+    #         typer.echo(p_nt)      
 
 # Find First(α) and for each terminal in First(α), make entry A –> α in the table.
 # If First(α) contains ε (epsilon) as terminal than, find the Follow(A) and for each terminal in Follow(A), make entry A –> α in the table.
@@ -91,6 +104,7 @@ class ParsingTable:
 
         # ambiguous = self._check_for_ambiguity()
         # if ambiguous:
+        #     display_helper.fail_secho("grammar is ambiguous")
         #     return
 
         for i, key in enumerate(self.first_set.keys(), start=0):

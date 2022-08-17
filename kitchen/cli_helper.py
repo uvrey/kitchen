@@ -22,6 +22,7 @@ from kitchen import (
     FILE_LOADING_EXISTS_ERROR, 
     FILE_LOADING_NONE_ERROR, 
     FILE_LOADING_DIR_ERROR, 
+    AMBIGUOUS_ERROR,
     SUCCESS, 
     __app_name__,
     display_helper,
@@ -148,12 +149,16 @@ def _set_parsetable(cfg) -> int:
         if not cfg.follow_set_calculated:
             cfg.reset_follow_set()
 
-        # initialise parsetable
-        cfg.setup_parsetable()
+        if not cfg.is_ambiguous:
+            # initialise parsetable
+            cfg.setup_parsetable()
 
-        # calculate parsetable
-        code = cfg.calculate_parsetable()
+            # calculate parsetable
+            code = cfg.calculate_parsetable()
+        else:
+            code = AMBIGUOUS_ERROR
         return code
+    return SUCCESS
     
 def _show_parsetable(cfg) -> None:
     """Displays the calculated parse table. 
@@ -161,8 +166,10 @@ def _show_parsetable(cfg) -> None:
     Args:
         cfg (ContextFreeGrammar): CFG for which the parse table is to be calculated.
     """    
-    _set_parsetable(cfg)
-    cfg.parsetable.print_parse_table()
+    code = _set_parsetable(cfg)
+    if code == SUCCESS:
+        cfg.parsetable.print_parse_table()
+    return code
 
 def handle_input(inp, cfg) -> None:
     """Handles user input by performing commands or otherwise parsing using the default method, LL(1)
@@ -174,7 +181,9 @@ def handle_input(inp, cfg) -> None:
     if inp.strip()[0] == "\\":
         _process_command(inp, cfg)
     else:
-        _init_parsing_ll1(inp.strip(), cfg)
+        code = _init_parsing_ll1(inp.strip(), cfg)
+        if code == AMBIGUOUS_ERROR:
+            error.ERR_ambiguous_grammar()
 
 def _init_parsing_ll1_via_cmd(inp, cfg) -> int:
     """Initialises LL(1) parsing via the command \\ll1 <input>
@@ -209,18 +218,21 @@ def _init_parsing_ll1(inp, cfg) -> int:
         int: Status code
     """    
     # calculate the parse table if it has not yet been done so
+    code = SUCCESS
     if not cfg.parsetable_calculated:
-        _set_parsetable(cfg)
+        code = _set_parsetable(cfg)
 
-    # set up the cfg parser 
-    code = _set_cfg_parser_ll1(inp, cfg)
-
-    # parse the input
     if code == SUCCESS:
-        if inp == cfg.parser_ll1.inp:
-            inp = ""
-        cfg.parser_ll1.parse_ll1(cfg.start_symbol, inp)
-    return SUCCESS
+        # set up the cfg parser 
+        code = _set_cfg_parser_ll1(inp, cfg)
+
+        # parse the input
+        if code == SUCCESS:
+            if inp == cfg.parser_ll1.inp:
+                inp = ""
+            cfg.parser_ll1.parse_ll1(cfg.start_symbol, inp)
+        return SUCCESS
+    return code
             
 def _set_cfg_parser_ll1(inp, cfg) -> int:
     """Initialises a new ParserLL1 object if it has not been initialised in this app session yet.
@@ -237,6 +249,21 @@ def _set_cfg_parser_ll1(inp, cfg) -> int:
         code = cfg.set_parser_ll1(p.ParserLL1(inp, cfg))
     return code
 
+def _prepare_to_parse(cfg):
+        if not cfg.first_set_calculated:
+            cfg.reset_first_set()
+
+        if not cfg.follow_set_calculated:
+            cfg.reset_follow_set()
+
+        if not cfg.is_ambiguous:
+            if not cfg.parsetable_calculated:
+                cfg.setup_parsetable()
+                cfg.calculate_parsetable()
+            return SUCCESS
+        else:
+            return AMBIGUOUS_ERROR
+
 def _init_parsing_vis_shortcut(inp, cfg) -> int:
     """Initialises the visualisation of LL(1) parsing on some input, via the app shortcut '\\v <input>'.
 
@@ -247,6 +274,7 @@ Returns:
         int: Status code
     """    
     to_parse = inp.strip()[2:].strip()
+    
     if to_parse == "":
         error.ERR_no_input_given()
     else:
@@ -315,7 +343,9 @@ def _process_command(inp, cfg) -> None:
             animation.render()
 
     elif inp == "\\show parsetable" or inp == "\\pt":
-        _show_parsetable(cfg)
+        code = _show_parsetable(cfg)
+        if code == AMBIGUOUS_ERROR:
+            error.ERR_ambiguous_grammar()
 
     elif inp == "\\vis parsetable" or inp == "\\vpt":
         if not cfg.first_set_calculated:
@@ -324,21 +354,24 @@ def _process_command(inp, cfg) -> None:
         if not cfg.follow_set_calculated:
             cfg.reset_follow_set()
 
-        if cfg.parsetable_calculated:
-            # re-initialise parsetable
-            cfg.setup_parsetable()
-        
-        config.OUTPUT_CONFIG["output_file"] = "Parsetable"
-        config.configure_output_file_name(config.PARSETABLE)
-        with m.tempconfig(config.OUTPUT_CONFIG):
-            animation = anim.ManimParseTable()
-            animation.setup_manim(cfg)
-            animation.render()
+        if not cfg.is_ambiguous:
+            if cfg.parsetable_calculated:
+                # re-initialise parsetable
+                cfg.setup_parsetable()
+            
+            config.OUTPUT_CONFIG["output_file"] = "Parsetable"
+            config.configure_output_file_name(config.PARSETABLE)
+            with m.tempconfig(config.OUTPUT_CONFIG):
+                animation = anim.ManimParseTable()
+                animation.setup_manim(cfg)
+                animation.render()
+        else:
+            error.ERR_ambiguous_grammar()
 
-    elif inp == "\\l":
-        new_path = typer.prompt("New path to CFG")
-        load_app(new_path)
-        # TODO reload CFG structure
+    # elif inp == "\\l":
+    #     new_path = typer.prompt("New path to CFG")
+    #     load_app(new_path)
+    #     # TODO reload CFG structure
       
     elif inp == "\\show cfg" or inp == "\\cfg":
         cfg.show_contents()
@@ -347,20 +380,18 @@ def _process_command(inp, cfg) -> None:
         config.edit_config(inp.strip()[2:].strip())
 
     elif inp[0:4] == "\\ll1":
-        _init_parsing_ll1_via_cmd(inp, cfg)
+        code = _prepare_to_parse(cfg)
+        if code == AMBIGUOUS_ERROR:
+            error.ERR_ambiguous_grammar()
+        else:
+            _init_parsing_ll1_via_cmd(inp, cfg)
 
     elif inp[0:2] == "\\v":
-        if not cfg.first_set_calculated:
-            cfg.reset_first_set()
-
-        if not cfg.follow_set_calculated:
-            cfg.reset_follow_set()
-
-        if not cfg.parsetable_calculated:
-            cfg.setup_parsetable()
-            cfg.calculate_parsetable()
-
-        _init_parsing_vis_shortcut(inp, cfg)
+        code = _prepare_to_parse(cfg)
+        if code == AMBIGUOUS_ERROR:
+            error.ERR_ambiguous_grammar()
+        else:
+            _init_parsing_vis_shortcut(inp, cfg)
     
     else:
         display_helper.fail_secho('Invalid command')
