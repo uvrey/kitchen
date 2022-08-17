@@ -23,7 +23,8 @@ from kitchen import (
     error,
     stack, 
     sounds,
-    config
+    config,
+    lang_spec
 )
 
 VCONFIG = {"radius": 0.25, "color": m.BLUE, "fill_opacity": 1}
@@ -36,6 +37,8 @@ GRID_ITEM_SCALE = 0.4
 
 # set global configs
 m.config.include_sound = True
+
+
 
 def _get_title_mobject(title):
     return m.Tex(title, tex_template=m.TexFontTemplates.french_cursive)
@@ -86,16 +89,20 @@ def _play_msg_with_other(self, msg, raw_msg= "", anim=[]):
             ),
     return SUCCESS
 
-def _get_tokens_from_input(inp) -> list:
+def _get_tokens_from_input(inp, spec = None) -> list:
     """Obtains the token stream of an input string. 
-
     Args:
         inp (str): Input string
-
     Returns:
         list: Token stream
     """    
-    return list(filter(None, inp.split(" ")))
+    if spec != None:
+        tokens = spec.get_tokens_from_input(inp)
+        return tokens
+    else:
+        display_helper.info_secho("Note:\tNo language specification has been provided, so the given \n\tinput will be interpreted as tokens directly.")
+        return list(filter(None, inp.split(" ")))
+
 
     # Helper function to put a message on the screen
 def notify(self, message, next_to_this):
@@ -1111,18 +1118,40 @@ def reset_g(self, g, root, anim=[]):
         ),
     )
 
+# general function for mapping elements in some list to another list
+def map_token_lists(self, lhs, rhs):
+    # create token group
+    map_group = m.VGroup()
+
+    # map the tokens
+    for index, il in enumerate(lhs, start=0):
+        small_group = m.VGroup()
+        lh = m.Text(il, slant=m.ITALIC, weight=m.BOLD)
+        arrow = m.Arrow(start=m.LEFT, end=m.RIGHT, buff=0).next_to(lh, m.RIGHT)
+        rh = m.Text(rhs[index], weight=m.BOLD, color=get_token_colour(self)).next_to(
+            arrow, m.RIGHT)
+        small_group.add(lh, arrow, rh)
+        map_group.add(small_group)
+    map_group.arrange(m.DOWN, aligned_edge = m.LEFT)
+    return map_group
+
+
+ # TODO: MAKE TOKENS AS OBJECTS WHEN NO INP SPEC PROVIDED!   
 class ManimParseTree(m.Scene):
     # Parse LL(1) in the CLI
     def setup(self):
         self.frame_width = m.config["frame_width"]
         self.frame_height = m.config["frame_height"]
 
-    def setup_manim(self, inp, cfg):
+    def setup_manim(self, inp, cfg, spec = None):
         self.inp = inp
-        self.tokens = _get_tokens_from_input(inp)
+        self.inp_list = lang_spec.clean_inp_stream(inp.split(" "))
+        self.spec = spec
+        self.tokens = _get_tokens_from_input(inp, spec)
         set_up_token_colour(self)
         self.tok_cols = []
 
+        # associate a colour for each token
         for t in self.tokens:
             self.tok_cols.append(get_token_colour(self))
 
@@ -1130,13 +1159,52 @@ class ManimParseTree(m.Scene):
         self.nts = sorted(cfg.nonterminals)
         self.ts = sorted(cfg.terminals)
 
+
     def construct(self):
-        self.vis_parse_ll1(self.inp, self.tokens)
+        self.intro()
+        #self.vis_parse_ll1(self.inp, self.tokens)
     
     def tear_down(self):
         self.mtable = None
         self.root = None
         clear_narrs()
+
+    # shows the input stream and its association with the token stream
+    def intro(self):
+        # introducing the input
+        title = m.Tex(r"Input to be parsed:")
+        sounds.narrate("Let's parse this input.", self)
+        inp = m.Text(self.inp, weight=m.BOLD, color=m.BLUE)
+        m.VGroup(title, inp).arrange(m.DOWN)
+        self.play(
+            m.FadeIn(title),
+            m.Write(inp, shift=m.DOWN),
+        )
+        self.wait()
+
+        # transforming to lexing
+        transform_title = m.Tex(
+            "Lexing matched the input to the following tokens:")
+        sounds.narrate("The input stream gives these token types.", self)
+        transform_title.to_edge(m.UP)
+        self.play(
+            m.Transform(title, transform_title),
+            m.FadeOut(inp)
+        )
+        self.wait()
+
+        # show tokens then fade everything out
+        
+        self.play(
+            m.LaggedStart(*(m.FadeIn(t, shift=m.UP)
+                        for t in map_token_lists(self, self.inp_list, lang_spec.get_token_types(self.tokens, as_list=True)))),
+        )
+        self.wait()
+
+        # fades the scene out
+        self.play(
+            *[m.FadeOut(mob)for mob in self.mobjects]
+        )
         
     def init_m_table(self, row_vals, row_labels, col_labels):
         row_labels = row_labels
@@ -1255,7 +1323,7 @@ class ManimParseTree(m.Scene):
 
         # draw LL(1) representation title
         ll1_title = _get_title_mobject("LL(1) parsing")
-        _play_msg_with_other(self, ["Parsing `" +  " ".join(original_tokens) + "' :)"], raw_msg = "Let's apply the L L 1 parsing algorithm")
+        _play_msg_with_other(self, ["LL(1) Parsing Algorithm"], raw_msg = "Let's apply the L L 1 parsing algorithm")
         keys = get_manim_cfg_group(self).to_edge(m.DOWN)
 
         # create the input group here

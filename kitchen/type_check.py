@@ -22,12 +22,13 @@ DONE
 investigate fstack weirdness :)
 get BLA working on current test cases (ll(1) subsets should work) :)
 warn when they are ambiguous :)
+customise the regex terminal definitions :)
+match raw input with regex expressions :)
+get regex spec from app/ with simon's help :)
 """
 
 """
 TODO - DEVELOPMENT
-match raw input with regex expressions
-get regex spec from app/ with simon's help
 
 get PT test cases written
 
@@ -40,8 +41,8 @@ GRAMMARS
 
 SEMANTIC ANALYSIS
 based on BLA, with help from the assignment
-add intro scene with token stream
-customise the terminal definitions
+add intro scene with token stream 
+
 """ 
 
 """

@@ -234,7 +234,7 @@ def _init_parsing_ll1_via_cmd(inp, cfg, spec) -> int:
                 config.configure_output_file_name(config.LL1_PARSING, to_parse)
                 with m.tempconfig(config.OUTPUT_CONFIG):
                     animation = anim.ManimParseTree()
-                    animation.setup_manim(to_parse, cfg)
+                    animation.setup_manim(to_parse, cfg, spec)
                     animation.render()       
     else:
         # parse \ll1 <input>
@@ -315,7 +315,7 @@ Returns:
         config.configure_output_file_name(config.LL1_PARSING, to_parse)
         with m.tempconfig(config.OUTPUT_CONFIG):
             animation = anim.ManimParseTree()
-            animation.setup_manim(to_parse, cfg)
+            animation.setup_manim(to_parse, cfg, spec)
             animation.render()       
     return SUCCESS
 

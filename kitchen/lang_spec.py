@@ -32,7 +32,7 @@ def get_spec(cfg):
     else:
         return None
     
-def _clean_inp_stream(inps):
+def clean_inp_stream(inps):
     cleaned = []
     for i in inps:
         cleaned.append(i.strip())
@@ -80,7 +80,7 @@ class Specification:
     
     def _process_reserved_words(self, line):
         split = line.split(" ")
-        cleaned_specs = _clean_inp_stream(split)
+        cleaned_specs = clean_inp_stream(split)
         try:
             self.reserved_words.append(cleaned_specs[2])
         except:
@@ -88,7 +88,7 @@ class Specification:
 
     def _process_regex_spec(self, line):
         split = line.split(" ")
-        cleaned_specs = _clean_inp_stream(split)
+        cleaned_specs = clean_inp_stream(split)
         try:
             t_found = cleaned_specs[1]
             regex = cleaned_specs[2]
@@ -114,7 +114,7 @@ class Specification:
     def get_tokens_from_input(self, inp):
         tokens = []
         inp_stream = inp.strip().split(" ")
-        cleaned_stream = _clean_inp_stream(inp_stream)
+        cleaned_stream = clean_inp_stream(inp_stream)
         for c in cleaned_stream:
             tokens.append(Token(self._match(c), c))
         if len(tokens) != len(cleaned_stream):
@@ -122,8 +122,36 @@ class Specification:
             return None
         return tokens
 
+
+
+def get_token_types(toks, as_list = False):
+    """Creates list of token types or returns the list itself if it is empty
+
+    Args:
+        toks (_type_): _description_
+        as_list (bool, optional): _description_. Defaults to False.
+
+    Returns:
+        _type_: _description_
+    """    
+    ts = []
+    try:
+        for t in toks:
+            ts.append(t.type)
+        if as_list: return ts
+        return " ".join(ts)
+    except:
+        return toks
+
+def get_token_values(toks, as_list = False):
+    ts = []
+    for t in toks:
+        ts.append(t.value)
+    if as_list: return ts
+    return " ".join(ts)
+
 class Token:
     def __init__(self, type, value):
         self.type = type
         self.value = value
-
+    

@@ -5,7 +5,7 @@ import anytree
 import re
 
 from kitchen import (
-    RE_NONTERMINAL, ERROR, RE_PRODUCTION, RE_TERMINAL, display_helper, error, SUCCESS, PARSING_ERROR)
+    RE_NONTERMINAL, ERROR, RE_PRODUCTION, RE_TERMINAL, display_helper, error, SUCCESS, PARSING_ERROR, lang_spec)
 
 def init_input(self, inp) -> int:
     """Helper function to (re-)initialise the input of a Parser.
@@ -195,8 +195,8 @@ class ParserLL1:
 
         # display the parse tree
         if not testing:
-            display_helper.success_secho("\nSuccessfully parsed token stream '" + self.get_token_type_string(original_tokens) +
-                                "'\nfrom input stream '" + self.get_token_value_string(original_tokens) + "'.\n\nParse tree:")
+            display_helper.success_secho("\nSuccessfully parsed token stream '" + lang_spec.get_token_types(original_tokens) +
+                                "'\nfrom input stream '" + lang_spec.get_token_values(original_tokens) + "'.\n\nParse tree:")
             display_helper.print_parsetree(self.root)
 
         else:
@@ -210,14 +210,3 @@ class ParserLL1:
                 return node
         return None
 
-    def get_token_type_string(self, toks):
-        ts = []
-        for t in toks:
-            ts.append(t.type)
-        return " ".join(ts)
-
-    def get_token_value_string(self, toks):
-        ts = []
-        for t in toks:
-            ts.append(t.value)
-        return " ".join(ts)
