@@ -37,7 +37,7 @@ CONFIG_DIR_PATH = Path(typer.get_app_dir(__app_name__))
 CONFIG_FILE_PATH = CONFIG_DIR_PATH / "config.ini"
 PARTIALS_PATH = ""
 
-def init_app(cfg_path: str) -> int:
+def init_app(cfg_path: str, spec_path = None) -> int:
     """Initialises the application by creating its configuration file and CFG path.
 
     Args:
@@ -50,9 +50,13 @@ def init_app(cfg_path: str) -> int:
     config_code = _init_config_file()
     if config_code != SUCCESS:
         return config_code
-    cfg_code = _create_cfg_path(cfg_path)
+
+    # create cfg path
+    cfg_code = _create_paths(cfg_path, spec_path)
+
     if cfg_code != SUCCESS:
         return cfg_code
+
     return SUCCESS
 
 def _init_config_file() -> int:
@@ -71,7 +75,7 @@ def _init_config_file() -> int:
         return FILE_LOADING_ERROR
     return SUCCESS
 
-def _create_cfg_path(cfg: str) -> int:
+def _create_paths(cfg_path: str, spec_path = None) -> int:
     """Creates a path to the CFG in the configuration of the application.
 
     Args:
@@ -84,24 +88,42 @@ def _create_cfg_path(cfg: str) -> int:
         int: Status code.
     """    
     # check that the cfg file exists
-    cfg_path = Path(cfg)
+    cfg_path = Path(cfg_path)
     path_error = _validate_path([cfg_path])
 
     if path_error:
         typer.secho(
-            f'Loading files failed with "{ERRORS[path_error]}"',
+            f'Loading the CFG file failed with "{ERRORS[path_error]}"',
             fg=typer.colors.RED,
         )
         raise typer.Exit(1)
 
-    # create the CFG
+    # load up the cfg config
     config_parser = configparser.ConfigParser()
-    config_parser["General"] = {"cfg": cfg_path}
+    config_parser['General'] = {}
+    config_parser['General']['cfg_path'] = str(cfg_path)
+    config_parser['General']['spec_path'] = ''
+    typer.echo(CONFIG_FILE_PATH)
+
+    # load the specification path if it is provided
+    if spec_path != None:
+        spec_path = Path(spec_path)
+
+        if path_error:
+            typer.secho(
+                f'Loading the specification file failed with "{ERRORS[path_error]}"',
+                fg=typer.colors.RED,
+            )
+
+        # load up the cfg 
+        config_parser['General']['spec_path'] = str(spec_path)
+
     try:
         with CONFIG_FILE_PATH.open("w") as file:
             config_parser.write(file)
     except OSError:
         return CFG_WRITE_ERROR
+
     return SUCCESS
 
 # Helper function to validate that the given cfg path is valid
@@ -120,14 +142,14 @@ def _validate_path(paths):
             return FILE_LOADING_EXISTS_ERROR
         return SUCCESS
 
-def load_app(path, testing = False) -> None:
+def load_app(cfg_path, spec_path = None, testing = False) -> None:
     """Loads the application given a CFG path.
     Args:
         path (String): Path to the CFG file.
     Raises:
         typer.Exit: When CFG loading is unsuccesful. 
     """    
-    app_init_error = init_app(path)
+    app_init_error = init_app(cfg_path, spec_path)
     if app_init_error:
         if not testing:
             typer.secho(
@@ -137,7 +159,10 @@ def load_app(path, testing = False) -> None:
         raise typer.Exit(1)
     else:
         if not testing:
-            typer.secho(f"Initialisation successful! The cfg path is " + path, 
+            typer.secho(f"Initialisation successful!\n\t The cfg path is " + cfg_path, 
+                        fg=typer.colors.GREEN)
+            if spec_path != None:
+                typer.secho(f"\t The language specification path is " + cfg_path, 
                         fg=typer.colors.GREEN)
 
 def _set_parsetable(cfg) -> int:

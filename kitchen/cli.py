@@ -1,5 +1,7 @@
 """ Creates the Kitchen CLI"""
 # kitchen/cli.py
+from email.policy import default
+from optparse import Option
 from sre_constants import SUCCESS
 import typer
 from pathlib import Path
@@ -79,12 +81,13 @@ def init(
             "-cfg",
             prompt="Please provide the path to your CFG",
             ),
+     spec_path: Optional[str] = typer.Argument(None)
 ) -> None:
     """Initializes the configuration files.
     Args:
         cfg_path (str): Path to the CFG file.
     """
-    cli_helper.load_app(cfg_path)
+    cli_helper.load_app(cfg_path, spec_path)
 
 
 @app.command(name="init-tests")
