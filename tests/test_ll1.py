@@ -31,7 +31,7 @@ def ll1_out_path():
     # ("cfg_8.txt"),
     # ("cfg_9.txt"), 
     # ("cfg_10.txt"), # issue here
-    # ("cfg_bla_simple_0.txt", "+ identifier"),
+    ("cfg_bla_simple_0.txt", "+ identifier"),
     ("cfg_bla_simple_1.txt", "identifier +"),
     ("cfg_bla_simple_2.txt", "identifier a identifier"),
 ])

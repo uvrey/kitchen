@@ -86,13 +86,13 @@ class ParserLL1:
                 if top == next:
                     tokens.remove(next)
                     p = self.stack.pop()
-                    typer.echo("looking at " + next)
+                   # typer.echo("looking at " + next)
 
                     # ALL NEW TODO
                     # pops appropriately
                     if self.parents != []:
                         popped = self.parents.pop()
-                        display_helper.structure_secho(self.parents)
+                        # display_helper.structure_secho(self.parents)
 
                         # reversed so we find the first match
                         parent_position = len(self.parents) - 1
@@ -104,7 +104,7 @@ class ParserLL1:
                         for node in reversed(self.parents):
                             if not node_found:
                                 if (node.id == temp_parent):
-                                    typer.echo("appending " + popped.id + " with parent " + node.id)
+                                  #  typer.echo("appending " + popped.id + " with parent " + node.id)
                                     new_node = anytree.Node(popped.id, parent=node, id=popped.id)
                                     node_found = True
                                     temp_parent = node.tmp_p
@@ -115,14 +115,14 @@ class ParserLL1:
 
                             # count how many to pop off based on node being found
                         #     parent_position = parent_position - 1
-                        typer.echo(popped.id + " has " + str(parent_count) + " parents. we pop them all off")
+                        # typer.echo(popped.id + " has " + str(parent_count) + " parents. we pop them all off")
 
                         # pop all the direct parents of and including the node we just encountered
                         for i in range(parent_count):
                             self.parents.pop()
 
-                        typer.echo("after popping we have: ")
-                        display_helper.info_secho(self.parents)
+                        # typer.echo("after popping we have: ")
+                        # display_helper.info_secho(self.parents)
 
                     else:
                         display_helper.fail_secho("TODO!")
