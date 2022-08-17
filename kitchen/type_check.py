@@ -17,4 +17,71 @@ class SymbolTable:
     def traverse_tree(self):
         pass
 
-    
+
+"""
+TODO - DEVELOPMENT
+match raw input with regex expressions
+get regex spec from app/ with simon's help
+
+investigate fstack weirdness :)
+
+get BLA working on current test cases
+get PT test cases written
+Fix manim parsing by adding improved algorithm  
+
+MANIM
+check epsilon bug in LL(1) parsing video
+
+GRAMMARS
+warn when they are ambiguous
+extension: detect LR recursion etc
+
+SEMANTIC ANALYSIS
+based on BLA, with help from the assignment
+add intro scene with token stream
+customise the terminal definitions
+""" 
+
+"""
+TODO - INTEGRATION
+start dsl tool from the typer app
+get regex commands
+""" 
+
+"""
+TODO - DETAILS
+scaling FS and FW properly
+cfg_1 parsing has sound not found error
+remove debugging output
+generate tree PNG for export
+update menu
+PT table spacing on large outputs
+""" 
+
+
+"""
+TODO - ADMIN
+complete documentation
+README
+clean up code   
+clean git repo
+
+PAPER
+- write and edit
+
+USER TESTING
+- ethics approval
+- conduct tests
+""" 
+
+""" 
+EXTENSIONS
+- lecturer-supplied audio
+- LALR/ shift reduce/ recursive descent parsing
+- proof of accuracy - algorithm analysis
+"""
+
+""" 
+FEATURES
+
+"""

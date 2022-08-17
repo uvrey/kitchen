@@ -86,25 +86,43 @@ class ParserLL1:
                 if top == next:
                     tokens.remove(next)
                     p = self.stack.pop()
+                    typer.echo("looking at " + next)
 
                     # ALL NEW TODO
                     # pops appropriately
                     if self.parents != []:
                         popped = self.parents.pop()
+                        display_helper.structure_secho(self.parents)
 
                         # reversed so we find the first match
-                        index = len(self.parents) - 1
+                        parent_position = len(self.parents) - 1
+                        parent_count = 0
+                        node_found = False
+                        temp_parent = popped.tmp_p
 
                         # linking new terminals to the tree
                         for node in reversed(self.parents):
-                            if node.id == popped.tmp_p:
-                                new_node = anytree.Node(popped.id, parent=node, id=popped.id)
-                                break
-                            index = index - 1
+                            if not node_found:
+                                if (node.id == temp_parent):
+                                    typer.echo("appending " + popped.id + " with parent " + node.id)
+                                    new_node = anytree.Node(popped.id, parent=node, id=popped.id)
+                                    node_found = True
+                                    temp_parent = node.tmp_p
+                            else:
+                                if (node.id == temp_parent):
+                                    parent_count = parent_count + 1
+                                    temp_parent = node.tmp_p
 
-                        # pop off as many as needed
-                        for j in range(index - 1):
+                            # count how many to pop off based on node being found
+                        #     parent_position = parent_position - 1
+                        typer.echo(popped.id + " has " + str(parent_count) + " parents. we pop them all off")
+
+                        # pop all the direct parents of and including the node we just encountered
+                        for i in range(parent_count):
                             self.parents.pop()
+
+                        typer.echo("after popping we have: ")
+                        display_helper.info_secho(self.parents)
 
                     else:
                         display_helper.fail_secho("TODO!")

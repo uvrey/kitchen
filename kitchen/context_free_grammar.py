@@ -368,6 +368,7 @@ class ContextFreeGrammar:
             # so let's find those that are still empty
             if len(pstack) == 1:
                 pstack = []
+                self.fstack = []
                 empty_set_nt = self.get_next_production(self.first_set)
                 if empty_set_nt != -1:
                     self._calculate_first_set(empty_set_nt, [])

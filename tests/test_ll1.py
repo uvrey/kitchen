@@ -33,6 +33,7 @@ def ll1_out_path():
     # ("cfg_10.txt"), # issue here
     # ("cfg_bla_simple_0.txt", "+ identifier"),
     ("cfg_bla_simple_1.txt", "identifier +"),
+    ("cfg_bla_simple_2.txt", "identifier a identifier"),
 ])
 
 def test_pt(sample_path, ll1_out_path, sample_cfg, input_str):
