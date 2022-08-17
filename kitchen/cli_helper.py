@@ -241,7 +241,7 @@ def _init_parsing_ll1_via_cmd(inp, cfg, spec) -> int:
         _init_parsing_ll1(inp[4:].strip(), cfg, spec)
     return SUCCESS
 
-def _init_parsing_ll1(inp, cfg, spec) -> int:
+def _init_parsing_ll1(inp, cfg, spec, semantic = False) -> int:
     """Initialise parsing using LL(1) by associating the CFG with its own LL(1) Parser object.
 
     Args:
@@ -252,6 +252,7 @@ def _init_parsing_ll1(inp, cfg, spec) -> int:
         int: Status code
     """    
     # calculate the parse table if it has not yet been done so
+
     code = SUCCESS
     if not cfg.parsetable_calculated:
         code = _set_parsetable(cfg)
@@ -264,8 +265,8 @@ def _init_parsing_ll1(inp, cfg, spec) -> int:
         if code == SUCCESS:
             if inp == cfg.parser_ll1.inp:
                 inp = ""
-            cfg.parser_ll1.parse_ll1(cfg.start_symbol, inp)
-        return SUCCESS
+            code = cfg.parser_ll1.parse_ll1(cfg.start_symbol, inp, semantic)
+            return code
     return code
             
 def _set_cfg_parser_ll1(inp, cfg, spec) -> int:
@@ -401,10 +402,23 @@ def _process_command(inp, cfg, spec) -> None:
         else:
             error.ERR_ambiguous_grammar()
 
-    # elif inp == "\\l":
-    #     new_path = typer.prompt("New path to CFG")
-    #     load_app(new_path)
-    #     # TODO reload CFG structure
+    elif inp == "\\vis semantic" or inp[0:5] == "\\vsem":
+        stripped = inp.strip()
+        to_sem = stripped[5:]
+        if to_sem == "":
+            display_helper.fail_secho("No input provided.")
+        else:
+            code = _prepare_to_parse(cfg)
+            if code == AMBIGUOUS_ERROR:
+                error.ERR_ambiguous_grammar()
+            else:
+                code = _init_parsing_ll1(to_sem, cfg, spec, semantic = True)
+                if code == SUCCESS:
+                    typer.echo("can now semantically analyse this thing" + to_sem)
+                    display_helper.print_parsetree(cfg.parser_ll1.root)
+                else:
+                    display_helper.fail_secho("Parsing failed. Cannot generate semantic analysis.")
+        
       
     elif inp == "\\show cfg" or inp == "\\cfg":
         cfg.show_contents()

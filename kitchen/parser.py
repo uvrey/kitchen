@@ -52,7 +52,7 @@ class ParserLL1:
                     anytree.Node("#", parent=node, id= "#")
         return SUCCESS
 
-    def parse_ll1(self, start_symbol, inp="", testing = False) -> int:
+    def parse_ll1(self, start_symbol, inp="", semantic = False, testing = False) -> int:
         """LL(1) Parser, which generates a parse tree and stores this to self.root
         Args:
             input (str): Input string to be parsed
@@ -61,6 +61,7 @@ class ParserLL1:
             int: Status code
         """      
         # if new input is supplied to an existing LL(1) parser object
+
         if inp == "":
             inp = self.inp
         else:
@@ -83,14 +84,18 @@ class ParserLL1:
         while self.stack != []:
             # in case we run out of input before the stack is empty
             if tokens == []:
-                if re.match(RE_TERMINAL, self.stack[-1]):
-                    error.ERR_parsing_error(self.root, "Expected " + self.stack[-1])
-                else:
-                    error.ERR_parsing_error(self.root)
+                if not semantic:
+                    if re.match(RE_TERMINAL, self.stack[-1]):
+                        error.ERR_parsing_error(self.root, "Expected " + self.stack[-1])
+                    else:
+                        error.ERR_parsing_error(self.root)
                 return PARSING_ERROR
 
             top = self.stack[-1]
-            next = tokens[0].type
+            try:
+                next = tokens[0].type
+            except:
+                next = tokens[0]
 
             if re.match(RE_TERMINAL, top) or top == "$":
                 if top == next:
@@ -142,8 +147,9 @@ class ParserLL1:
                         self.check_for_epsilons()
                     
                 else:
-                    error.ERR_parsing_error(self.root,
-                        "Unexpected token [" + top + "]")
+                    if not semantic:
+                        error.ERR_parsing_error(self.root,
+                            "Unexpected token [" + top + "]")
                     return PARSING_ERROR
             elif re.match(RE_NONTERMINAL, top):
                 try:
@@ -184,24 +190,26 @@ class ParserLL1:
                         self.parents.append(t)
 
                 except:
-                    error.ERR_parsing_error(self.root,
-                        "ParseTable[" + top + ", " + next + "] is empty.")
+                    if not semantic:
+                        error.ERR_parsing_error(self.root,
+                            "ParseTable[" + top + ", " + next + "] is empty.")
                     return PARSING_ERROR
 
         # in case parsing finishes but there are still tokens left in the stack
         if len(tokens) > 0:
-            error.ERR_parsing_error(self.root, "Unexpected end of input.")
+            if not semantic:
+                error.ERR_parsing_error(self.root, "Unexpected end of input.")
             return PARSING_ERROR
 
         # display the parse tree
-        if not testing:
-            display_helper.success_secho("\nSuccessfully parsed token stream '" + lang_spec.get_token_types(original_tokens) +
-                                "'\nfrom input stream '" + lang_spec.get_token_values(original_tokens) + "'.\n\nParse tree:")
-            display_helper.print_parsetree(self.root)
-
-        else:
-            display_helper.success_secho("Success.")
-            display_helper.structure_secho(anytree.RenderTree(self.root, style= anytree.AsciiStyle()).by_attr("id"))
+        if not semantic:
+            if not testing:
+                display_helper.success_secho("\nSuccessfully parsed token stream '" + lang_spec.get_token_types(original_tokens) +
+                                    "'\nfrom input stream '" + lang_spec.get_token_values(original_tokens) + "'.\n\nParse tree:")
+                display_helper.print_parsetree(self.root)
+            else:
+                display_helper.success_secho("Success.")
+                display_helper.structure_secho(anytree.RenderTree(self.root, style= anytree.AsciiStyle()).by_attr("id"))
         return SUCCESS
 
     def get_node(self, node_id):
