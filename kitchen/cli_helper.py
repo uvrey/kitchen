@@ -30,7 +30,8 @@ from kitchen import (
     animation as anim,
     error, 
     parser as p,
-    config
+    config,
+    dsl_tool
 )
 
 CONFIG_DIR_PATH = Path(typer.get_app_dir(__app_name__))
@@ -237,7 +238,7 @@ def _init_parsing_ll1_via_cmd(inp, cfg, spec) -> int:
                     animation.render()       
     else:
         # parse \ll1 <input>
-        _init_parsing_ll1(inp[4:].strip(), cfg)
+        _init_parsing_ll1(inp[4:].strip(), cfg, spec)
     return SUCCESS
 
 def _init_parsing_ll1(inp, cfg, spec) -> int:
@@ -257,7 +258,7 @@ def _init_parsing_ll1(inp, cfg, spec) -> int:
 
     if code == SUCCESS:
         # set up the cfg parser 
-        code = _set_cfg_parser_ll1(inp, cfg)
+        code = _set_cfg_parser_ll1(inp, cfg, spec)
 
         # parse the input
         if code == SUCCESS:
@@ -267,7 +268,7 @@ def _init_parsing_ll1(inp, cfg, spec) -> int:
         return SUCCESS
     return code
             
-def _set_cfg_parser_ll1(inp, cfg) -> int:
+def _set_cfg_parser_ll1(inp, cfg, spec) -> int:
     """Initialises a new ParserLL1 object if it has not been initialised in this app session yet.
 
     Args:
@@ -279,7 +280,7 @@ def _set_cfg_parser_ll1(inp, cfg) -> int:
     """    
     code = SUCCESS
     if not cfg.is_parser_ll1_set_up:
-        code = cfg.set_parser_ll1(p.ParserLL1(inp, cfg))
+        code = cfg.set_parser_ll1(p.ParserLL1(inp, cfg, spec))
     return code
 
 def _prepare_to_parse(cfg):
@@ -336,8 +337,7 @@ def _process_command(inp, cfg, spec) -> None:
         raise typer.Exit()
 
     elif inp == "\\dsl":
-        # TODO start DSL tool
-        pass
+        dsl_tool.main()
 
     elif inp == "\\show first" or inp == "\\fs":
         cfg.show_first_set()

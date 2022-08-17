@@ -11,9 +11,9 @@ from pathlib import Path
 __app_name__= "kitchen"
 __version__ = "0.1.0"
 
-RE_TERMINAL = '[a-z][a-z]*|$|#|\+|-|/|\*|\(|\)|,|='
-RE_NONTERMINAL = '[A-Z][A-Z]*'
-RE_PRODUCTION = '[A-Z][A-Z]*|[a-z][a-z]*|$|#|\+|-|/|\*|\(|\)|,|='
+RE_TERMINAL = r'[a-z][a-z]*|$|#|\+|-|/|\*|\(|\)|,|='
+RE_NONTERMINAL = r'[A-Z][A-Z]*'
+RE_PRODUCTION = r'[A-Z][A-Z]*|[a-z][a-z]*|$|#|\+|-|/|\*|\(|\)|,|='
 
 
 TEXT_SCALE = 1
@@ -27,7 +27,6 @@ COLOURS = [m.BLUE_A, m.TEAL_B, m.GREEN_B, m.YELLOW_B, m.GOLD_B,
     DARK,
     LIGHT
 ) = range(2)
-
 
 (
     SUCCESS,

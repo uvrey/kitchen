@@ -1,0 +1,315 @@
+LANGUAGE SPECIFICATION DOCUMENT
+
+# Specification document for DSL design tool. Fill in the blanks.
+# White space is ignored so feel free to use it as you please.
+# Blank lines and lines beginning with a # are also ignored.
+
+---
+
+Tokens:
+
+# (C, I, R, or T) <Token name> <Token regex or reserved word>
+# 
+# Use C header if you wish matches for this token to be checked against reserved words.
+# Use I header if you wish this token to be ignored in parsing stage.
+# Use R header if you wish this token to be a reserved word.
+# Use T header if you wish no special treatment for this token.
+# Remember to escape special characters: 
+#     . ^ $ * + ? { } [ ] \ | ( ) 
+
+I comment (/\*[^(\*/)]*\*/)|(//.*)
+I whitespace (\s)+
+T type B|S|N
+T id [a-z_][a-zA-Z0-9_]*
+T literal_B T|F
+T literal_S "([^"]|\\")*"
+T literal_N [+-]?[1-9][0-9]+
+T lbracket \(
+T rbracket \)
+T equals ==
+T not_equals ~=
+T and &
+T or \|
+T not ~
+T concatenate C
+T less_than_equals <=
+T greater_than_equals >= 
+T less_than <
+T greater_than >
+T add \+
+T subtract -
+T multiply \*
+T divide /
+T assign =
+T print P
+
+---
+
+Productions:
+
+# P <Non-terminal> -> <Production> [| <Alternate production>]
+# F [<Flag>]
+# I [<List of indexes>]
+# 
+# Empty productions may not be used as alternate productions.
+# Flags are used when building the abstract syntax tree to give context to the semantic analyser. 
+# Default flags are:
+#     STATEMENT DECLARATION OPERATOR IDENTIFIER EMPTY
+# Symbols at the listed indexes are saved in the abstract syntax tree in the order they appear. 
+# 
+# For example:
+#    (I)    0              1       2    3      
+#     P EXPRESSION -> EXPRESSION plus TERM
+#     F OPERATOR
+#     I 2 1 3
+#     ...results in an AST entry of (OPERATOR, plus, p [1], p [3]).
+
+P PROGRAM -> STATEMENT PROGRAM
+F STATEMENT
+I 1 2
+
+P PROGRAM ->
+F EMPTY
+I
+
+P STATEMENT -> type id
+F DECLARATION
+I 1 2
+
+P STATEMENT -> id assign VALUE
+F OPERATOR
+I 2 1 3
+
+P STATEMENT -> print VALUE
+F OPERATOR
+I 1 2
+
+P VALUE -> VALUE equals ASSERTION | VALUE not_equals ASSERTION
+F OPERATOR
+I 2 1 3
+
+P VALUE -> ASSERTION
+F
+I 1
+
+P ASSERTION -> ASSERTION or QUESTION
+F OPERATOR
+I 2 1 3
+
+P ASSERTION -> QUESTION
+F
+I 1
+
+P QUESTION -> QUESTION and ANSWER
+F OPERATOR
+I 2 1 3
+
+P QUESTION -> ANSWER
+F
+I 1
+
+P ANSWER -> not ANSWER
+F OPERATOR
+I 1 2
+
+P ANSWER -> VARIABLE
+F
+I 1
+
+P VARIABLE -> literal_B
+F literal_B
+I 1
+
+P VARIABLE -> VARIABLE concatenate OBJECT
+F OPERATOR
+I 2 1 3
+
+P VARIABLE -> OBJECT
+F
+I 1
+
+P OBJECT -> literal_S
+F literal_S
+I 1
+
+P OBJECT -> OBJECT less_than_equals EXPRESSION | OBJECT greater_than_equals EXPRESSION | OBJECT less_than EXPRESSION | OBJECT greater_than EXPRESSION
+F OPERATOR
+I 2 1 3
+
+P OBJECT -> EXPRESSION
+F 
+I 1
+
+P EXPRESSION -> EXPRESSION add TERM | EXPRESSION subtract TERM
+F OPERATOR
+I 2 1 3
+
+P EXPRESSION -> TERM
+F
+I 1
+
+P TERM -> TERM multiply FACTOR | TERM divide FACTOR
+F OPERATOR
+I 2 1 3
+
+P TERM -> FACTOR
+F
+I 1
+
+P FACTOR -> literal_N
+F literal_N
+I 1
+
+P FACTOR -> lbracket VALUE rbracket
+F 
+I 2
+
+P FACTOR -> id
+F IDENTIFIER
+I 1
+
+---
+
+Booleans:
+
+# T <True symbol>
+# F <False symbol>
+#
+# This allows you to define your own boolean literals for your language.
+
+T T
+F F
+
+---
+
+Datatypes:
+
+# N <Name>
+# L <Literal name>
+# T <Type string>
+#
+# Type string has to be one of:
+#     BOOLEAN STRING NUMERIC
+# Literal name is the flag used in the AST to reference a literal of this type.
+
+N B 
+L literal_B
+T BOOLEAN 
+
+N S
+L literal_S
+T STRING  
+
+N N
+L literal_N
+T NUMERIC
+
+---
+
+Operators:
+
+# S <Symbol>
+# A <Number of arguments>
+# (T <List of types>)*
+# F <Format string>
+#
+# The list of types must choose a type for each argument and, optionally, the return type last. 
+# Please enter a format string corresponding to your desired Python output code.
+# Remember, if these operators are used recursively, to surround your format string with parentheses.
+# 
+# For example:
+#     S @
+#     A 2
+#     T int string string
+#     F {1} + \" is \" + {0}
+#     ...will give @ 4 "answer" = "answer is 4".
+
+S =
+A 2
+T B B
+T S S
+T N N
+F {0} = {1}
+
+S P
+A 1
+T B
+T S
+T N
+F print ({0})
+
+S ==
+A 2
+T B B B
+T S S B
+T N N B
+F ({0} == {1})
+
+S ~=
+A 2
+T B B B
+T S S B
+T N N B
+F ({0} != {1})
+
+S &
+A 2
+T B B B
+F ({0} and {1})
+
+S |
+A 2
+T B B B
+F ({0} or {1})
+
+S ~
+A 1
+T B B
+F (not {0})
+
+S C
+A 2
+T S S S
+F ({0} + {1})
+
+S <=
+A 2
+T N N B
+F ({0} <= {1})
+
+S >=
+A 2
+T N N B
+F ({0} >= {1})
+
+S <
+A 2
+T N N B
+F ({0} < {1})
+
+S >
+A 2
+T N N B
+F ({0} > {1})
+
+S +
+A 2
+T N N N
+F ({0} + {1})
+
+S -
+A 2
+T N N N
+F ({0} - {1})
+
+S *
+A 2
+T N N N
+F ({0} * {1})
+
+S /
+A 2
+T N N N
+F ({0} / {1})
+
+---

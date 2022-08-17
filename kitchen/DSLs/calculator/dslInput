@@ -1,0 +1,11 @@
+I variable_0
+
+variable_0 = 3 + 2 \ 5 * 10
+
+P variable_0
+
+F variable1
+
+variable1 = -2.1 / 4E2 - +3.2134 + (variable_0 / variable_0 + 3)
+
+P variable1

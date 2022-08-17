@@ -1,7 +1,5 @@
 """ Creates the Kitchen CLI"""
 # kitchen/cli.py
-from email.policy import default
-from optparse import Option
 from sre_constants import SUCCESS
 import typer
 from pathlib import Path
@@ -14,6 +12,7 @@ from kitchen import (
      cli_helper, 
      context_free_grammar as cfg, 
      display_helper,
+     dsl_tool,
      sounds,
      ERROR,
      lang_spec,
@@ -90,7 +89,6 @@ def init(
     """
     cli_helper.load_app(cfg_path, spec_path)
 
-
 @app.command(name="init-tests")
 def init_tests(
      cfg_path: str = typer.Option(
@@ -129,6 +127,11 @@ def run() -> None:
     while (True):
         input = typer.prompt("Input")
         cli_helper.handle_input(input, cfg, spec)
+
+# TODO
+@app.command(name="dsl-tool")
+def init_dsl() -> None:
+    dsl_tool.main()
 
 @app.command(name="show-cfg")
 def show_cfg() -> None:

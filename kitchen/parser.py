@@ -19,9 +19,8 @@ def init_input(self, inp) -> int:
         return ERROR
     else:
         self.inp = inp
-        self.tokens = _get_tokens_from_input(inp)
+        self.tokens = _get_tokens_from_input(inp, self.spec)
     return SUCCESS
-
 
 # TODO read the spec file and match
 def _get_tokens_from_input(inp, spec = None) -> list:
@@ -31,15 +30,20 @@ def _get_tokens_from_input(inp, spec = None) -> list:
     Returns:
         list: Token stream
     """    
-    # TODO 
-    return list(filter(None, inp.split(" ")))
+    if spec != None:
+        toks = spec.get_tokens_from_input(inp)
+        display_helper.info_secho("The input stream matched these tokens:" + str(toks))
+        return toks
+    else:
+        display_helper.info_secho("Note:\tNo language specification has been provided, so the given \n\tinput will be interpreted as tokens directly.")
+        return list(filter(None, inp.split(" ")))
 
 class ParserLL1:
     def __init__(self, inp, cfg, spec = None):
-        init_input(self, inp)
         self.cfg = cfg
         self.pt_dict = cfg.parsetable.pt_dict
         self.spec = spec
+        init_input(self, inp)
 
     def check_for_epsilons(self):
         # look for any epsilons that came before and add. 
@@ -62,6 +66,10 @@ class ParserLL1:
             inp = self.inp
         else:
             init_input(self, inp)
+
+        if None in self.tokens:
+            display_helper.fail_secho("Not all tokens from the input stream were matched :(")
+            return
 
         # set up structures
         tokens = self.tokens[:]

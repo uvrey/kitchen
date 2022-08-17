@@ -1,0 +1,647 @@
+from enum import Enum
+import sys
+import os
+
+__version__    = '1.00'
+
+#-----------------------------------------------------------------------------
+#                     === User configurable parameters ===
+#
+# Change these to modify the default behavior of sem (if you wish)
+#-----------------------------------------------------------------------------
+FLAG_PROGRAMME  = "PROGRAMME"
+FLAG_STATEMENT  = "STATEMENT"
+FLAG_TYPE       = "TYPE"
+FLAG_OPERATOR   = "OPERATOR"
+FLAG_IDENTIFIER = "ID"
+FLAG_LITERAL    = "LITERAL"
+#-----------------------------------------------------------------------------
+
+# String type-checking compatibility
+if sys.version_info[0] < 3:
+    string_types = basestring
+else:
+    string_types = str
+
+MAXINT = sys.maxsize
+
+# Enumeration of datatypes accepted.
+class SemEnumType (Enum):
+    BOOLEAN = 1
+    NUMERIC = 2
+    STRING  = 3
+
+# Enumeration of operators accepted.
+class SemEnumOp (Enum):
+    PRINT               =   1
+    ASSIGN              =   2
+    EQUALS              =   3
+    NOT_EQUALS          =   4
+    NOT                 = 101
+    AND                 = 102
+    OR                  = 103
+    GREATER_THAN_EQUALS = 201
+    GREATER_THAN        = 202
+    LESS_THAN_EQUALS    = 203
+    LESS_THAN           = 204
+    INCREMENT           = 205
+    DECREMENT           = 206
+    ADD                 = 207
+    MULTIPLY            = 208
+    SUBTRACT            = 209
+    INTEGER_DIVIDE      = 210
+    FLOAT_DIVIDE        = 211
+    MODULO              = 212
+    POWER_OF            = 212
+    CONCATENATE         = 301
+
+# Exception raised for semantic analysis errors.
+class SemError (Exception):
+    pass
+
+# Exception raised for type errors.
+class SemTypeError (SemError):
+    pass
+
+# Exception raised for operator errors.
+class SemOpError (SemError):
+    pass
+
+# Exception raised for symbol table errors.
+class SemSymbolError (SemError):
+    pass
+
+# Exception where no boolean type is defined.
+class SemNoBoolTypeError (SemTypeError):
+    pass
+
+# Exception where no type list is defined.
+class SemNoTypeListError (SemTypeError):
+    pass
+
+# Exception where two types are given the same name.
+class SemTypeDuplicateError (SemTypeError):
+    pass
+
+# Type Mismatch Exception.
+class SemTypeMismatchError (SemTypeError):
+    def __init__ (list):
+        errormsg = "Unsupported operand type(s):"
+        
+        for strType in list:
+            errormsg += "\n\t" + strType
+        
+        errormsg += "."
+        
+        super ().__init__ (errormsg)
+
+# Exception where type does not exist with given name.
+class SemTypeNotFoundError (SemTypeError):
+    pass
+
+# Exception where type does not exist with given enumeration.
+class SemTypeEnumError (SemTypeError):
+    def __init__ (type_string):
+        error_msg = "Type {} is not defined. Choose from:\n".format (type_string)
+                  
+        for name, _ in SemEnumType.__members__.items ():
+            error_msg += name + "\n"
+                
+        error_msg += "."
+                 
+        super ().__init__ (error_msg)         
+
+# Exception where no operator list is defined.
+class SemNoOpListError (SemOpError):
+    pass
+
+# Exception where an operator with a given symbol has already been defined.
+class SemOpDuplicateError (SemOpError):
+    pass
+
+# Exception where operator does not exist with given enumeration.
+class SemOpEnumError (SemOpError):
+    def __init__ (op_string):
+        error_msg = "Operator {} is not defined. Choose from:\n".format (op_string)
+                  
+        for name, _ in SemEnumOp.__members__.items ():
+            error_msg += name + "\n"
+        
+        error_msg += "."
+        
+        super ().__init__ (error_msg)
+    
+# Exception where a symbol has already been declared.
+class SemDeclaredError (SemSymbolError):
+    pass
+
+# Exception where a symbol has not already been declared.
+class SemNotDeclaredError (SemSymbolError):
+    pass
+
+# Create a datatype.
+class SemType:
+    def __init__ (
+      self, 
+      strTypeName, 
+      enumType):
+        self.typeName = strTypeName
+        self.datatype = enumType
+
+    BOOL_NAME = None
+    
+# There is only one boolean type.
+SemType.BOOL_TYPE = SemType (SemType.BOOL_NAME, SemEnumType.BOOLEAN)
+    
+
+class SemVar:
+    def __init__ (
+      self,
+      strValue,
+      semType):
+        self.value = strValue
+        self.dtype = semType   
+    
+    @staticmethod
+    def literal (strValue, semType):
+        return SemVar (strValue, semType)
+    
+    def display (self, strValue):
+        return "print ({})".format (strValue)
+    
+    def assign (self, strValue):
+        result = "{} = {}".format (self.value, strValue)
+
+    def equals (self, o2):
+        if self.dtype == o2.dtype:
+            val    = "({} == {})".format (self.value, o2.value)
+            result = SemVar (val, SemType.BOOL_TYPE)
+        else:
+            raise SemTypeMismatchError (
+              [self.dtype.typeName, o2.dtype.typeName])
+
+    def notEquals (self, o2):
+        if self.dtype == o2.dtype:
+            val    = "({} != {})".format (self.value, o2.value)
+            result = SemVar (val, SemType.BOOL_TYPE)
+            return result 
+        else:
+            raise SemTypeMismatchError (
+              [self.dtype.typeName, o2.dtype.typeName])
+    
+    def boolNot (self):
+        if (self.dtype == SemType.BOOL_TYPE):
+            val    = "not {}".format (self.value)
+            result = SemVar (val, SemType.BOOL_TYPE)
+            return result
+        else:
+            raise SemTypeMismatchError (
+              [self.dtype.typeName])
+
+    def boolAnd (self, o2):
+        if ((self.dtype == SemType.BOOL_TYPE) and 
+          (o2.dtype == SemType.BOOL_TYPE)):
+            val    = "({} and {})".format (self.value, o2.value)
+            result = SemVar (val, SemType.BOOL_TYPE)
+            return result
+        else:
+            raise SemTypeMismatchError (
+              [self.dtype.typeName, o2.dtype.typeName])
+            
+    def boolOr (self, o2):
+        if ((self.dtype == SemType.BOOL_TYPE) 
+          and (o2.dtype == SemType.BOOL_TYPE)):
+            val    = "({} or {})".format (self.value, o2.value)
+            result = SemVar (val, SemType.BOOL_TYPE)
+            return result
+        else:
+            raise SemTypeMismatchError (
+              [self.dtype.typeName, o2.dtype.typeName])
+
+    def lessThan (self, o2):
+        if ((self.dtype.datatype == SemEnumType.NUMERIC) 
+          and (self.dtype == o2.dtype)):
+            val    = "({} < {})".format (self.value, o2.value)
+            result = SemVar (val, SemType.BOOL_TYPE)
+            return result 
+        else:
+            raise SemTypeMismatchError (
+              [self.dtype.typeName, o2.dtype.typeName])
+
+    def lessThanEquals (self, o2):
+        if ((self.dtype.datatype == SemEnumType.NUMERIC) 
+          and (self.dtype == o2.dtype)):
+            val    = "({} <= {})".format (self.value, o2.value)
+            result = SemVar (val, SemType.BOOL_TYPE)
+            return result 
+        else:
+            raise SemTypeMismatchError (
+              [self.dtype.typeName, o2.dtype.typeName])
+
+    def greaterThan (self, o2):
+        if ((self.dtype.datatype == SemEnumType.NUMERIC)
+          and (self.dtype == o2.dtype)):
+            val    = "({} > {})".format (self.value, o2.value)
+            result = SemVar (val, SemType.BOOL_TYPE)
+            return result 
+        else:
+            raise SemTypeMismatchError (
+              [self.dtype.typeName, o2.dtype.typeName])
+
+    def greaterThanEquals (self, o2):
+        if ((self.dtype.datatype == SemEnumType.NUMERIC)
+          and (self.dtype == o2.dtype)):
+            val    = "({} >= {})".format (self.value, o2.value)
+            result = SemVar (val, SemType.BOOL_TYPE)
+            return result 
+        else:
+            raise SemTypeMismatchError (
+              [self.dtype.typeName, o2.dtype.typeName])
+
+    def add (self, o2):
+        if ((self.dtype.datatype == SemEnumType.NUMERIC)
+          and (self.dtype == o2.dtype)):
+            val    = "({} + {})".format (self.value, o2.value)
+            result = SemVar (val, self.dtype)
+            return result 
+        else:
+            raise SemTypeMismatchError (
+              [self.dtype.typeName, o2.dtype.typeName])
+
+    def subtract (self, o2):
+        if ((self.dtype.datatype == SemEnumType.NUMERIC)
+          and (self.dtype == o2.dtype)):
+            val    = "({} - {})".format (self.value, o2.value)
+            result = SemVar (val, self.dtype)
+            return result 
+        else:
+            raise SemTypeMismatchError (
+              [self.dtype.typeName, o2.dtype.typeName])
+
+    def multiply (self, o2):
+        if ((self.dtype.datatype == SemEnumType.NUMERIC)
+          and (self.dtype == o2.dtype)):
+            val    = "({} * {})".format (self.value, o2.value)
+            result = SemVar (val, self.dtype)
+            return result 
+        else:
+            raise SemTypeMismatchError (
+              [self.dtype.typeName, o2.dtype.typeName])
+
+    def intDivide (self, o2):
+        if ((self.dtype.datatype == SemEnumType.NUMERIC)
+          and (self.dtype == o2.dtype)):
+            val    = "({} // {})".format (self.value, o2.value)
+            result = SemVar (val, self.dtype)
+            return result 
+        else:
+            raise SemTypeMismatchError (
+              [self.dtype.typeName, o2.dtype.typeName])
+
+    def floatDivide (self, o2):
+        if ((self.dtype.datatype == SemEnumType.NUMERIC)
+          and (self.dtype == o2.dtype)):
+            val    = "({} / {})".format (self.value, o2.value)
+            result = SemVar (val, self.dtype)
+            return result 
+        else:
+            raise SemTypeMismatchError (
+              [self.dtype.typeName, o2.dtype.typeName])
+
+    def modulo (self, o2):
+        if ((self.dtype.datatype == SemEnumType.NUMERIC)
+          and (self.dtype == o2.dtype)):
+            val    = "({} % {})".format (self.value, o2.value)
+            result = SemVar (val, self.dtype)
+            return result 
+        else:
+            raise SemTypeMismatchError (
+              [self.dtype.typeName, o2.dtype.typeName])
+
+    def powerOf (self, o2):
+        if ((self.dtype.datatype == SemEnumType.NUMERIC)
+          and (self.dtype == o2.dtype)):
+            val    = "({} ** {})".format (self.value, o2.value)
+            result = SemVar (val, self.dtype)
+            return result 
+        else:
+            raise SemTypeMismatchError (
+              [self.dtype.typeName, o2.dtype.typeName])
+
+    def increment (self):
+        if (self.dtype.datatype == SemEnumType.NUMERIC):
+            one = SemVar.literal (self.dtype, "1")
+            inc = self.assign (self.add (one))
+            return inc
+        else:
+            raise SemTypeMismatchError (
+              [self.dtype.typeName])
+    
+    def decrement (self):
+        if (self.dtype.datatype == SemEnumType.NUMERIC):
+            one = SemVar.literal (self.dtype, "1")
+            dec = self.assign (self.subtract (one))
+            return inc
+        else:
+            raise SemTypeMismatchError (
+              [self.dtype.typeName])
+
+    def concatenate (self, o2):
+        if ((self.dtype.datatype == SemEnumType.STRING)
+          and (self.dtype == o2.dtype)):
+            val    = "({} + {})".format (self.value, o2.value)
+            result = SemVar (val, self.dtype)
+            return result 
+        else:
+            raise SemTypeMismatchError (
+              [self.dtype.typeName, o2.dtype.typeName])
+
+
+SemVar.methods = {
+    SemEnumOp.PRINT               : getattr (SemVar, "display"           ),
+    SemEnumOp.ASSIGN              : getattr (SemVar, "assign"            ),
+    SemEnumOp.EQUALS              : getattr (SemVar, "equals"            ),
+    SemEnumOp.NOT_EQUALS          : getattr (SemVar, "notEquals"         ),
+    SemEnumOp.NOT                 : getattr (SemVar, "boolNot"           ),
+    SemEnumOp.AND                 : getattr (SemVar, "boolAnd"           ),
+    SemEnumOp.OR                  : getattr (SemVar, "boolOr"            ),
+    SemEnumOp.GREATER_THAN_EQUALS : getattr (SemVar, "greaterThanEquals" ),
+    SemEnumOp.GREATER_THAN        : getattr (SemVar, "greaterThan"       ),
+    SemEnumOp.LESS_THAN_EQUALS    : getattr (SemVar, "lessThanEquals"    ),
+    SemEnumOp.LESS_THAN           : getattr (SemVar, "lessThan"          ),
+    SemEnumOp.INCREMENT           : getattr (SemVar, "increment"         ),
+    SemEnumOp.DECREMENT           : getattr (SemVar, "decrement"         ),
+    SemEnumOp.ADD                 : getattr (SemVar, "add"               ),
+    SemEnumOp.MULTIPLY            : getattr (SemVar, "multiply"          ),
+    SemEnumOp.SUBTRACT            : getattr (SemVar, "subtract"          ),
+    SemEnumOp.INTEGER_DIVIDE      : getattr (SemVar, "intDivide"         ),
+    SemEnumOp.FLOAT_DIVIDE        : getattr (SemVar, "floatDivide"       ),
+    SemEnumOp.MODULO              : getattr (SemVar, "modulo"            ),
+    SemEnumOp.POWER_OF            : getattr (SemVar, "powerOf"           ),
+    SemEnumOp.CONCATENATE         : getattr (SemVar, "concatenate"       )
+}
+
+
+class SemOperator:
+    def __init__ (
+      self,
+      strSymbol,
+      semType,
+      enumFunc):
+        self.symbol   = strSymbol
+        self.dtype    = semType
+        self.enumFunc = enumOp 
+
+# Table of datatypes of type SemType.
+class SemTypeTable:
+    def __init__ (self):
+        self.table = []
+        self.add (SemType.BOOL_TYPE)
+    
+    def exists (self, strTypeName):
+        for i in range (len (self.table)):
+            if (self.table [i].typeName == strTypeName):
+                return True    
+        return False
+    
+    def add (self, semType):
+        if exists (semType.typeName):
+            raise SemTypeDuplicateError
+        else:
+            self.table.append (semType)  
+
+# Table of operators of type SemOperator.
+class SemOperatorTable:
+    def __init__ (self):
+        self.table = []
+    
+    def exists (self, strSymbol):
+        for i in range (len (self.table)):
+            if (self.table [i].symbol == strSymbol):
+                return True    
+        return False
+    
+    def add (self, semOperator):
+        if exists (semOperator.symbol):
+            raise SemOpDuplicateError
+        else:
+            self.table.append (semOperator)  
+
+# Table of symbols of type SemVar.
+class SemSymbolTable:
+    def __init__ (
+      self, 
+      symbols = []):
+        self.table = symbols
+
+    def retrieve (self, strVarName):
+        for i in range (len (self.table)):
+            if (self.table [i].value == strVarName):
+                return self.table [i].value
+        raise SemNotDeclaredError
+    
+    def exists (self, strVarName):
+        try:
+            symbol = retrieve (self, strVarName)
+            return True
+        except SemNotDeclaredError:
+            return False
+    
+    def add (self, strVarName, semType, typeTable):
+        if exists (strVarName):
+            raise SemDeclaredError
+        elif not typeTable.exists (semType.typeName):
+            raise SemTypeNotFoundError
+        else:
+            symbol = SemVar (strVarName, semType)
+            self.table.append (symbol)
+
+
+# -----------------------------------------------------------------------------
+#                               == SemAnalyser ==
+#
+# The semantic analyser for the given language.
+# -----------------------------------------------------------------------------
+class SemAnalyser:
+    """Work in progress"""
+    def __init__ (
+      self, 
+      datatypes, 
+      operators):
+        self.typeTable     = datatypes
+        self.operatorTable = operators
+        self.symbolTable   = SemSymbolTable ()
+
+    def interpret (self, ast, lineNo = 0):        
+        # Whole programme.
+        if (ast [0] == FLAG_PROGRAMME):
+            return interpret (ast [1], 1)
+            
+        # Process statements one at a time.
+        elif (ast [0] [0] == FLAG_STATEMENT):
+            return (interpret (ast [0] [1], lineNo) + "\n" 
+              + interpret (ast [1:], lineNo + 1))
+            
+        # Variable declaration.
+        if (ast [0] [0] == FLAG_TYPE):
+            pass
+        # Operation.
+        elif (ast [0] [0] == FLAG_OPERATOR):
+            pass
+        else:
+            raise SemError ("The parser returned a bad result: " + ast [0])
+        
+# -----------------------------------------------------------------------------
+# get_caller_module_dict ()
+#
+# This function returns a dictionary containing all of the symbols defined within
+# a caller further down the call stack.  This is used to get the environment
+# associated with the sem () call if none was provided.
+# -----------------------------------------------------------------------------
+# Source:
+# ply: yacc.py
+#
+# Copyright (C) 2001-2018
+# David M. Beazley (Dabeaz LLC)
+# All rights reserved.
+#
+# Redistribution and use in source and binary forms, with or without
+# modification, are permitted provided that the following conditions are
+# met:
+#
+# * Redistributions of source code must retain the above copyright notice,
+#   this list of conditions and the following disclaimer.
+# * Redistributions in binary form must reproduce the above copyright notice,
+#   this list of conditions and the following disclaimer in the documentation
+#   and/or other materials provided with the distribution.
+# * Neither the name of the David Beazley or Dabeaz LLC may be used to
+#   endorse or promote products derived from this software without
+#  specific prior written permission.
+#
+# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+# "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+# LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+# A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+# OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+# SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+# LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+# DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+# THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+# (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+# OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+# -----------------------------------------------------------------------------
+def get_caller_module_dict (levels):
+    f = sys._getframe (levels)
+    sdict = f.f_globals.copy ()
+    if f.f_globals != f.f_locals:
+        sdict.update (f.f_locals)
+    return sdict
+    
+# -----------------------------------------------------------------------------
+# SemReflect ()
+#
+# This class represents information extracted for building a semantic analyser
+# including start symbol, error function, tokens, precedence list, action 
+# functions, etc.
+# -----------------------------------------------------------------------------
+class SemReflect (object):
+    def __init__ (self, dict):
+        self.sdict      = dict
+        self.datatypes  = None
+        self.operators  = None
+        self.ast        = None
+
+    # Get all of the basic information.
+    def get_all (self):
+        self.get_datatypes ()
+        self.get_operators ()
+        self.get_ast       ()
+  
+    # Get all types from the language.
+    def get_datatypes (self):
+        bool_string = self.sdict.get ("boolean_name", None)
+        
+        if not bool_string:
+            raise SemNoBoolTypeError ()
+        
+        SemType.BOOL_NAME = boolString
+        
+        dt_strings = self.sdict.get ("datatypes", None)
+        
+        if not dt_strings:
+            raise SemNoTypeListError ()
+        
+        dts = SemTypeTable ()
+        
+        for (name, type_string) in dt_strings:
+            enumType = None
+            
+            try:
+                enumType = SemEnumType [type_string.upper ()].value
+            except KeyError:
+                raise SemTypeEnumError (type_string)
+                
+            dt = SemType (name, enumType)
+            dts.add (dt)
+             
+        self.datatypes = dts
+
+    # Get all operators from the language.    
+    def get_operators (self):
+        op_strings = self.sdict.get ("operators", None)
+
+        if not op_strings:
+            raise SemNoOpListError ()
+        
+        ops = SemOperatorTable ()
+        
+        for (symbol, dtype, op_string) in op_strings:
+            enumOp = None
+            
+            try:
+                enumOp = SemEnumOp [op_string.upper ()].value
+            except KeyError:
+                raise SemOpEnumError (op_string)
+               
+            op = SemOp (symbol, dtype, enumOp)
+            ops.add (op)
+             
+        self.operators = ops
+    
+    # Get the ast from the parser.
+    def get_ast (self):
+        result = self.sdict.get ("result", None)
+        self.ast = result
+        
+# -----------------------------------------------------------------------------
+# sem (module)
+#
+# Build a semantic analyser
+# -----------------------------------------------------------------------------
+
+def sem ():
+    """Work in progress"""    
+    sdict = get_caller_module_dict (2)
+
+    # Collect semantic analyser information from the dictionary
+    sinfo = SemReflect (sdict)
+    sinfo.get_all()
+
+    # Build the semantic analyser
+    analyser = SemAnalyser (sinfo.datatypes, sinfo.operators)
+    
+    pythonCode = analyser.interpret (sinfo.ast)
+
+
+def main (args):
+    nextInput = input ("Enter a command or q to quit\n")
+        
+    while (nextInput.strip ().upper () != "Q"):
+        exec (nextInput)
+        nextInput = input ("Enter a command or q to quit\n")
+
+
+if (__name__ == "__main__"):
+    sys.path.append (sys.path [0] [:-4])
+    import lexFile_gcclex
+    main (sys.argv)

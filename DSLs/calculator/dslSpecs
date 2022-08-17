@@ -1,0 +1,210 @@
+LANGUAGE SPECIFICATION DOCUMENT
+
+# Specification document for DSL design tool. Fill in the blanks.
+# White space is ignored so feel free to use it as you please.
+# Blank lines and lines beginning with a # are also ignored.
+
+---
+
+Tokens:
+
+# (C, I, R, or T) <Token name> <Token regex or reserved word>
+# 
+# Use C header if you wish matches for this token to be checked against reserved words.
+# Use I header if you wish this token to be ignored in parsing stage.
+# Use R header if you wish this token to be a reserved word.
+# Use T header if you wish no special treatment for this token.
+# Remember to escape special characters: 
+#     . ^ $ * + ? { } [ ] \ | ( ) 
+
+I comment (/\*[^(\*/)]*\*/)|(//.*)
+I whitespace \s+
+T type I|F
+T id [a-z_][a-zA-Z0-9_]*
+T literal_F [+-]?((0|([1-9](\d)*))[eE][+-]?(0|([1-9](\d)*))|((((0|([1-9](\d)*))\.)|\.)(\d)+([eE][+-]?(0|([1-9](\d)*)))?))
+T literal_I [+-]?[1-9](\d)*
+T lbracket \(
+T rbracket \)
+T assign =
+T print P
+T add \+
+T subtract -
+T multiply \*
+T divide_I \\
+T divide_F /
+
+---
+
+Productions:
+
+# P <Non-terminal> -> <Production> [| <Alternate production>]
+# F [<Flag>]
+# I [<List of indexes>]
+# 
+# Empty productions may not be used as alternate productions.
+# Flags are used when building the abstract syntax tree to give context to the semantic analyser. 
+# Default flags are:
+#     STATEMENT DECLARATION OPERATOR IDENTIFIER EMPTY
+# Symbols at the listed indexes are saved in the abstract syntax tree in the order they appear. 
+# 
+# For example:
+#    (I)    0              1       2    3      
+#     P EXPRESSION -> EXPRESSION plus TERM
+#     F OPERATOR
+#     I 2 1 3
+#     ...results in an AST entry of (OPERATOR, plus, p [1], p [3]).
+
+P PROGRAM -> STATEMENT PROGRAM
+F STATEMENT
+I 1 2
+
+P PROGRAM ->
+F EMPTY
+I
+
+P STATEMENT -> type id
+F DECLARATION
+I 1 2
+
+P STATEMENT -> id assign EXPRESSION
+F OPERATOR
+I 2 1 3
+
+P STATEMENT -> print EXPRESSION
+F OPERATOR
+I 1 2
+
+P EXPRESSION -> EXPRESSION add TERM | EXPRESSION subtract TERM
+F OPERATOR
+I 2 1 3
+
+P EXPRESSION -> TERM
+F
+I 1
+
+P TERM -> TERM multiply FACTOR | TERM divide_I FACTOR | TERM divide_F FACTOR
+F OPERATOR
+I 2 1 3
+
+P TERM -> FACTOR
+F
+I 1
+
+P FACTOR -> literal_I
+F literal_I
+I 1
+
+P FACTOR -> literal_F
+F literal_F
+I 1
+
+P FACTOR -> lbracket EXPRESSION rbracket
+F 
+I 2
+
+P FACTOR -> id
+F IDENTIFIER
+I 1
+
+---
+
+Booleans:
+
+# T <True symbol>
+# F <False symbol>
+#
+# This allows you to define your own boolean literals for your language.
+
+T T
+F F
+
+---
+
+Datatypes:
+
+# N <Name>
+# L <Literal name>
+# T <Type string>
+#
+# Type string has to be one of:
+#     BOOLEAN STRING NUMERIC
+# Literal name is the flag used in the AST to reference a literal of this type.
+
+N I
+L literal_I
+T NUMERIC
+
+N F
+L literal_F
+T NUMERIC
+
+---
+
+Operators:
+
+# S <Symbol>
+# A <Number of arguments>
+# (T <List of types>)*
+# F <Format string>
+#
+# The list of types must choose a type for each argument and, optionally, the return type last. 
+# Please enter a format string corresponding to your desired Python output code.
+# Remember, if these operators are used recursively, to surround your format string with parentheses.
+# 
+# For example:
+#     S @
+#     A 2
+#     T int string string
+#     F {1} + \" is \" + {0}
+#     ...will give @ 4 "answer" = "answer is 4".
+
+S =
+A 2
+T I I
+T F F
+F {0} = {1}
+
+S P
+A 1
+T I
+T F
+F print ({0})
+
+S +
+A 2
+T I I I
+T F F F
+T I F F
+T F I F
+F ({0} + {1})
+
+S -
+A 2
+T I I I
+T F F F
+T I F F
+T F I F
+F ({0} - {1})
+
+S *
+A 2
+T I I I
+T F F F
+T I F F
+T F I F
+F ({0} * {1})
+
+S \
+A 2
+T I I I
+F ({0} // {1})
+
+S /
+A 2
+T I I F
+T F F F
+T I F F
+T F I F
+F ({0} / {1})
+
+---
