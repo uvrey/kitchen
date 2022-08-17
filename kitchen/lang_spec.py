@@ -2,6 +2,7 @@
 
 import configparser
 from pathlib import Path
+from xmlrpc.server import resolve_dotted_attribute
 from kitchen import SUCCESS, display_helper, cli_helper
 import typer
 import re
@@ -44,38 +45,60 @@ class Specification:
         self.spec_contents = spec_path.read_text()
         self.token_spec = {}
         self.cfg = cfg
+        self.reserved_words = []
 
         # associate spec regex with token types
         self.read_to_spec()
 
     def read_to_spec(self):
         contents = self.spec_contents.split("\n")
+        line_count = 0
         read_toks = False
+        reserved = False
         for line in contents:
             if len(line) > 0 and line.strip()[0] != "#":
-                if line == "Tokens:":
-                    read_toks = True
+                if line == "Reserved words:":
+                    reserved = True
                 else:
-                    if read_toks:
-                        if line.strip() == "---":
-                            return
-                        else:
-                            self._process_regex_spec(line)
+                    if line == "Tokens:":
+                        read_toks = True
+                    else:
+                        if read_toks:
+                            if line.strip() == "---":
+                                break
+                            else:
+                                self._process_regex_spec(line)
+                                line_count = line_count + 1
+                        if reserved:
+                            if line.strip() == "---":
+                                reserved = False
+                            else:
+                                self._process_reserved_words(line.strip())
+
+        if line_count != len(self.cfg.terminals):
+            display_helper.fail_secho("Note: Some terminals in the CFG are missing regex definitions :(")
     
+    def _process_reserved_words(self, line):
+        split = line.split(" ")
+        cleaned_specs = _clean_inp_stream(split)
+        try:
+            self.reserved_words.append(cleaned_specs[2])
+        except:
+            display_helper.fail_secho("Some error with reserved words occurred.")
+
     def _process_regex_spec(self, line):
         split = line.split(" ")
         cleaned_specs = _clean_inp_stream(split)
-        typer.echo(cleaned_specs)
         try:
-            t = cleaned_specs[1]
+            t_found = cleaned_specs[1]
             regex = cleaned_specs[2]
             # add regex for each terminal
-            if t in self.cfg.terminals:
-                self.token_spec[t] = regex
+            if t_found in self.cfg.terminals:
+                self.token_spec[t_found] = regex
             else:
-                display_helper.info_secho("Note: " + t + " is defined in specificiation but does not appear in CFG.")
+                display_helper.info_secho("Note: " + t_found + " is defined in specificiation but does not appear in CFG.")
         except:
-            display_helper.fail_secho("Some error with regex spec file occurred.")
+            display_helper.fail_secho("Some error with regex processing occurred.")
             return
 
     def show_contents(self):
@@ -83,6 +106,8 @@ class Specification:
 
     def _match(self, inp):
         for key in self.token_spec:
+            if inp in self.reserved_words:
+                return inp
             if re.match(self.token_spec[key], inp):
                 return key
 
