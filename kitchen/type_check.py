@@ -33,6 +33,7 @@ class SemanticAnalyser:
 
     # TODO how to add to this symbol table? 
     # reset symbol table command?
+    # constraints of single line of input parsed?
 
 """
 DONE
@@ -42,6 +43,9 @@ warn when they are ambiguous :)
 customise the regex terminal definitions :)
 match raw input with regex expressions :)
 get regex spec from app/ with simon's help :)
+add intro scene with token stream :)
+get regex commands :)
+notify about LL(1) grammar ambiguity from parse table stage. :)
 """
 
 """
@@ -50,24 +54,27 @@ TODO - DEVELOPMENT
 get PT test cases written
 
 TESTING
-pass the funnt things
+pass the funny things
+
 MANIM
 check epsilon bug in LL(1) parsing video
-long names look weird in parsing vids
+long names look weird in parsing vids - place above node and highlight the colour to opp of bg? 
 Fix manim parsing by adding improved algorithm  
+Get parsing colours to match LL(1) tokens
 
 GRAMMARS
 
+CLI
+- some terminals missing regex error - investigate
+- Notes on regex spec - necessary?
+
 SEMANTIC ANALYSIS
 based on BLA, with help from the assignment
-add intro scene with token stream 
-
 """ 
 
 """
 TODO - INTEGRATION
 start dsl tool from the typer app
-get regex commands
 """ 
 
 """
@@ -78,8 +85,10 @@ remove debugging output
 generate tree PNG for export
 update menu
 PT table spacing on large outputs
-notify about LL(1) grammar ambiguity from parse table stage.
+
 Neaten up cli_helper parsing code
+Code style choices
+
 """ 
 
 """
@@ -118,10 +127,23 @@ For any production S -> A | B, it must be the case that:
     string beginning with a terminal in Follow(A)
 """
 
+"""
+FEATURES
+- unique filenames and timestamps
+- configurable interface
+- 4 algorithms visualised
+- handles more complex grammars
+- handles DSLs
+- sound effects and narration
+~ matching token colours
+~ some semantic analysis 
+"""
 """ 
 LIMITATIONS
 Unlike PLY (LALR), Kitchen does not have
 support for empty productions, precedence rules, error recovery, 
 and ambiguous grammars. 
-
+Single line of input accepted
+Max number of token colours 
+Sound may get corrupted when animation is cancelled before it is finished - so it can't clear the cache
 """
