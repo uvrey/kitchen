@@ -1,13 +1,15 @@
 from logging import root
-from manim import m
-from kitchen import (RE_TERMINAL, RE_PRODUCTION, RE_NONTERMINAL, cli_helper, sounds, animation)
+import manim as m
+from kitchen import (RE_TERMINAL, RE_PRODUCTION, RE_NONTERMINAL, cli_helper, sounds, animation, display_helper)
 import typer
+import anytree
 
-class SymbolTable:
-    def __init__(self, cfg, root, g):
+class SemanticAnalyser:
+    def __init__(self, cfg, root, inp):
         self.cfg = cfg
         self.root = root
-        self.g = g
+        self.input = inp
+        self.symbol = {'Symbol': [], 'Type': [], 'Scope': []}
 
 # 1.	If a variable(identifier) is created/defined on the left hand side of an assignment, it should check if it has already been defined, in which case it should generate an appropriate semantic error. 
 # 2.	If a variable(identifier) is used in the right hand side of an assignment it should check if it has been defined already, and if not it should generate an appropriate semantic error.
@@ -16,6 +18,21 @@ class SymbolTable:
 
     def traverse_tree(self):
         pass
+
+    # TODO how to get order of this match the output?
+    # why are these properties not carrying over :(
+    def init_analysis(self):
+        typer.echo("analysing...")
+        for node in anytree.PreOrderIter(self.root):
+            typer.echo(node.id)
+            # if node.token != None:
+            #     try:
+            #         display_helper.show_tokens(node.token)
+            #     except:
+            #         typer.echo(node.id)
+
+    # TODO how to add to this symbol table? 
+    # reset symbol table command?
 
 """
 DONE

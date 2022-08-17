@@ -7,6 +7,7 @@ from glob import glob
 from pathlib import Path
 from re import L
 from xmlrpc.client import Boolean
+from .type_check import SemanticAnalyser
 import typer
 import os
 import shutil
@@ -414,8 +415,8 @@ def _process_command(inp, cfg, spec) -> None:
             else:
                 code = _init_parsing_ll1(to_sem, cfg, spec, semantic = True)
                 if code == SUCCESS:
-                    typer.echo("can now semantically analyse this thing" + to_sem)
-                    display_helper.print_parsetree(cfg.parser_ll1.root)
+                    sem_analyser = SemanticAnalyser(cfg, cfg.parser_ll1.root, to_sem)
+                    sem_analyser.init_analysis()
                 else:
                     display_helper.fail_secho("Parsing failed. Cannot generate semantic analysis.")
         
