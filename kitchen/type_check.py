@@ -25,16 +25,24 @@ get regex spec from app/ with simon's help
 
 investigate fstack weirdness :)
 
-get BLA working on current test cases
+get BLA working on current test cases (ll(1) subsets should work)
 get PT test cases written
 Fix manim parsing by adding improved algorithm  
 
 MANIM
 check epsilon bug in LL(1) parsing video
+long names look weird in parsing vids
 
 GRAMMARS
 warn when they are ambiguous
 extension: detect LR recursion etc
+ Valid LL(1) Grammars
+
+For any production S -> A | B, it must be the case that:
+
+    For no terminal t could A and B derive strings beginning with t
+    At most one of A and B can derive the empty string
+    if B can derive the empty string, then A does not derive any string beginning with a terminal in Follow(A)
 
 SEMANTIC ANALYSIS
 based on BLA, with help from the assignment
@@ -56,6 +64,7 @@ remove debugging output
 generate tree PNG for export
 update menu
 PT table spacing on large outputs
+notify about LL(1) grammar ambiguity from parse table stage.
 """ 
 
 
@@ -83,5 +92,13 @@ EXTENSIONS
 
 """ 
 FEATURES
+
+"""
+
+""" 
+LIMITATIONS
+Unlike PLY (LALR), Kitchen does not have
+support for empty productions, precedence rules, error recovery, 
+and ambiguous grammars. 
 
 """

@@ -1,3 +1,4 @@
+from optparse import AmbiguousOptionError
 import typer
 import manim as m
 import re
@@ -50,7 +51,6 @@ class ParsingTable:
         self.first_set = fs
         self.follow_set = fw
 
-
     def init_parsetable(self):
         """ Initialises the parsing table. 
         """        
@@ -88,6 +88,10 @@ class ParsingTable:
     def populate_table(self):
         """Populates the whole table with the first and follow set, if appropriate
         """
+
+        # ambiguous = self._check_for_ambiguity()
+        # if ambiguous:
+        #     return
 
         for i, key in enumerate(self.first_set.keys(), start=0):
             for j, item in enumerate(self.first_set[key], start=0):
@@ -199,14 +203,14 @@ class ParsingTable:
         display_helper.info_secho("Parse Table:")
 
         # print column labels
-        col_label = "\t"
+        col_label = "\t\t"
         for t in self.ts:
             col_label += t + "\t"
         display_helper.structure_secho(col_label)
 
         # print rows and contents
         for nt in self.pt_dict.keys():
-            row = nt + ":"
+            row = nt + ":\t"
             for t in self.ts:
                 try:
                     if self.pt_dict[nt][t] != None:
