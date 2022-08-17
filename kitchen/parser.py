@@ -68,7 +68,7 @@ class ParserLL1:
             init_input(self, inp)
 
         if None in self.tokens:
-            display_helper.fail_secho("Not all tokens from the input stream were matched :(")
+            display_helper.fail_secho("Not all tokens from the input stream were matched :(\nParsing failed.")
             return
 
         # set up structures
