@@ -116,10 +116,14 @@ class Specification:
         inp_stream = inp.strip().split(" ")
         cleaned_stream = _clean_inp_stream(inp_stream)
         for c in cleaned_stream:
-            tokens.append(self._match(c))
-        
+            tokens.append(Token(self._match(c), c))
         if len(tokens) != len(cleaned_stream):
             display_helper.fail_secho("Could not match all tokens.")
             return None
         return tokens
+
+class Token:
+    def __init__(self, type, value):
+        self.type = type
+        self.value = value
 

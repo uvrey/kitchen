@@ -31,9 +31,8 @@ def _get_tokens_from_input(inp, spec = None) -> list:
         list: Token stream
     """    
     if spec != None:
-        toks = spec.get_tokens_from_input(inp)
-        display_helper.info_secho("The input stream matched these tokens:" + str(toks))
-        return toks
+        tokens = spec.get_tokens_from_input(inp)
+        return tokens
     else:
         display_helper.info_secho("Note:\tNo language specification has been provided, so the given \n\tinput will be interpreted as tokens directly.")
         return list(filter(None, inp.split(" ")))
@@ -91,11 +90,11 @@ class ParserLL1:
                 return PARSING_ERROR
 
             top = self.stack[-1]
-            next = tokens[0]
+            next = tokens[0].type
 
             if re.match(RE_TERMINAL, top) or top == "$":
                 if top == next:
-                    tokens.remove(next)
+                    tokens = tokens[1:]
                     p = self.stack.pop()
                    # typer.echo("looking at " + next)
 
@@ -196,9 +195,10 @@ class ParserLL1:
 
         # display the parse tree
         if not testing:
-            display_helper.success_secho("Successfully parsed token stream '" + " ".join(original_tokens) +
-                                "'!\nParse tree:")
+            display_helper.success_secho("\nSuccessfully parsed token stream '" + self.get_token_type_string(original_tokens) +
+                                "'\nfrom input stream '" + self.get_token_value_string(original_tokens) + "'.\n\nParse tree:")
             display_helper.print_parsetree(self.root)
+
         else:
             display_helper.success_secho("Success.")
             display_helper.structure_secho(anytree.RenderTree(self.root, style= anytree.AsciiStyle()).by_attr("id"))
@@ -209,4 +209,15 @@ class ParserLL1:
             if node_id == self.root:
                 return node
         return None
-    
+
+    def get_token_type_string(self, toks):
+        ts = []
+        for t in toks:
+            ts.append(t.type)
+        return " ".join(ts)
+
+    def get_token_value_string(self, toks):
+        ts = []
+        for t in toks:
+            ts.append(t.value)
+        return " ".join(ts)

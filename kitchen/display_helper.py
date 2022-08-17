@@ -65,6 +65,10 @@ def structure_secho(msg):
 def show_config_opts():
     info_secho("Options:\n\t Quality: -q <high | med | low>\n\t Preview: -p <y | n>\n\t Narration: -n <y / n>")
 
+def show_tokens(tokens):
+    for t in tokens:
+        structure_secho("Token < Type: " + t.type + ", Value: " + t.value + " >")
+
 def pretty_print_dict(dict):
     """Prints a nicely-formatted dictionary.
 
