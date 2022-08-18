@@ -475,8 +475,9 @@ class ContextFreeGrammar:
                     elif index < len(pps) - 1:
                         next_item = pps[index + 1]
                         # if an item is directly followed by a terminal, it is appended to its follow set
-                        if re.match(RE_TERMINAL, next_item) and next_item not in self.follow_set[item]:
-                            self.follow_set[item].append(next_item)
+                        if re.match(RE_TERMINAL, next_item):
+                            if next_item not in self.follow_set[item]:
+                                self.follow_set[item].append(next_item)
                         else:
                             # we add the first of the non-terminal at this next index
                             tmp_first= self.first_set[next_item]

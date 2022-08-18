@@ -156,7 +156,9 @@ class ParserLL1:
                 try:
                     pt_entry = self.pt_dict[top][next]
                     prods = pt_entry.split("->")
+                  
                     pt = self.stack.pop()
+                    typer.echo("popping " + pt)
 
                     # add sequence of productions to the stack
                     ps = list(filter(None, re.findall(
