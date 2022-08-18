@@ -1,5 +1,6 @@
 """ General parser generator for Kitchen """
 # kitchen/parser.py
+from tracemalloc import start
 import typer
 import anytree
 import re
@@ -108,41 +109,58 @@ class ParserLL1:
                     # pops appropriately
                     if self.parents != []:
                         popped = self.parents.pop()
+
+                        # set up leading connections
+                        # for index, node in enumerate(self.parents, start = 0):
+                        #     if node == popped.token:
+                        #         needs_connecting = self.parents[index + 1:]
+                        #         break
+
+                        # set up the terminal node
+                        popped.parent = popped.token
+                        # connect all nodes that lead to the token
+                        # for nd in reversed(needs_connecting):
+                        #     nd.parent = nd.token
+
+                        # display_helper.print_parsetree(self.root)
+                        # return
+
+                        # typer.echo(needs_connecting)
                         # display_helper.structure_secho(self.parents)
 
                         # reversed so we find the first match
-                        parent_count = 0
-                        node_found = False
-                        temp_parent = popped.tmp_p
+                    #     parent_count = 0
+                    #     node_found = False
+                    #     temp_parent = popped.tmp_p
 
-                        # create node
-                      #  display_helper.info_secho(popped.id + " has parent " + popped.token.id)
-                        new_node = anytree.Node(popped.id, parent=popped.token, id=popped.id, token = popped.token)
+                    #     # create node
+                    #   #  display_helper.info_secho(popped.id + " has parent " + popped.token.id)
+                    #     new_node = anytree.Node(popped.id, parent=popped.token, id=popped.id, token = popped.token)
                         
-                        #linking new terminals to the tree
-                        for node in reversed(self.parents):
-                            if not node_found:
-                                if (node.id == temp_parent):
-                                #    display_helper.info_secho("appending " + popped.id + " with parent " + node.id)
-                                   # new_node = anytree.Node(popped.id, parent=node, id=popped.id, token = prev_token)
-                                    node_found = True
-                                    temp_parent = node.tmp_p
-                            else:
-                                if (node.id == temp_parent):
-                                    parent_count = parent_count + 1
-                                    temp_parent = node.tmp_p
+                    #     #linking new terminals to the tree
+                    #     for node in reversed(self.parents):
+                    #         if not node_found:
+                    #             if (node.id == temp_parent):
+                    #             #    display_helper.info_secho("appending " + popped.id + " with parent " + node.id)
+                    #                # new_node = anytree.Node(popped.id, parent=node, id=popped.id, token = prev_token)
+                    #                 node_found = True
+                    #                 temp_parent = node.tmp_p
+                    #         else:
+                    #             if (node.id == temp_parent):
+                    #                 parent_count = parent_count + 1
+                    #                 temp_parent = node.tmp_p
 
-                            # count how many to pop off based on node being found
-                        #     parent_position = parent_position - 1
-                       # typer.echo(popped.id + " has " + str(parent_count) + " parents. we pop them all off")
+                    #         # count how many to pop off based on node being found
+                    #     #     parent_position = parent_position - 1
+                    #    # typer.echo(popped.id + " has " + str(parent_count) + " parents. we pop them all off")
 
-                        # pop all the direct parents of and including the node we just encountered
-                        typer.echo("popping " + str(parent_count - 1) + " OFF!!")
-                        if parent_count > 0:
-                            for i in range(parent_count - 1):
-                                p = self.parents.pop()
-                                p.parent = p.token
-                                typer.echo("LAST PARENT POPPED: " + str(p))
+                    #     # pop all the direct parents of and including the node we just encountered
+                    #     typer.echo("popping " + str(parent_count - 1) + " OFF!!")
+                    #     if parent_count > 0:
+                    #         for i in range(parent_count - 1):
+                    #             p = self.parents.pop()
+                    #             p.parent = p.token
+                    #             typer.echo("LAST PARENT POPPED: " + str(p))
 
                     else:
                         display_helper.fail_secho("TODO!")
@@ -165,13 +183,18 @@ class ParserLL1:
                     prods = pt_entry.split("->")
                   
                     pt = self.stack.pop()
-                    display_helper.fail_secho("finding productions of " + prods[1])
-   
-                        #typer.echo(self.parents)
+                    display_helper.fail_secho("finding productions of " + prods[0])
+
+                    if top != start_symbol:
+                        # append new non-terminal path to the tree
+                        to_be_appended = self.parents[-1]
+                        if to_be_appended.parent == None:
+                            to_be_appended.parent = to_be_appended.token
 
                     # add sequence of productions to the stack
                     ps = list(filter(None, re.findall(
                         RE_PRODUCTION, prods[1])))
+                    typer.echo(ps)
                     nodes_to_append = []
 
                     # this is the direction we push to the stack
@@ -181,37 +204,28 @@ class ParserLL1:
                             new_node = anytree.Node(p, parent=self.root, id=p, tmp_p = self.root.id, token = self.root)
                         else:
                             # add connecting node if it is a non-terminal
-                            if re.match(RE_NONTERMINAL, p):
-                                # typer.echo("giving " + p + " parent " + self.parents[-1].id)
-                                # BUG assigning wrong parents
-                                new_node = anytree.Node(
-                                    p, id=p, parent=self.root, tmp_p=prods[0].strip(), token = self.parents[-1])
-                            else:
-                                if p != "#":
-                                    # BUG giving leaf terminals the wrong parents
-                                    display_helper.info_secho("giving " + p + " parent " + str(self.parents[-1]))
-                                    typer.echo("\n")
-
-                                    # for qq in self.parents:
-                                    #     display_helper.success_secho(qq)
-
-                                    new_node = anytree.Node(
-                                        p, id=p, tmp_p=prods[0].strip(), token = self.parents[-1])
+                            new_node = anytree.Node(
+                                p, id=p, parent = None, tmp_p=prods[0].strip(), token = self.parents[-1])
                                     
                         # we don't need to match epsilon, and we also only want non-terminals as parent nodes
                         if p != "#":
                             self.stack.append(p)
                             nodes_to_append.append(new_node)
 
-                    # TODO NEW! only append parents once whole list has been processed
+                    # pop off parents
+                    if self.parents != []:
+                        self.parents.pop()
+                    
+                    # add children
                     for t in nodes_to_append:
-                        typer.echo("appending " + t.id + " to parents") 
                         self.parents.append(t)
 
-                    if self.parents != []:
-                        for i, p in enumerate(self.parents, start=1):
-                            typer.echo(i)
-                            display_helper.structure_secho(p)
+                    if top != start_symbol:
+                        if self.parents != []:
+                            for i, p in enumerate(self.parents, start=1):
+                                typer.echo(i)
+                                display_helper.structure_secho(p)
+                     
 
                 except:
                     if not semantic:
