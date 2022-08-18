@@ -56,6 +56,9 @@ get PT test cases written
 TESTING
 pass the funny things
 
+solve CFG_13 parsing table, ll1 bug
+solve parsing bug with bla_complex
+
 MANIM
 check epsilon bug in LL(1) parsing video
 long names look weird in parsing vids - place above node and highlight the colour to opp of bg? 
@@ -63,6 +66,7 @@ Fix manim parsing by adding improved algorithm
 Get parsing colours to match LL(1) tokens
 
 GRAMMARS
+- first set animation not moving CFG to the left
 
 CLI
 - some terminals missing regex error - investigate
@@ -88,6 +92,7 @@ PT table spacing on large outputs
 
 Neaten up cli_helper parsing code
 Code style choices
+gray lines for tables
 
 """ 
 
@@ -138,6 +143,7 @@ FEATURES
 ~ matching token colours
 ~ some semantic analysis 
 """
+
 """ 
 LIMITATIONS
 Unlike PLY (LALR), Kitchen does not have
@@ -145,5 +151,6 @@ support for empty productions, precedence rules, error recovery,
 and ambiguous grammars. 
 Single line of input accepted
 Max number of token colours 
+Difficult grammars not handled
 Sound may get corrupted when animation is cancelled before it is finished - so it can't clear the cache
 """

@@ -4,3 +4,5 @@ shellingham==1.4.0
 pytest==6.2.4
 pyyaml==6.0
 gtts==2.2.4
+pandas==1.4.3
+tabulate==0.8.10

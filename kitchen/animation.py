@@ -340,6 +340,7 @@ class ManimFirstSet(m.Scene):
             m.FadeIn(self.cfg.manim_firstset_lead[production]),
             m.FadeToColor(cfg_line, color=config.opp_col()),
             guide.animate.to_edge(m.RIGHT),
+            keys.animate.to_edge(m.LEFT)
         )
 
         # if production does not have a first set
@@ -532,7 +533,6 @@ class ManimFollowSet(m.Scene):
             # draw follow set title
             fw_title = _get_title_mobject("follow set calculation") 
             guide = get_guide().scale(CFG_SCALE)
-
 
             # set the stage
             self.play(

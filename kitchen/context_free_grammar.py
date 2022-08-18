@@ -285,7 +285,7 @@ class ContextFreeGrammar:
         if production in pstack and len(pstack) > 1:
             return
 
-        typer.echo("looking at " + production)
+      #  typer.echo("looking at " + production)
 
         pstack.append(production)
 
@@ -293,10 +293,11 @@ class ContextFreeGrammar:
         try:
             # loop through values which a production leads to
             for p in self.cfg_dict[production]:
-                display_helper.structure_secho(production + " leads to " + p)
+             #   display_helper.structure_secho(production + " leads to " + p)
 
                 # add the appended production to fstack
                 self.fstack.append(production + " -> " + p)
+
                 # if a production is/ starts with a non-terminal
                 if p in self.cfg_dict or p[0].isupper():
                     # find all the productions which are led by a non-terminal
@@ -313,14 +314,17 @@ class ContextFreeGrammar:
                                     # add production which led to this to the parse table
                                     # typer.echo("WE GOT TO " + current_item + " VIA ")
                                     # typer.echo(self.fstack[j])
+                              #      typer.echo("fset index at " + ps)
+                                    display_helper.info_secho(self.fstack[j])
                                     self.firstset_index[ps].append(
                                         self.fstack[j])
                                     self.first_set[ps].append(current_item)
                                 else:
-                                    display_helper.info_secho("2")
+                              #      display_helper.info_secho("2")
                                     self.is_ambiguous = True
 
-                            # reset the fstack
+                            # reset the fstack and break since we are just interested in the first production
+                            # that does not lead to an epsilon
                             self.fstack.pop()
                             break
                         else:
@@ -328,23 +332,23 @@ class ContextFreeGrammar:
                             if current_item != production:
                                 # we should add A without epsilon if we are the top level production
                                 had_eps = "#" in self.first_set[current_item]
-                                typer.echo("recursing on " + current_item)
+                                # typer.echo("recursing on " + current_item)
                                 self._calculate_first_set(
                                         current_item, pstack)
                                 has_eps = "#" in self.first_set[current_item]
 
-                            # we don't include the last epsilon if we 
-                            # 1) found it in the first set of a non-terminal AND
-                            # 2) we didn't have it in this first set beforehand AND
-                            # 3) we are the top level production (ie. not in the middle of recursion)
-                            # 4) we are not the LAST production 
-
+                                # we don't include the last epsilon if we 
+                                # 1) found it in the first set of a non-terminal AND
+                                # 2) we didn't have it in this first set beforehand AND
+                                # 3) we are the top level production (ie. not in the middle of recursion)
+                                # 4) we are not the LAST production 
                                 if not had_eps and has_eps and len(pstack) == 1 and index != len(p_nt) - 1:
                                     self.first_set[production].remove("#")
                             
                                 if not self.vis_has_epsilon:
                                     break
                     self.vis_has_epsilon = False
+                    
                 else:
                     # if a production starts with a terminal
                     first_terminal = list(
@@ -362,14 +366,12 @@ class ContextFreeGrammar:
                             self.firstset_index[ps].append(self.fstack[j])
                             self.first_set[ps].append(first_terminal[0]) 
                         else:
-                            display_helper.info_secho("1")
+                    #        display_helper.info_secho("1")
                             self.is_ambiguous = True
 
-                    # TODO unpack why fstack works like this for bla but not all others    
-                    # for p in range(len(pstack)):
-                    #     self.fstack.pop()
+                    if self.fstack != []:            
+                        self.fstack.pop()
 
-                    # TODO fstack for the next round
                     # display_helper.info_secho("....")
                     # display_helper.structure_secho(pstack)
                     # typer.echo(self.firstset_index)

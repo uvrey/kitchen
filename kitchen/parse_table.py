@@ -2,6 +2,7 @@
 import typer
 import manim as m
 import re
+import pandas as pd
 from kitchen import (
     RE_TERMINAL,
     display_helper,
@@ -56,9 +57,9 @@ class ParsingTable:
         """ Initialises the parsing table. 
         """        
         for n in self.nts:
+            self.pt_dict[n] = {}
             for t in self.ts:
-                self.pt_dict[n] = {}
-                self.pt_dict[n][t] = None
+                self.pt_dict[n][t] = "Error"
 
     def row(self, nt):
         """Obtain the row index of a given non-terminal.
@@ -82,30 +83,12 @@ class ParsingTable:
         """        
         return self.ts.index(t) + 1
 
-    # def _check_for_ambiguity(self):
-    #     for key in self.cfg_dict.keys():
-    #         if len(self.cfg_dict[key]) > 1:
-    #             self._check_fs(self.cfg_dict[key])
-    #     return False
-    
-    # def _check_fs(self, p_nt):
-    #     first_set = []
-    #     for p in p_nt:
-    #         p_nt = list(filter(None, re.findall(RE_PRODUCTION, p)))
-    #         display_helper.success_secho("Sending this to fs")
-    #         typer.echo(p_nt)      
-
 # Find First(α) and for each terminal in First(α), make entry A –> α in the table.
 # If First(α) contains ε (epsilon) as terminal than, find the Follow(A) and for each terminal in Follow(A), make entry A –> α in the table.
 # If the First(α) contains ε and Follow(A) contains $ as terminal, then make entry A –> α in the table for the $. 
     def populate_table(self):
         """Populates the whole table with the first and follow set, if appropriate
         """
-
-        # ambiguous = self._check_for_ambiguity()
-        # if ambiguous:
-        #     display_helper.fail_secho("grammar is ambiguous")
-        #     return
 
         for i, key in enumerate(self.first_set.keys(), start=0):
             for j, item in enumerate(self.first_set[key], start=0):
@@ -134,7 +117,7 @@ class ParsingTable:
             production (String): Production at ParseTable[nt, t]
         """
         try:
-            if self.pt_dict[nt][t] != None:
+            if self.pt_dict[nt][t] != "Error":
                 error.ERR_too_many_productions_ll1(nt, t)
             else:
                 self.pt_dict[nt][t] = production
@@ -215,32 +198,22 @@ class ParsingTable:
         """        
         # print heading
         display_helper.info_secho("Parse Table:")
-
-        # print column labels
-        col_label = "\t\t"
-        for t in self.ts:
-            col_label += t + "\t"
-        display_helper.structure_secho(col_label)
-
-        # print rows and contents
-        for nt in self.pt_dict.keys():
-            row = nt + ":\t"
-            for t in self.ts:
-                try:
-                    if self.pt_dict[nt][t] != None:
-                        row += re.sub(r'\s+', '',
-                                    self.pt_dict[nt][t]) + "\t"
-                    else:
-                        row += "\t"
-                except:
-                    row += "\t"
-            display_helper.structure_secho(row)
+        df = pd.DataFrame.from_dict(self.pt_dict).transpose().to_markdown()
+        display_helper.structure_secho(df)
 
     def print_parse_table_testing(self):
         """Prints the parse table for testing purposes
         """        
         # print heading
         typer.echo(self.pt_dict)
+
+def highlight_error(s):
+    if s == "Error" :
+        return ['background-color: red']
+    else:
+        return ['background-color: white']
+
+
 
 
   

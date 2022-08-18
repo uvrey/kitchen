@@ -75,8 +75,8 @@ class Specification:
                             else:
                                 self._process_reserved_words(line.strip())
 
-        if line_count != len(self.cfg.terminals):
-            display_helper.fail_secho("Note: Some terminals in the CFG are missing regex definitions :(")
+        # if line_count != len(self.cfg.terminals):
+        #     display_helper.fail_secho("Note: Some terminals in the CFG are missing regex definitions :(")
     
     def _process_reserved_words(self, line):
         split = line.split(" ")
@@ -95,8 +95,8 @@ class Specification:
             # add regex for each terminal
             if t_found in self.cfg.terminals:
                 self.token_spec[t_found] = regex
-            else:
-                display_helper.info_secho("Note: " + t_found + " is defined in specificiation but does not appear in CFG.")
+            # else:
+            #     display_helper.info_secho("Note: " + t_found + " is defined in specificiation but does not appear in CFG.")
         except:
             display_helper.fail_secho("Some error with regex processing occurred.")
             return
