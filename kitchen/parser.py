@@ -182,6 +182,7 @@ class ParserLL1:
                                     
                         # we don't need to match epsilon, and we also only want non-terminals as parent nodes
                         if p != "#":
+                            typer.echo("adding " + p + " to the stack")
                             self.stack.append(p)
                             nodes_to_append.append(new_node)
 
@@ -197,6 +198,8 @@ class ParserLL1:
 
         # in case parsing finishes but there are still tokens left in the stack
         if len(tokens) > 0:
+            typer.echo(tokens)
+            display_helper.structure_secho(self.stack)
             if not semantic:
                 error.ERR_parsing_error(self.root, "Unexpected end of input.")
             return PARSING_ERROR

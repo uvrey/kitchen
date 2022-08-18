@@ -285,15 +285,17 @@ class ContextFreeGrammar:
         if production in pstack and len(pstack) > 1:
             return
 
+        typer.echo("looking at " + production)
+
         pstack.append(production)
 
         # if production does not have a first set
         try:
             # loop through values which a production leads to
             for p in self.cfg_dict[production]:
+                display_helper.structure_secho(production + " leads to " + p)
 
                 # add the appended production to fstack
-                # TODO check this thing
                 self.fstack.append(production + " -> " + p)
                 # if a production is/ starts with a non-terminal
                 if p in self.cfg_dict or p[0].isupper():
@@ -315,17 +317,21 @@ class ContextFreeGrammar:
                                         self.fstack[j])
                                     self.first_set[ps].append(current_item)
                                 else:
+                                    display_helper.info_secho("2")
                                     self.is_ambiguous = True
 
                             # reset the fstack
                             self.fstack.pop()
                             break
                         else:
-                            # we should add A without epsilon if we are the top level production
-                            had_eps = "#" in self.first_set[current_item]
-                            self._calculate_first_set(
-                                current_item, pstack)
-                            has_eps = "#" in self.first_set[current_item]
+                            # we should not find the first set of ourselves
+                            if current_item != production:
+                                # we should add A without epsilon if we are the top level production
+                                had_eps = "#" in self.first_set[current_item]
+                                typer.echo("recursing on " + current_item)
+                                self._calculate_first_set(
+                                        current_item, pstack)
+                                has_eps = "#" in self.first_set[current_item]
 
                             # we don't include the last epsilon if we 
                             # 1) found it in the first set of a non-terminal AND
@@ -333,11 +339,11 @@ class ContextFreeGrammar:
                             # 3) we are the top level production (ie. not in the middle of recursion)
                             # 4) we are not the LAST production 
 
-                            if not had_eps and has_eps and len(pstack) == 1 and index != len(p_nt) - 1:
-                                self.first_set[production].remove("#")
+                                if not had_eps and has_eps and len(pstack) == 1 and index != len(p_nt) - 1:
+                                    self.first_set[production].remove("#")
                             
-                            if not self.vis_has_epsilon:
-                                break
+                                if not self.vis_has_epsilon:
+                                    break
                     self.vis_has_epsilon = False
                 else:
                     # if a production starts with a terminal
@@ -356,6 +362,7 @@ class ContextFreeGrammar:
                             self.firstset_index[ps].append(self.fstack[j])
                             self.first_set[ps].append(first_terminal[0]) 
                         else:
+                            display_helper.info_secho("1")
                             self.is_ambiguous = True
 
                     # TODO unpack why fstack works like this for bla but not all others    

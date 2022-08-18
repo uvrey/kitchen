@@ -146,17 +146,30 @@ def get_token_types(toks, as_list = False):
     try:
         for t in toks:
             ts.append(t.type)
-        if as_list: return ts
-        return " ".join(ts)
+        if as_list: 
+            return ts
+        else:
+            typer.echo("returning :")
+            typer.echo (" ".join(ts))
+            return " ".join(ts)
     except:
-        return toks
+        if as_list: 
+            return toks
+        return " ".join(toks)
 
 def get_token_values(toks, as_list = False):
     ts = []
-    for t in toks:
-        ts.append(t.value)
-    if as_list: return ts
-    return " ".join(ts)
+    try:
+        for t in toks:
+            ts.append(t.value)
+        if as_list: 
+            return ts
+        else: 
+            return " ".join(toks)
+    except:
+        if as_list: 
+            return toks
+        return " ".join(ts)
 
 class Token:
     def __init__(self, type, value):
