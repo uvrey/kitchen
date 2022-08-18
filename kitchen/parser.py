@@ -103,65 +103,12 @@ class ParserLL1:
                     prev_token = tokens[0]
                     tokens = tokens[1:]
                     p = self.stack.pop()
-                    typer.echo("MATCHED " + next)
 
-                    # ALL NEW TODO
-                    # pops appropriately
                     if self.parents != []:
                         popped = self.parents.pop()
 
-                        # set up leading connections
-                        # for index, node in enumerate(self.parents, start = 0):
-                        #     if node == popped.token:
-                        #         needs_connecting = self.parents[index + 1:]
-                        #         break
-
                         # set up the terminal node
                         popped.parent = popped.token
-                        # connect all nodes that lead to the token
-                        # for nd in reversed(needs_connecting):
-                        #     nd.parent = nd.token
-
-                        # display_helper.print_parsetree(self.root)
-                        # return
-
-                        # typer.echo(needs_connecting)
-                        # display_helper.structure_secho(self.parents)
-
-                        # reversed so we find the first match
-                    #     parent_count = 0
-                    #     node_found = False
-                    #     temp_parent = popped.tmp_p
-
-                    #     # create node
-                    #   #  display_helper.info_secho(popped.id + " has parent " + popped.token.id)
-                    #     new_node = anytree.Node(popped.id, parent=popped.token, id=popped.id, token = popped.token)
-                        
-                    #     #linking new terminals to the tree
-                    #     for node in reversed(self.parents):
-                    #         if not node_found:
-                    #             if (node.id == temp_parent):
-                    #             #    display_helper.info_secho("appending " + popped.id + " with parent " + node.id)
-                    #                # new_node = anytree.Node(popped.id, parent=node, id=popped.id, token = prev_token)
-                    #                 node_found = True
-                    #                 temp_parent = node.tmp_p
-                    #         else:
-                    #             if (node.id == temp_parent):
-                    #                 parent_count = parent_count + 1
-                    #                 temp_parent = node.tmp_p
-
-                    #         # count how many to pop off based on node being found
-                    #     #     parent_position = parent_position - 1
-                    #    # typer.echo(popped.id + " has " + str(parent_count) + " parents. we pop them all off")
-
-                    #     # pop all the direct parents of and including the node we just encountered
-                    #     typer.echo("popping " + str(parent_count - 1) + " OFF!!")
-                    #     if parent_count > 0:
-                    #         for i in range(parent_count - 1):
-                    #             p = self.parents.pop()
-                    #             p.parent = p.token
-                    #             typer.echo("LAST PARENT POPPED: " + str(p))
-
                     else:
                         display_helper.fail_secho("TODO!")
 
