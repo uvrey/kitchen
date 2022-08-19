@@ -17,25 +17,36 @@ class SemanticAnalyser:
     # 2.	If a variable(identifier) is used in the right hand side of an assignment it should check if it has been defined already, and if not it should generate an appropriate semantic error.
     # TODO get context of expression; when is it LHS, when is it RHS?
 
+    def _call_error(self, msg = ""):
+        display_helper.fail_secho("Error: "+ msg)
+        self.print_symbol_table()
+        return 
+
+    # plan: check if types are the same on either side. if so, we check rhs and lhs accordingly
     def init_analysis(self):
         lhs = True
+        lh_type = None
         for node in anytree.PreOrderIter(self.root):
             if node.token != None:
                 try:
                     if not lhs:
-                        typer.echo("rhs of expr: " + node.token.value)
+                        if node.token.value not in self.symbol['Symbol'] and lh_type == node.token.type:
+                            self._call_error(node.token.value + " has not yet been defined.")
+                            return
                         lhs = True
-
-                    elif node.token.value in self.symbol['Symbol'] and node.token.value != node.token.type and lhs:
-                        display_helper.fail_secho("Error! "+ node.token.value + " has already been defined.")
-                        self.print_symbol_table()
-                        return 
+                    else:
+                        if node.token.value != "=":
+                            if node.token.value in self.symbol['Symbol']:
+                                self._call_error(node.token.value + " has already been defined.")
+                                return
+                            else:
+                                lh_type = node.token.type
+                        else:
+                            lhs = False
                     
-                    if node.token.value == "=":
-                        lhs = False
-
                     self.symbol['Symbol'].append(node.token.value)
                     self.symbol['Type'].append(node.token.type)
+
                 except:
                     display_helper.fail_secho("Cannot semantically analyse only a token stream.")
                     return
