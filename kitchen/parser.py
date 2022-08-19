@@ -127,8 +127,8 @@ class ParserLL1:
                         popped = self.parents.pop()
 
                         # set up the terminal node
-                        typer.echo("matching " + popped.id + " to its parent " + popped.token.id)
-                        popped.parent = popped.token
+                        typer.echo("matching " + popped.id + " to its parent " + popped.tmp_parent.id)
+                        popped.parent = popped.tmp_parent
                     else:
                         display_helper.fail_secho("TODO!")
 
@@ -156,7 +156,7 @@ class ParserLL1:
                         # append new non-terminal path to the tree
                         to_be_appended = self.parents[-1]
                         if to_be_appended.parent == None:
-                            to_be_appended.parent = to_be_appended.token
+                            to_be_appended.parent = to_be_appended.tmp_parent
 
                     # add sequence of productions to the stack
                     ps = list(filter(None, re.findall(
@@ -169,11 +169,11 @@ class ParserLL1:
                     for p in ps:
                         # add to the tree
                         if top == start_symbol:
-                            new_node = anytree.Node(p, parent=self.root, id=p, tmp_p = self.root.id, token = self.root)
+                            new_node = anytree.Node(p, parent=self.root, id=p, tmp_p = self.root.id, tmp_parent = self.root)
                         else:
                             # add connecting node if it is a non-terminal
                             new_node = anytree.Node(
-                                p, id=p, parent = None, tmp_p=prods[0].strip(), token = self.parents[-1])
+                                p, id=p, parent = None, tmp_p=prods[0].strip(), tmp_parent = self.parents[-1])
                                     
                         # we don't need to match epsilon, and we also only want non-terminals as parent nodes
                         if p != "#":
