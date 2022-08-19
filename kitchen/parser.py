@@ -35,7 +35,6 @@ def _get_tokens_from_input(inp, spec = None) -> list:
         tokens = spec.get_tokens_from_input(inp)
         return tokens
     else:
-        display_helper.info_secho("Note:\tNo language specification has been provided, so the given \n\tinput will be interpreted as tokens directly.")
         return list(filter(None, inp.split(" ")))
 
 class ParserLL1:
@@ -129,8 +128,8 @@ class ParserLL1:
                     pt_entry = self.pt_dict[top][next]
                     prods = pt_entry.split("->")
                   
-                    pt = self.stack.pop()
-                    display_helper.fail_secho("finding productions of " + prods[0])
+                    self.stack.pop()
+                    # display_helper.fail_secho("finding productions of " + prods[0])
 
                     if top != start_symbol:
                         # append new non-terminal path to the tree
@@ -141,7 +140,7 @@ class ParserLL1:
                     # add sequence of productions to the stack
                     ps = list(filter(None, re.findall(
                         RE_PRODUCTION, prods[1])))
-                    typer.echo(ps)
+                   
                     nodes_to_append = []
 
                     # this is the direction we push to the stack
@@ -167,11 +166,11 @@ class ParserLL1:
                     for t in nodes_to_append:
                         self.parents.append(t)
 
-                    if top != start_symbol:
-                        if self.parents != []:
-                            for i, p in enumerate(self.parents, start=1):
-                                typer.echo(i)
-                                display_helper.structure_secho(p)
+                    # if top != start_symbol:
+                    #     if self.parents != []:
+                    #         for i, p in enumerate(self.parents, start=1):
+                    #             typer.echo(i)
+                    #             display_helper.structure_secho(p)
                 except:
                     if not semantic:
                         error.ERR_parsing_error(self.root,
@@ -187,8 +186,11 @@ class ParserLL1:
         # display the parse tree
         if not semantic:
             if not testing:
-                display_helper.success_secho("\nSuccessfully parsed token stream '" + lang_spec.get_token_types(original_tokens) +
-                                    "'\nfrom input stream '" + lang_spec.get_token_values(original_tokens) + "'.\n\nParse tree:")
+                types = lang_spec.get_token_format(original_tokens, types=True)
+                values = lang_spec.get_token_format(original_tokens, values=True)
+             
+                display_helper.success_secho("\nSuccessfully parsed token stream '" + types +
+                                    "'\nfrom input stream '" + values + "'.\n\nParse tree:")
                 display_helper.print_parsetree(self.root)
             else:
                 display_helper.success_secho("Success.")

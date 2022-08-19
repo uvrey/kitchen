@@ -1190,7 +1190,7 @@ class ManimParseTree(m.Scene):
         
         self.play(
             m.LaggedStart(*(m.FadeIn(t, shift=m.UP)
-                        for t in map_token_lists(self, self.inp_list, lang_spec.get_token_types(self.tokens, as_list=True)))),
+                        for t in map_token_lists(self, self.inp_list, lang_spec.get_token_format(self.tokens, types=True, as_list=True)))),
         )
         self.wait()
 

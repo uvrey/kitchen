@@ -123,8 +123,6 @@ class Specification:
         return tokens
 
 def get_index_by_token_type(tokens, t):
-    typer.echo("we want " + t + " in " + get_token_types(tokens))
-
     for i, t in enumerate(tokens, start = 0):
         try:
             if tokens.type == t:
@@ -132,7 +130,7 @@ def get_index_by_token_type(tokens, t):
         except:
             return tokens.index(t)
 
-def get_token_types(toks, as_list = False):
+def get_token_format(toks, values = False, types = False, as_list = False):
     """Creates list of token types or returns the list itself if it is empty
 
     Args:
@@ -145,31 +143,19 @@ def get_token_types(toks, as_list = False):
     ts = []
     try:
         for t in toks:
-            ts.append(t.type)
+            if types:
+                ts.append(t.type)
+            elif values:
+                ts.append(t.value)
         if as_list: 
             return ts
         else:
-            typer.echo("returning :")
-            typer.echo (" ".join(ts))
             return " ".join(ts)
     except:
         if as_list: 
             return toks
         return " ".join(toks)
 
-def get_token_values(toks, as_list = False):
-    ts = []
-    try:
-        for t in toks:
-            ts.append(t.value)
-        if as_list: 
-            return ts
-        else: 
-            return " ".join(toks)
-    except:
-        if as_list: 
-            return toks
-        return " ".join(ts)
 
 class Token:
     def __init__(self, type, value):

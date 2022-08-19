@@ -1,5 +1,6 @@
 """ Creates the Kitchen CLI"""
 # kitchen/cli.py
+from unittest.mock import NonCallableMagicMock
 import typer
 from pathlib import Path
 from typing import Optional
@@ -121,6 +122,9 @@ def run() -> None:
 
     cfg = get_cfg()
     spec = lang_spec.get_spec(cfg)
+
+    if spec == None:
+        display_helper.info_secho("Note:\tNo language specification has been provided, so the given \n\tinput will be interpreted as tokens directly.")
 
     display_helper.success_secho("CFG loaded successfully.")
     while (True):
