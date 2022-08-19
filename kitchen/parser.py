@@ -172,8 +172,6 @@ class ParserLL1:
                             for i, p in enumerate(self.parents, start=1):
                                 typer.echo(i)
                                 display_helper.structure_secho(p)
-                     
-
                 except:
                     if not semantic:
                         error.ERR_parsing_error(self.root,
