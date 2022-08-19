@@ -16,15 +16,24 @@ class SemanticAnalyser:
     # 1.	If a variable(identifier) is created/defined on the left hand side of an assignment, it should check if it has already been defined, in which case it should generate an appropriate semantic error. 
     # 2.	If a variable(identifier) is used in the right hand side of an assignment it should check if it has been defined already, and if not it should generate an appropriate semantic error.
     # TODO get context of expression; when is it LHS, when is it RHS?
-    
+
     def init_analysis(self):
+        lhs = True
         for node in anytree.PreOrderIter(self.root):
             if node.token != None:
                 try:
-                    if node.token.value in self.symbol['Symbol'] and node.token.value != node.token.type:
+                    if not lhs:
+                        typer.echo("rhs of expr: " + node.token.value)
+                        lhs = True
+
+                    elif node.token.value in self.symbol['Symbol'] and node.token.value != node.token.type and lhs:
                         display_helper.fail_secho("Error! "+ node.token.value + " has already been defined.")
                         self.print_symbol_table()
                         return 
+                    
+                    if node.token.value == "=":
+                        lhs = False
+
                     self.symbol['Symbol'].append(node.token.value)
                     self.symbol['Type'].append(node.token.type)
                 except:
@@ -36,7 +45,6 @@ class SemanticAnalyser:
         display_helper.info_secho("Symbol Table:")
         df = pd.DataFrame.from_dict(self.symbol).to_markdown()
         display_helper.structure_secho(df)
-
 
 """
 DONE
