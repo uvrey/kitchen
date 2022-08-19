@@ -72,31 +72,31 @@ solve CFG_13 parsing table, ll1 bug :)
 pass the funny things :)
 id language :)
 semantic analyser backend :)
+solve parsing bug with bla_complex - it was not LL(1) compatible :)
+first set animation not moving CFG to the left :)
+PT table spacing on large outputs :) 
 """
 
 """
 TODO - DEVELOPMENT
 
-get PT test cases written
 
 TESTING
-solve parsing bug with bla_complex
+get lots of test cases written
 
 MANIM
 check epsilon bug in LL(1) parsing video
 long names look weird in parsing vids - place above node and highlight the colour to opp of bg? 
 Fix manim parsing by adding improved algorithm  
 Get parsing colours to match LL(1) tokens
+implement semantic analysis
 
 GRAMMARS
-- first set animation not moving CFG to the left
 
 CLI
 - some terminals missing regex error - investigate
 - Notes on regex spec - necessary?
 
-SEMANTIC ANALYSIS
-based on BLA, with help from the assignment
 """ 
 
 """
@@ -111,12 +111,10 @@ cfg_1 parsing has sound not found error
 remove debugging output
 generate tree PNG for export
 update menu
-PT table spacing on large outputs
 
 Neaten up cli_helper parsing code
 Code style choices
 gray lines for tables
-
 """ 
 
 """
