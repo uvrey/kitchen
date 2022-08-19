@@ -52,6 +52,21 @@ class ParserLL1:
                     anytree.Node("#", parent=node, id= "#")
         return SUCCESS
 
+    def _parsing_successful(self, tokens, semantic: bool, testing = False, verbose = True):
+        types = lang_spec.get_token_format(tokens, types=True)
+        values = lang_spec.get_token_format(tokens, values=True)
+        
+        if not semantic:
+            if testing:
+                display_helper.success_secho("Success.")
+                display_helper.structure_secho(anytree.RenderTree(self.root, style= anytree.AsciiStyle()).by_attr("id"))
+                return
+
+            if verbose:
+                display_helper.success_secho("\nSuccessfully parsed token stream '" + types +
+                                            "'\nfrom input stream '" + values + "'.\n\nParse tree:")
+                display_helper.print_parsetree(self.root)
+
     def parse_ll1(self, start_symbol, inp="", semantic = False, testing = False) -> int:
         """LL(1) Parser, which generates a parse tree and stores this to self.root
         Args:
@@ -88,6 +103,11 @@ class ParserLL1:
                     if re.match(RE_TERMINAL, self.stack[-1]):
                         error.ERR_parsing_error(self.root, "Expected " + self.stack[-1])
                     else:
+                        # parsing is successful if the remaining non-terminal may tend to epsilon
+                        if "#" in self.cfg.first_set[self.stack[-1]] and len(self.stack) == 1:
+                            self._parsing_successful(original_tokens, semantic, testing)
+                            return
+
                         error.ERR_parsing_error(self.root)
                 return PARSING_ERROR
 
@@ -184,17 +204,9 @@ class ParserLL1:
             return PARSING_ERROR
 
         # display the parse tree
-        if not semantic:
-            if not testing:
-                types = lang_spec.get_token_format(original_tokens, types=True)
-                values = lang_spec.get_token_format(original_tokens, values=True)
-             
-                display_helper.success_secho("\nSuccessfully parsed token stream '" + types +
-                                    "'\nfrom input stream '" + values + "'.\n\nParse tree:")
-                display_helper.print_parsetree(self.root)
-            else:
-                display_helper.success_secho("Success.")
-                display_helper.structure_secho(anytree.RenderTree(self.root, style= anytree.AsciiStyle()).by_attr("id"))
+        if not testing:
+            self._parsing_successful(original_tokens, semantic, testing)
+               
         return SUCCESS
 
     def get_node(self, node_id):

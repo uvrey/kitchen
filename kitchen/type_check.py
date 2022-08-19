@@ -46,6 +46,7 @@ get regex spec from app/ with simon's help :)
 add intro scene with token stream :)
 get regex commands :)
 notify about LL(1) grammar ambiguity from parse table stage. :)
+solve CFG_13 parsing table, ll1 bug :)
 """
 
 """
@@ -56,7 +57,6 @@ get PT test cases written
 TESTING
 pass the funny things
 
-solve CFG_13 parsing table, ll1 bug
 solve parsing bug with bla_complex
 
 MANIM
@@ -152,5 +152,6 @@ and ambiguous grammars.
 Single line of input accepted
 Max number of token colours 
 Difficult grammars not handled
+Checking for conflicts
 Sound may get corrupted when animation is cancelled before it is finished - so it can't clear the cache
 """
