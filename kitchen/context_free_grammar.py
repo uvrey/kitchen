@@ -315,7 +315,6 @@ class ContextFreeGrammar:
                                     # typer.echo("WE GOT TO " + current_item + " VIA ")
                                     # typer.echo(self.fstack[j])
                               #      typer.echo("fset index at " + ps)
-                                    display_helper.info_secho(self.fstack[j])
                                     self.firstset_index[ps].append(
                                         self.fstack[j])
                                     self.first_set[ps].append(current_item)
@@ -389,7 +388,6 @@ class ContextFreeGrammar:
                     self._calculate_first_set(empty_set_nt, [])
             else:
                 pstack.pop()
-                self.fstack = self.fstack[1:]
 
         except KeyError:
             error.ERR_key_not_given_in_CFG(production)

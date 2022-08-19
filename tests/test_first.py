@@ -19,6 +19,7 @@ def fs_out_path():
 """ Test calculation of first sets on existing CFG files """
 @pytest.mark.parametrize("sample_cfg", [
     ("cfg.txt"),
+    ("cfg_0.txt"),
     ("cfg_1.txt"),
     ("cfg_2.txt"),
     ("cfg_3.txt"),

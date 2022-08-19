@@ -142,7 +142,6 @@ class ParsingTable:
             for t in self.ts:
                 try:
                     item = self.pt_dict[n][t]
-                    typer.echo(item)
                     if item != None:
                         if re.match(RE_TERMINAL, item):
                             row.append(item)

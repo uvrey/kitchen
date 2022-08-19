@@ -382,6 +382,9 @@ def _process_command(inp, cfg, spec) -> None:
         if code == AMBIGUOUS_ERROR:
             error.ERR_ambiguous_grammar()
 
+    elif inp == "\\gt":
+        typer.echo(cfg.cfg_contents.replace("->", "::="))
+
     elif inp == "\\vis parsetable" or inp == "\\vpt":
         if not cfg.first_set_calculated:
             cfg.reset_first_set()

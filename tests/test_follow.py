@@ -21,8 +21,9 @@ def fw_out_path():
 """ Test calculation of first sets on existing CFG files """
 @pytest.mark.parametrize("sample_cfg", [
     ("cfg.txt"),
-    ("cfg_1.txt"), # need memo
-    ("cfg_2.txt"), # issue here with follow(B) ans done
+    ("cfg_0.txt"),
+    ("cfg_1.txt"), 
+    ("cfg_2.txt"), 
     ("cfg_3.txt"),
     ("cfg_4.txt"),
     ("cfg_5.txt"),
@@ -30,7 +31,7 @@ def fw_out_path():
     ("cfg_7.txt"), 
     ("cfg_8.txt"),
     ("cfg_9.txt"), 
-    ("cfg_10.txt"), # issue here
+    ("cfg_10.txt"), 
 ])
 
 def test_fw(sample_path, fw_out_path, sample_cfg):

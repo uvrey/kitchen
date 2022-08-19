@@ -119,7 +119,6 @@ class ParserLL1:
 
             if re.match(RE_TERMINAL, top) or top == "$":
                 if top == next:
-                    prev_token = tokens[0]
                     tokens = tokens[1:]
                     p = self.stack.pop()
 
@@ -186,11 +185,6 @@ class ParserLL1:
                     for t in nodes_to_append:
                         self.parents.append(t)
 
-                    # if top != start_symbol:
-                    #     if self.parents != []:
-                    #         for i, p in enumerate(self.parents, start=1):
-                    #             typer.echo(i)
-                    #             display_helper.structure_secho(p)
                 except:
                     if not semantic:
                         error.ERR_parsing_error(self.root,
@@ -204,9 +198,7 @@ class ParserLL1:
             return PARSING_ERROR
 
         # display the parse tree
-        if not testing:
-            self._parsing_successful(original_tokens, semantic, testing)
-               
+        self._parsing_successful(original_tokens, semantic, testing)               
         return SUCCESS
 
     def get_node(self, node_id):
