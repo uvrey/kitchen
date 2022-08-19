@@ -3,36 +3,47 @@ import manim as m
 from kitchen import (RE_TERMINAL, RE_PRODUCTION, RE_NONTERMINAL, cli_helper, sounds, animation, display_helper)
 import typer
 import anytree
+import pandas as pd
 
 class SemanticAnalyser:
     def __init__(self, cfg, root, inp):
         self.cfg = cfg
         self.root = root
         self.input = inp
-        self.symbol = {'Symbol': [], 'Type': [], 'Scope': []}
+        self.symbol = {'Symbol': [], 'Type': []}
 
 # 1.	If a variable(identifier) is created/defined on the left hand side of an assignment, it should check if it has already been defined, in which case it should generate an appropriate semantic error. 
 # 2.	If a variable(identifier) is used in the right hand side of an assignment it should check if it has been defined already, and if not it should generate an appropriate semantic error.
-    def create_symbol_table(self):
+    def _create_symbol_table(self):
         pass
 
     def traverse_tree(self):
         pass
 
-    # TODO how to get order of this match the output?
-    # why are these properties not carrying over :(
+    # TODO get +/ = to associate names and vals
+    # 1.	If a variable(identifier) is created/defined on the left hand side of an assignment, it should check if it has already been defined, in which case it should generate an appropriate semantic error. 
+    # 2.	If a variable(identifier) is used in the right hand side of an assignment it should check if it has been defined already, and if not it should generate an appropriate semantic error.
+
     def init_analysis(self):
         for node in anytree.PreOrderIter(self.root):
-            typer.echo(node.id)
-            # if node.token != None:
-            #     try:
-            #         display_helper.show_tokens(node.token)
-            #     except:
-            #         typer.echo(node.id)
+            if node.token != None:
+                try:
+                    if node.token.value in self.symbol['Symbol'] and node.token.value != node.token.type:
+                        display_helper.fail_secho("Error! "+ node.token.value + " has already been defined.")
+                        self.print_symbol_table()
+                        return 
+                    self.symbol['Symbol'].append(node.token.value)
+                    self.symbol['Type'].append(node.token.type)
+                except:
+                    display_helper.fail_secho("Cannot semantically analyse only a token stream.")
+                    return
+        self.print_symbol_table()
 
-    # TODO how to add to this symbol table? 
-    # reset symbol table command?
-    # constraints of single line of input parsed?
+    def print_symbol_table(self):
+        display_helper.info_secho("Symbol Table:")
+        df = pd.DataFrame.from_dict(self.symbol).to_markdown()
+        display_helper.structure_secho(df)
+
 
 """
 DONE

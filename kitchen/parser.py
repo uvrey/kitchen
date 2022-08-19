@@ -50,7 +50,7 @@ class ParserLL1:
         for node in self.root.descendants:
             if re.match(RE_NONTERMINAL, node.id):
                 if len(node.children) == 0 and "#" in self.cfg.first_set[node.id]:
-                    anytree.Node("#", parent=node, id= "#")
+                    anytree.Node("#", parent=node, id= "#", token = None)
         return SUCCESS
 
     def _parsing_successful(self, tokens, semantic: bool, testing = False, verbose = True):
@@ -83,6 +83,9 @@ class ParserLL1:
         else:
             init_input(self, inp)
 
+        # display_helper.info_secho("MAPPED TO TOKENS:")
+        # display_helper.show_tokens(self.tokens)
+
         if None in self.tokens:
             display_helper.fail_secho("Not all tokens from the input stream were matched :(\nParsing failed.")
             return
@@ -94,7 +97,7 @@ class ParserLL1:
 
         # add start symbol to the stack
         self.stack.append(start_symbol)
-        self.root = anytree.Node(start_symbol, id=start_symbol)
+        self.root = anytree.Node(start_symbol, id = start_symbol, token = None)
         self.parents = []
 
         while self.stack != []:
@@ -120,6 +123,7 @@ class ParserLL1:
 
             if re.match(RE_TERMINAL, top) or top == "$":
                 if top == next:
+                    prev_token = tokens[0]
                     tokens = tokens[1:]
                     p = self.stack.pop()
 
@@ -127,8 +131,8 @@ class ParserLL1:
                         popped = self.parents.pop()
 
                         # set up the terminal node
-                        typer.echo("matching " + popped.id + " to its parent " + popped.tmp_parent.id)
                         popped.parent = popped.tmp_parent
+                        popped.token = prev_token
                     else:
                         display_helper.fail_secho("TODO!")
 
@@ -169,11 +173,11 @@ class ParserLL1:
                     for p in ps:
                         # add to the tree
                         if top == start_symbol:
-                            new_node = anytree.Node(p, parent=self.root, id=p, tmp_p = self.root.id, tmp_parent = self.root)
+                            new_node = anytree.Node(p, parent=self.root, id=p, tmp_p = self.root.id, tmp_parent = self.root, token = None)
                         else:
                             # add connecting node if it is a non-terminal
                             new_node = anytree.Node(
-                                p, id=p, parent = None, tmp_p=prods[0].strip(), tmp_parent = self.parents[-1])
+                                p, id=p, parent = None, tmp_p=prods[0].strip(), tmp_parent = self.parents[-1], token = None)
                                     
                         # we don't need to match epsilon, and we also only want non-terminals as parent nodes
                         if p != "#":
