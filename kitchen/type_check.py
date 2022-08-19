@@ -18,7 +18,7 @@ class SemanticAnalyser:
     # TODO get context of expression; when is it LHS, when is it RHS?
 
     def _call_error(self, msg = ""):
-        display_helper.fail_secho("Error: "+ msg)
+        display_helper.fail_secho("Type Error: "+ msg)
         self.print_symbol_table()
         return 
 
@@ -48,7 +48,7 @@ class SemanticAnalyser:
                     self.symbol['Type'].append(node.token.type)
 
                 except:
-                    display_helper.fail_secho("Cannot semantically analyse only a token stream.")
+                    self._call_error("Cannot semantically analyse only a token stream.")
                     return
         self.print_symbol_table()
 
@@ -71,7 +71,7 @@ notify about LL(1) grammar ambiguity from parse table stage. :)
 solve CFG_13 parsing table, ll1 bug :)
 pass the funny things :)
 id language :)
-semantic analyser background :)
+semantic analyser backend :)
 """
 
 """

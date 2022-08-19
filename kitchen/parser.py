@@ -45,8 +45,7 @@ class ParserLL1:
         init_input(self, inp)
 
     def check_for_epsilons(self):
-        # look for any epsilons that came before and add. 
-        display_helper.print_parsetree(self.root)
+        # look for any epsilons that came before and add.
         for node in self.root.descendants:
             if re.match(RE_NONTERMINAL, node.id):
                 if len(node.children) == 0 and "#" in self.cfg.first_set[node.id]:

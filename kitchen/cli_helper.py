@@ -407,9 +407,9 @@ def _process_command(inp, cfg, spec) -> None:
         else:
             error.ERR_ambiguous_grammar()
 
-    elif inp == "\\vis semantic" or inp[0:5] == "\\vsem":
+    elif inp == "\\semantic" or inp[0:4] == "\\sem":
         stripped = inp.strip()
-        to_sem = stripped[5:]
+        to_sem = stripped[4:]
         if to_sem == "":
             display_helper.fail_secho("No input provided.")
         else:
