@@ -46,6 +46,7 @@ class ParserLL1:
 
     def check_for_epsilons(self):
         # look for any epsilons that came before and add. 
+        display_helper.print_parsetree(self.root)
         for node in self.root.descendants:
             if re.match(RE_NONTERMINAL, node.id):
                 if len(node.children) == 0 and "#" in self.cfg.first_set[node.id]:
@@ -99,15 +100,15 @@ class ParserLL1:
         while self.stack != []:
             # in case we run out of input before the stack is empty
             if tokens == []:
-                if not semantic:
-                    if re.match(RE_TERMINAL, self.stack[-1]):
+                if re.match(RE_TERMINAL, self.stack[-1]):
+                    if not semantic:
                         error.ERR_parsing_error(self.root, "Expected " + self.stack[-1])
-                    else:
-                        # parsing is successful if the remaining non-terminal may tend to epsilon
-                        if "#" in self.cfg.first_set[self.stack[-1]] and len(self.stack) == 1:
-                            self._parsing_successful(original_tokens, semantic, testing)
-                            return
-
+                else:
+                    # parsing is successful if the remaining non-terminal may tend to epsilon
+                    if "#" in self.cfg.first_set[self.stack[-1]] and len(self.stack) == 1:
+                        self._parsing_successful(original_tokens, semantic, testing)
+                        return SUCCESS
+                    if not semantic:
                         error.ERR_parsing_error(self.root)
                 return PARSING_ERROR
 
@@ -126,6 +127,7 @@ class ParserLL1:
                         popped = self.parents.pop()
 
                         # set up the terminal node
+                        typer.echo("matching " + popped.id + " to its parent " + popped.token.id)
                         popped.parent = popped.token
                     else:
                         display_helper.fail_secho("TODO!")
@@ -161,9 +163,10 @@ class ParserLL1:
                         RE_PRODUCTION, prods[1])))
                    
                     nodes_to_append = []
+                    stack_to_append = []
 
                     # this is the direction we push to the stack
-                    for p in reversed(ps):
+                    for p in ps:
                         # add to the tree
                         if top == start_symbol:
                             new_node = anytree.Node(p, parent=self.root, id=p, tmp_p = self.root.id, token = self.root)
@@ -174,7 +177,7 @@ class ParserLL1:
                                     
                         # we don't need to match epsilon, and we also only want non-terminals as parent nodes
                         if p != "#":
-                            self.stack.append(p)
+                            stack_to_append.append(p)
                             nodes_to_append.append(new_node)
 
                     # pop off parents
@@ -182,8 +185,11 @@ class ParserLL1:
                         self.parents.pop()
                     
                     # add children
-                    for t in nodes_to_append:
-                        self.parents.append(t)
+                    for n in reversed(nodes_to_append):
+                        self.parents.append(n)
+                    
+                    for s in reversed(stack_to_append):
+                        self.stack.append(s)
 
                 except:
                     if not semantic:

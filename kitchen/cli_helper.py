@@ -383,7 +383,8 @@ def _process_command(inp, cfg, spec) -> None:
             error.ERR_ambiguous_grammar()
 
     elif inp == "\\gt":
-        typer.echo(cfg.cfg_contents.replace("->", "::="))
+        new_cfg = ""
+        nc = cfg.cfg_contents.replace("->", "::=")
 
     elif inp == "\\vis parsetable" or inp == "\\vpt":
         if not cfg.first_set_calculated:
@@ -421,9 +422,8 @@ def _process_command(inp, cfg, spec) -> None:
                     sem_analyser = SemanticAnalyser(cfg, cfg.parser_ll1.root, to_sem)
                     sem_analyser.init_analysis()
                 else:
-                    display_helper.fail_secho("Parsing failed. Cannot generate semantic analysis.")
-        
-      
+                    display_helper.fail_secho("Parsing failed with code " + str(code)+ ".Cannot generate semantic analysis.")
+       
     elif inp == "\\show cfg" or inp == "\\cfg":
         cfg.show_contents()
 

@@ -22,7 +22,6 @@ class SemanticAnalyser:
     # TODO how to get order of this match the output?
     # why are these properties not carrying over :(
     def init_analysis(self):
-        typer.echo("analysing...")
         for node in anytree.PreOrderIter(self.root):
             typer.echo(node.id)
             # if node.token != None:
@@ -47,6 +46,8 @@ add intro scene with token stream :)
 get regex commands :)
 notify about LL(1) grammar ambiguity from parse table stage. :)
 solve CFG_13 parsing table, ll1 bug :)
+pass the funny things :)
+id language :)
 """
 
 """
@@ -55,8 +56,6 @@ TODO - DEVELOPMENT
 get PT test cases written
 
 TESTING
-pass the funny things
-
 solve parsing bug with bla_complex
 
 MANIM
