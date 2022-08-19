@@ -75,11 +75,11 @@ semantic analyser backend :)
 solve parsing bug with bla_complex - it was not LL(1) compatible :)
 first set animation not moving CFG to the left :)
 PT table spacing on large outputs :) 
+update menu :)
 """
 
 """
 TODO - DEVELOPMENT
-
 
 TESTING
 get lots of test cases written
@@ -96,7 +96,6 @@ GRAMMARS
 CLI
 - some terminals missing regex error - investigate
 - Notes on regex spec - necessary?
-
 """ 
 
 """
@@ -110,7 +109,7 @@ scaling FS and FW properly
 cfg_1 parsing has sound not found error
 remove debugging output
 generate tree PNG for export
-update menu
+another algorithm? (easy?)
 
 Neaten up cli_helper parsing code
 Code style choices
