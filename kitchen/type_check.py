@@ -12,18 +12,11 @@ class SemanticAnalyser:
         self.input = inp
         self.symbol = {'Symbol': [], 'Type': []}
 
-# 1.	If a variable(identifier) is created/defined on the left hand side of an assignment, it should check if it has already been defined, in which case it should generate an appropriate semantic error. 
-# 2.	If a variable(identifier) is used in the right hand side of an assignment it should check if it has been defined already, and if not it should generate an appropriate semantic error.
-    def _create_symbol_table(self):
-        pass
-
-    def traverse_tree(self):
-        pass
-
     # TODO get +/ = to associate names and vals
     # 1.	If a variable(identifier) is created/defined on the left hand side of an assignment, it should check if it has already been defined, in which case it should generate an appropriate semantic error. 
     # 2.	If a variable(identifier) is used in the right hand side of an assignment it should check if it has been defined already, and if not it should generate an appropriate semantic error.
-
+    # TODO get context of expression; when is it LHS, when is it RHS?
+    
     def init_analysis(self):
         for node in anytree.PreOrderIter(self.root):
             if node.token != None:
@@ -59,6 +52,7 @@ notify about LL(1) grammar ambiguity from parse table stage. :)
 solve CFG_13 parsing table, ll1 bug :)
 pass the funny things :)
 id language :)
+semantic analyser background :)
 """
 
 """
