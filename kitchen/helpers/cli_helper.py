@@ -23,7 +23,7 @@ from kitchen import (
 )
 
 from kitchen.helpers import (
-    display_helper,
+    display,
     error, 
     config,
 )
@@ -334,7 +334,7 @@ def _process_command(inp, cfg, spec) -> None:
     """   
 
     if inp == "\\m":
-        display_helper.print_menu()
+        display.print_menu()
 
     elif inp == "\\q":
         raise typer.Exit()
@@ -413,7 +413,7 @@ def _process_command(inp, cfg, spec) -> None:
         stripped = inp.strip()
         to_sem = stripped[4:]
         if to_sem == "":
-            display_helper.fail_secho("No input provided.")
+            display.fail_secho("No input provided.")
         else:
             code = _prepare_to_parse(cfg)
             if code == AMBIGUOUS_ERROR:
@@ -424,7 +424,7 @@ def _process_command(inp, cfg, spec) -> None:
                     sem_analyser = SemanticAnalyser(cfg, cfg.parser_ll1.root, to_sem)
                     sem_analyser.init_analysis()
                 else:
-                    display_helper.fail_secho("Parsing failed with code " + str(code)+ ".Cannot generate semantic analysis.")
+                    display.fail_secho("Parsing failed with code " + str(code)+ ".Cannot generate semantic analysis.")
        
     elif inp == "\\show cfg" or inp == "\\cfg":
         cfg.show_contents()
@@ -433,7 +433,7 @@ def _process_command(inp, cfg, spec) -> None:
         if spec != None:
             spec.show_contents()
         else:
-            display_helper.fail_secho("No specification provided.")
+            display.fail_secho("No specification provided.")
 
     elif inp.strip()[0:2] == "\\c":
         config.edit_config(inp.strip()[2:].strip())
@@ -453,7 +453,7 @@ def _process_command(inp, cfg, spec) -> None:
             _init_parsing_vis_shortcut(inp, cfg, spec)
     
     else:
-        display_helper.fail_secho('Invalid command')
+        display.fail_secho('Invalid command')
 
 
 

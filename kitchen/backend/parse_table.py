@@ -7,7 +7,7 @@ from kitchen import (
     RE_TERMINAL,
 )
 from kitchen.helpers import (
-    display_helper,
+    display,
     error
 )
 
@@ -33,14 +33,14 @@ class ParsingTable:
     def show_structures(self) -> None:
         """Displays the structures involved in forming the parse table. 
         """        
-        display_helper.info_secho("First set:")
-        display_helper.pretty_print_dict(self.first_set)
-        display_helper.info_sechotyper.echo("Follow set")
-        display_helper.pretty_print_dict(self.follow_set)
-        display_helper.info_sechotyper.echo("Terminals")
-        display_helper.pretty_print_dictpprint.pprint(self.ts)
-        display_helper.info_sechotyper.echo("Non terminals")
-        display_helper.pretty_print_dictpprint.pprint(self.nts)
+        display.info_secho("First set:")
+        display.pretty_print_dict(self.first_set)
+        display.info_sechotyper.echo("Follow set")
+        display.pretty_print_dict(self.follow_set)
+        display.info_sechotyper.echo("Terminals")
+        display.pretty_print_dictpprint.pprint(self.ts)
+        display.info_sechotyper.echo("Non terminals")
+        display.pretty_print_dictpprint.pprint(self.nts)
 
     def set_internals(self, fs, fw, fs_index):
         """Sets up the internal components of the parsing table. 
@@ -197,9 +197,9 @@ class ParsingTable:
         """Prints the parse table.
         """        
         # print heading
-        display_helper.info_secho("Parse Table:")
+        display.info_secho("Parse Table:")
         df = pd.DataFrame.from_dict(self.pt_dict).transpose().to_markdown()
-        display_helper.structure_secho(df)
+        display.structure_secho(df)
 
     def print_parse_table_testing(self):
         """Prints the parse table for testing purposes

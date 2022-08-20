@@ -1,5 +1,5 @@
 from kitchen import (SUCCESS, DARK, LIGHT)
-from kitchen.helpers import (sounds, display_helper, config)
+from kitchen.helpers import (sounds, display, config)
 from datetime import datetime
 import manim as m
 
@@ -54,10 +54,10 @@ def _set_quality(inp) -> bool:
     try:
         q_index = inp.index("-q")
         if inp[q_index + 1] not in opts:
-            display_helper.fail_secho("\t Options: -q <high | med | low>")
+            display.fail_secho("\t Options: -q <high | med | low>")
         else:
             OUTPUT_CONFIG["quality"] = qs[opts.index(inp[q_index + 1])]
-            display_helper.success_secho("Success: set 'quality' to '" + OUTPUT_CONFIG["quality"] + "'\n")
+            display.success_secho("Success: set 'quality' to '" + OUTPUT_CONFIG["quality"] + "'\n")
             return True
     except:
         return False
@@ -70,10 +70,10 @@ def _set_theme(inp) -> bool:
     try:
         t_index = inp.index("-t")
         if inp[t_index + 1] not in opts:
-            display_helper.fail_secho("\t Options: -t <dark | light>")
+            display.fail_secho("\t Options: -t <dark | light>")
         else:
             set_theme(ts[opts.index(inp[t_index + 1])])
-            display_helper.success_secho("Success: set 'theme' to '" + inp[t_index + 1] + "'\n")
+            display.success_secho("Success: set 'theme' to '" + inp[t_index + 1] + "'\n")
             return True
     except:
         return False
@@ -85,10 +85,10 @@ def _set_preview(inp):
     try:
         p_index = inp.index("-p")
         if inp[p_index + 1] not in opts:
-            display_helper.fail_secho("\t Options: -p <y | n>")
+            display.fail_secho("\t Options: -p <y | n>")
         else:
             OUTPUT_CONFIG["preview"] = ps[opts.index(inp[p_index + 1])]
-            display_helper.success_secho("Success: set 'preview' to '" + OUTPUT_CONFIG["preview"] + "'\n")
+            display.success_secho("Success: set 'preview' to '" + OUTPUT_CONFIG["preview"] + "'\n")
             return True
     except:
         return False   
@@ -105,10 +105,10 @@ def _set_narration(inp):
                 sounds.set_config(sounds.NARR)
             else:
                 sounds.set_config(sounds.NO_NARR)
-            display_helper.success_secho("Success: set 'narration' to '" + str(narr) + "'\n")
+            display.success_secho("Success: set 'narration' to '" + str(narr) + "'\n")
             return True
         else:
-            display_helper.fail_secho("\t Options: -n <y | n>")          
+            display.fail_secho("\t Options: -n <y | n>")          
     except:
         return False   
 
@@ -118,15 +118,15 @@ def _adjust_settings(inp):
     ncode = _set_narration(inp)
     tcode = _set_theme(inp)
     if not (qcode or pcode or ncode or tcode):
-        display_helper.fail_secho("Invalid configuration.\n")
+        display.fail_secho("Invalid configuration.\n")
     return
 
 
 def _show_config():
     global OUTPUT_CONFIG
-    display_helper.info_secho("Current configuration settings:")
-    display_helper.pretty_print_config_settings(OUTPUT_CONFIG, sounds.get_config())
-    display_helper.show_config_opts()
+    display.info_secho("Current configuration settings:")
+    display.pretty_print_config_settings(OUTPUT_CONFIG, sounds.get_config())
+    display.show_config_opts()
 
 def edit_config(inp):
     code = False

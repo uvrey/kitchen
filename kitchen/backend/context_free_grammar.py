@@ -19,7 +19,7 @@ from kitchen import (
 )
 
 from kitchen.helpers import (
-    display_helper,
+    display,
     error
 )
 
@@ -60,7 +60,7 @@ def get_prods(cfg_contents) -> list:
         # check that non-terminal doesn't start productions
         # TODO handle this error properly
         if not re.match(RE_NONTERMINAL, pps[0]):
-            display_helper.fail_secho("CFG Error at line " + str(line) + "-> " + pps[0])
+            display.fail_secho("CFG Error at line " + str(line) + "-> " + pps[0])
             raise typer.Exit()
             return CFG_ERROR_NT_FORMAT
 
@@ -247,8 +247,8 @@ class ContextFreeGrammar:
             self._clean_first_set()
             self.first_set_calculated = True
 
-        display_helper.info_secho("Showing first set:")
-        display_helper.pretty_print_dict(self.first_set)
+        display.info_secho("Showing first set:")
+        display.pretty_print_dict(self.first_set)
         self.first_set_calculated = True
 
     def show_first_set_testing(self) -> None:
@@ -292,7 +292,7 @@ class ContextFreeGrammar:
         try:
             # loop through values which a production leads to
             for p in self.cfg_dict[production]:
-             #   display_helper.structure_secho(production + " leads to " + p)
+             #   display.structure_secho(production + " leads to " + p)
 
                 # add the appended production to fstack
                 self.fstack.append(production + " -> " + p)
@@ -318,7 +318,7 @@ class ContextFreeGrammar:
                                         self.fstack[j])
                                     self.first_set[ps].append(current_item)
                                 else:
-                              #      display_helper.info_secho("2")
+                              #      display.info_secho("2")
                                     self.is_ambiguous = True
 
                             # reset the fstack and break since we are just interested in the first production
@@ -364,18 +364,18 @@ class ContextFreeGrammar:
                             self.firstset_index[ps].append(self.fstack[j])
                             self.first_set[ps].append(first_terminal[0]) 
                         else:
-                    #        display_helper.info_secho("1")
+                    #        display.info_secho("1")
                             self.is_ambiguous = True
 
                     if self.fstack != []:            
                         self.fstack.pop()
 
-                    # display_helper.info_secho("....")
-                    # display_helper.structure_secho(pstack)
+                    # display.info_secho("....")
+                    # display.structure_secho(pstack)
                     # typer.echo(self.firstset_index)
-                    # display_helper.structure_secho(self.first_set)
+                    # display.structure_secho(self.first_set)
                     # typer.echo(self.fstack)
-                    # display_helper.success_secho("....")
+                    # display.success_secho("....")
 
             # by this point, we have recursively found a bunch of first sets
             # so let's find those that are still empty
@@ -407,8 +407,8 @@ class ContextFreeGrammar:
             self._calculate_follow_set(True)
             self.follow_set_calculated = True
 
-        display_helper.info_secho("Showing follow set:")
-        display_helper.pretty_print_dict(self.follow_set)
+        display.info_secho("Showing follow set:")
+        display.pretty_print_dict(self.follow_set)
         self.follow_set_calculated = True
 
     def show_follow_set_testing(self) -> None:

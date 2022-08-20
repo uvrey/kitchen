@@ -25,7 +25,7 @@ from kitchen.helpers import (
     sounds,
     config,
     lang_spec,
-    display_helper,
+    display,
 )
 
 from kitchen.backend import *
@@ -101,7 +101,7 @@ def _get_tokens_from_input(inp, spec = None) -> list:
         tokens = spec.get_tokens_from_input(inp)
         return tokens
     else:
-        display_helper.info_secho("Note:\tNo language specification has been provided, so the given \n\tinput will be interpreted as tokens directly.")
+        display.info_secho("Note:\tNo language specification has been provided, so the given \n\tinput will be interpreted as tokens directly.")
         return list(filter(None, inp.split(" ")))
 
 # Helper function to put a message on the screen
@@ -296,7 +296,7 @@ class ManimFirstSet(m.Scene):
 
     def construct(self):
         sounds.narrate("Let's find the first set!", self)
-        display_helper.info_secho("Visualising the First Set:")
+        display.info_secho("Visualising the First Set:")
 
         # set title and scaling here since the function is recursive
         fs_title = _get_title_mobject("first set calculation") 
@@ -450,7 +450,7 @@ class ManimFirstSet(m.Scene):
                             # add to first set
                             self.cfg.first_set[ps].append(first_terminal[0])
                             # add this terminal and play VGroup of each production in the stack
-                            display_helper.info_secho("texing: " + terminal_to_write)
+                            display.info_secho("texing: " + terminal_to_write)
                             new_element = m.Tex(
                                     terminal_to_write, color=m.TEAL).scale(TEXT_SCALE)
                             self.cfg.manim_firstset_contents[ps].add(
@@ -519,7 +519,7 @@ class ManimFollowSet(m.Scene):
 
     def construct(self):     
         sounds.narrate("Let's find the follow set.", self)
-        display_helper.info_secho("Visualising follow set calculation:")
+        display.info_secho("Visualising follow set calculation:")
         self.vis_follow_set(True)
     
     def tear_down(self):
@@ -1640,8 +1640,8 @@ class ManimParseTree(m.Scene):
         _play_msg_with_other(self, ["Successfully parsed `" + lang_spec.get_token_types(original_tokens) +
                                 "'!"], raw_msg= "Parsing successful! That was a valid input.")
 
-        display_helper.success_secho("Successfully parsed '" + lang_spec.get_token_types(original_tokens) +
+        display.success_secho("Successfully parsed '" + lang_spec.get_token_types(original_tokens) +
                               "'!\nParse tree:")
-        display_helper.print_parsetree(self.root)
+        display.print_parsetree(self.root)
         return SUCCESS
 

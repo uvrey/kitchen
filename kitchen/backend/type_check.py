@@ -1,6 +1,6 @@
 
 import manim as m
-from kitchen.helpers import (display_helper)
+from kitchen.helpers import (display)
 import anytree
 import pandas as pd
 
@@ -17,7 +17,7 @@ class SemanticAnalyser:
     # TODO get context of expression; when is it LHS, when is it RHS?
 
     def _call_error(self, msg = ""):
-        display_helper.fail_secho("Type Error: "+ msg)
+        display.fail_secho("Type Error: "+ msg)
         self.print_symbol_table()
         return 
 
@@ -52,9 +52,9 @@ class SemanticAnalyser:
         self.print_symbol_table()
 
     def print_symbol_table(self):
-        display_helper.info_secho("Symbol Table:")
+        display.info_secho("Symbol Table:")
         df = pd.DataFrame.from_dict(self.symbol).to_markdown()
-        display_helper.structure_secho(df)
+        display.structure_secho(df)
 
 """
 DONE

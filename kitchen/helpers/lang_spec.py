@@ -3,7 +3,7 @@
 import configparser
 from pathlib import Path
 from kitchen import SUCCESS
-from kitchen.helpers import display_helper, cli_helper
+from kitchen.helpers import display, cli_helper
 import typer
 import re
 
@@ -21,7 +21,7 @@ def get_spec(cfg):
     if cli_helper.CONFIG_FILE_PATH.exists():
             spec_path = get_spec_path(cli_helper.CONFIG_FILE_PATH)
     else:
-        display_helper.fail_secho(
+        display.fail_secho(
             'Config file not found. Please run "kitchen init"',
         )
         raise typer.Exit(1)
@@ -76,7 +76,7 @@ class Specification:
                                 self._process_reserved_words(line.strip())
 
         # if line_count != len(self.cfg.terminals):
-        #     display_helper.fail_secho("Note: Some terminals in the CFG are missing regex definitions :(")
+        #     display.fail_secho("Note: Some terminals in the CFG are missing regex definitions :(")
     
     def _process_reserved_words(self, line):
         split = line.split(" ")
@@ -84,7 +84,7 @@ class Specification:
         try:
             self.reserved_words.append(cleaned_specs[2])
         except:
-            display_helper.fail_secho("Some error with reserved words occurred.")
+            display.fail_secho("Some error with reserved words occurred.")
 
     def _process_regex_spec(self, line):
         split = line.split(" ")
@@ -96,13 +96,13 @@ class Specification:
             if t_found in self.cfg.terminals:
                 self.token_spec[t_found] = regex
             # else:
-            #     display_helper.info_secho("Note: " + t_found + " is defined in specificiation but does not appear in CFG.")
+            #     display.info_secho("Note: " + t_found + " is defined in specificiation but does not appear in CFG.")
         except:
-            display_helper.fail_secho("Some error with regex processing occurred.")
+            display.fail_secho("Some error with regex processing occurred.")
             return
 
     def show_contents(self):
-        display_helper.structure_secho(self.spec_contents)
+        display.structure_secho(self.spec_contents)
 
     def _match(self, inp):
         for key in self.token_spec:
@@ -118,7 +118,7 @@ class Specification:
         for c in cleaned_stream:
             tokens.append(Token(self._match(c), c))
         if len(tokens) != len(cleaned_stream):
-            display_helper.fail_secho("Could not match all tokens.")
+            display.fail_secho("Could not match all tokens.")
             return None
         return tokens
 

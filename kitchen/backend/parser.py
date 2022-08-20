@@ -7,7 +7,7 @@ import re
 
 from kitchen import (
     RE_NONTERMINAL, ERROR, RE_PRODUCTION, RE_TERMINAL, SUCCESS, PARSING_ERROR,)
-from kitchen.helpers import (display_helper, error, lang_spec)
+from kitchen.helpers import (display, error, lang_spec)
 
 def init_input(self, inp) -> int:
     """Helper function to (re-)initialise the input of a Parser.
@@ -59,14 +59,14 @@ class ParserLL1:
         
         if not semantic:
             if testing:
-                display_helper.success_secho("Success.")
-                display_helper.structure_secho(anytree.RenderTree(self.root, style= anytree.AsciiStyle()).by_attr("id"))
+                display.success_secho("Success.")
+                display.structure_secho(anytree.RenderTree(self.root, style= anytree.AsciiStyle()).by_attr("id"))
                 return
 
             if verbose:
-                display_helper.success_secho("\nSuccessfully parsed token stream '" + types +
+                display.success_secho("\nSuccessfully parsed token stream '" + types +
                                             "'\nfrom input stream '" + values + "'.\n\nParse tree:")
-                display_helper.print_parsetree(self.root)
+                display.print_parsetree(self.root)
 
     def parse_ll1(self, start_symbol, inp="", semantic = False, testing = False) -> int:
         """LL(1) Parser, which generates a parse tree and stores this to self.root
@@ -83,11 +83,11 @@ class ParserLL1:
         else:
             init_input(self, inp)
 
-        # display_helper.info_secho("MAPPED TO TOKENS:")
-        # display_helper.show_tokens(self.tokens)
+        # display.info_secho("MAPPED TO TOKENS:")
+        # display.show_tokens(self.tokens)
 
         if None in self.tokens:
-            display_helper.fail_secho("Not all tokens from the input stream were matched :(\nParsing failed.")
+            display.fail_secho("Not all tokens from the input stream were matched :(\nParsing failed.")
             return
 
         # set up structures
@@ -134,7 +134,7 @@ class ParserLL1:
                         popped.parent = popped.tmp_parent
                         popped.token = prev_token
                     else:
-                        display_helper.fail_secho("TODO!")
+                        display.fail_secho("TODO!")
 
                     # if we have matched our last token
                     if len(tokens) == 1:
@@ -149,12 +149,12 @@ class ParserLL1:
             elif re.match(RE_NONTERMINAL, top):
 
                 try:
-                  #  display_helper.success_secho("trying to find entry at " + str(top) + ", " + str(next))
+                  #  display.success_secho("trying to find entry at " + str(top) + ", " + str(next))
                     pt_entry = self.pt_dict[top][next]
                     prods = pt_entry.split("->")
                   
                     self.stack.pop()
-                    # display_helper.fail_secho("finding productions of " + prods[0])
+                    # display.fail_secho("finding productions of " + prods[0])
 
                     if top != start_symbol:
                         # append new non-terminal path to the tree

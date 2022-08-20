@@ -1,5 +1,5 @@
 """ Contains functions for displaying information to the console. """
-# kitchen/display_helper.py
+# kitchen/display.py
 
 import typer
 import anytree

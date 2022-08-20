@@ -4,7 +4,7 @@ import manim as m
 import os
 from pathlib import Path
 from kitchen import SOUND_ERROR, SUCCESS
-from kitchen.helpers import display_helper
+from kitchen.helpers import display
 from gtts import gTTS
 
 (
@@ -69,7 +69,7 @@ def init_narr_dir():
     try:
         Path(narration_dir).mkdir(exist_ok=True)
     except OSError:
-        display_helper.fail_secho("There was an issue creating the narration directory.")
+        display.fail_secho("There was an issue creating the narration directory.")
         return 
 
 def clear_narr_dir():
@@ -114,7 +114,7 @@ def add_sound_to_scene(scene, sound_spec):
         elif sound_spec==MOVE:
             scene.add_sound(os.getcwd() + r'\assets\sounds\move.wav')
     except OSError:
-        display_helper.fail_secho("Sound not found - please check your assets folder.")
+        display.fail_secho("Sound not found - please check your assets folder.")
         return SOUND_ERROR
 
     return SUCCESS

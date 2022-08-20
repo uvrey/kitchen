@@ -18,7 +18,7 @@ from kitchen.backend import (
 
 from kitchen.helpers import (
     cli_helper, 
-    display_helper,
+    display,
     sounds,
     lang_spec,
     config
@@ -52,7 +52,7 @@ def get_cfg() -> cfg.ContextFreeGrammar:
     if cli_helper.CONFIG_FILE_PATH.exists():
         cfg_path = cfg.get_cfg_path(cli_helper.CONFIG_FILE_PATH)
     else:
-        display_helper.fail_secho(
+        display.fail_secho(
             'Config file not found. Please run "kitchen init"',
         )
         raise typer.Exit(1)
@@ -60,7 +60,7 @@ def get_cfg() -> cfg.ContextFreeGrammar:
     if cfg_path.exists():
         return cfg.ContextFreeGrammar(cfg_path)
     else:
-        display_helper.fail_secho('CFG not found. Please run "kitchen init" first')
+        display.fail_secho('CFG not found. Please run "kitchen init" first')
         raise typer.Exit(1)
 
 def _check_cfg(cfg) -> None:
@@ -76,7 +76,7 @@ def _check_cfg(cfg) -> None:
     #typer.echo(cfg.prods)  
     # TODO fix
     # if cfg.prods in ERRORS:
-    #     display_helper.fail_secho('"CFG file invalid with "{ERRORS[cfg.prods]}"')
+    #     display.fail_secho('"CFG file invalid with "{ERRORS[cfg.prods]}"')
     #     raise typer.Abort()
 
 @app.command()
@@ -124,15 +124,15 @@ def run() -> None:
     sounds.init_narr_dir()
     config.init_config()
 
-    display_helper.print_welcome()
+    display.print_welcome()
 
     cfg = get_cfg()
     spec = lang_spec.get_spec(cfg)
 
     if spec == None:
-        display_helper.info_secho("Note:\tNo language specification has been provided, so the given \n\tinput will be interpreted as tokens directly.")
+        display.info_secho("Note:\tNo language specification has been provided, so the given \n\tinput will be interpreted as tokens directly.")
 
-    display_helper.success_secho("CFG loaded successfully.")
+    display.success_secho("CFG loaded successfully.")
     while (True):
         input = typer.prompt("Input")
         cli_helper.handle_input(input, cfg, spec)
