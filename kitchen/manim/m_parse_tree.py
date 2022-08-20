@@ -1,4 +1,7 @@
 
+""" Generates a visualisation of the parse tree calculation. """
+# kitchen/manim/m_parse_tree.py
+
 import manim as m
 import re
 import typer
@@ -211,8 +214,7 @@ class MParseTree(m.Scene):
                         if re.match(RE_TERMINAL, item):
                             row.append(item)
                         else:
-                            tmp = item.replace(
-                                "->", "\\to").strip().replace("#", "\epsilon")
+                            tmp = mg.to_tex(item)
                             row.append(tmp)
                     else:
                         row.append("")
@@ -385,13 +387,13 @@ class MParseTree(m.Scene):
                                             if re.match(RE_NONTERMINAL, r.id) and r.id != p.id and r.height == 0:
                                                 if "#" in self.cfg.first_set[r.id]:
                                                     new_node = anytree.Node(
-                                                        "#", parent=r, id="eps", manim=m.MathTex("\epsilon"))
+                                                        "#", parent=r, id="eps", manim=m.MathTex(r'\varepsilon'))
                                                     vertex_id = r.id + "_" + new_node.id
                                                     parent_id = r.id
                                                     if r.id != start_symbol:
                                                         parent_id = r.parent.id + "_" + r.id
                                                     v = create_vertex(
-                                                        g, vertex_id, parent_id, "\epsilon", color = m.BLUE)
+                                                        g, vertex_id, parent_id, r'\varepsilon', color = m.BLUE)
                                                     reset_g(
                                                         self, g, start_symbol)
 

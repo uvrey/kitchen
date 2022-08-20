@@ -139,7 +139,7 @@ class ParsingTable:
                             row.append(item)
                         else:
                             tmp = item.replace(
-                                "->", "\\to").strip().replace("#", "\epsilon")
+                                "->", "\\to").strip().replace("#", "\\varepsilon")
                             row.append(tmp)
                     else:
                         row.append("")
@@ -171,7 +171,7 @@ class ParsingTable:
         ts_m = []
         for t in self.ts:
             if t == "#":
-                ts_m.append("\epsilon")
+                ts_m.append("\\varepsilon")
             else:
                 ts_m.append(t)
         return ts_m

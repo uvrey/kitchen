@@ -118,7 +118,8 @@ def print_menu():
             ("show parsetable", "pt", "Display parse table"), 
             ("vis parsetable", "vpt", "Visualise parse table calculation"), 
             ("ll1 <input>", "<input>", "Show LL(1) parse tree"), 
-            ("ll1 v <input>", "v <input>", "Visualise LL(1) parse tree construction")]
+            ("ll1 v <input>", "v <input>", "Visualise LL(1) parse tree \
+                construction")]
         
     df= pd.DataFrame(data=cmds,  columns = ["Command", "Shortcut", "Detail"])
     info_secho(df.to_markdown(index=False))
@@ -133,9 +134,10 @@ def print_parsetree(root):
             structure_secho("%s%s" % (pre, node.id))
 
 def to_tex(item):
-    tex_item = item.replace(r'$', r'\$').replace(r'\epsilon', r'$\epsilon$').replace("#", r'$\epsilon$').replace("\\subseteq", "$\\subseteq$").replace("->", "$\\to$").replace("(", "$($").replace(")", "$)$")
+    tex_item = item.replace(r'$', r'\$')
+    tex_item = tex_item.replace(r'\varepsilon', r'$\varepsilon$').replace(r'#', r'$\varepsilon$').replace("\\subseteq", "$\\subseteq$").replace("->", "$\\to$").replace("(", "$($").replace(")", "$)$")
     return tex_item
 
 def to_math_tex(item):
-    tex_item = item.replace(r'$', r'\$').replace("#", r'\epsilon').replace("->", "\\to")
+    tex_item = item.replace(r'$', r'\$').replace("#", r'\varepsilon').replace("->", "\\to")
     return tex_item

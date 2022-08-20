@@ -210,7 +210,7 @@ class MFirstSet(m.Scene):
 
                         # notify about user epsilon if we are somewhere in the stack
                         if first_terminal[0] == "#" and ps != start:
-                            mg.display_msg(self, ["\\epsilon found at production " + production + ",", "so " + production + " may disappear :)"], raw_msg = "The production may disappear since it can lead to epsilon.")
+                            mg.display_msg(self, ["\\varepsilon found at production " + production + ",", "so " + production + " may disappear :)"], raw_msg = "The production may disappear since it can lead to epsilon.")
 
                         # reset other colours to white
                         self.cfg.manim_firstset_contents[ps].fade_to(

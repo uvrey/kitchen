@@ -21,11 +21,12 @@ def get_title_mobject(title):
     return m.Tex(title, tex_template=m.TexFontTemplates.french_cursive)
 
 def to_tex(item):
-    tex_item = item.replace("$", "\$").replace("\epsilon", "$\epsilon$").replace("#", "$\epsilon$").replace("\\subseteq", "$\\subseteq$").replace("->", "$\\to$").replace("(", "$($").replace(")", "$)$")
+    tex_item = item.replace(r'$', r'\$').replace(r'\varepsilon', r'$\varepsilon$')
+    tex_item = tex_item.replace(r'#', r'\varepsilon').replace(r'\\subseteq', r'$\\subseteq$').replace("->", "$\\to$").replace("(", "$($").replace(")", "$)$")
     return tex_item
 
 def to_math_tex(item):
-    tex_item = item.replace("$", "\$").replace("#", "\epsilon").replace("->", "\\to")
+    tex_item = item.replace(r'$', r'\$').replace(r'#', r'\varepsilon').replace("->", "\\to")
     return tex_item
 
 def display_msg(self, msg, raw_msg= "", anim=[]):
