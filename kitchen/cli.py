@@ -14,10 +14,10 @@ from kitchen import (
 
 from kitchen.backend import (
   context_free_grammar as cfg, 
-)
+  cli_helper
+  )
 
 from kitchen.helpers import (
-    cli_helper, 
     display,
     sounds,
     lang_spec,
@@ -49,8 +49,8 @@ def get_cfg() -> cfg.ContextFreeGrammar:
     Returns:
         cfg.ContextFreeGrammar: ContextFreeGrammar object associated with the given CFG.
     """    
-    if cli_helper.CONFIG_FILE_PATH.exists():
-        cfg_path = cfg.get_cfg_path(cli_helper.CONFIG_FILE_PATH)
+    if config.CONFIG_FILE_PATH.exists():
+        cfg_path = cfg.get_cfg_path(config.CONFIG_FILE_PATH)
     else:
         display.fail_secho(
             'Config file not found. Please run "kitchen init"',

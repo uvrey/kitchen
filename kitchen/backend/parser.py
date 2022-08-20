@@ -21,11 +21,11 @@ def init_input(self, inp) -> int:
         return ERROR
     else:
         self.inp = inp
-        self.tokens = _get_tokens_from_input(inp, self.spec)
+        self.tokens = get_tokens_from_input(inp, self.spec)
     return SUCCESS
 
 # TODO read the spec file and match
-def _get_tokens_from_input(inp, spec = None) -> list:
+def get_tokens_from_input(inp, spec = None) -> list:
     """Obtains the token stream of an input string. 
     Args:
         inp (str): Input string

@@ -1,19 +1,10 @@
 """ Configuration for the application """
 
-import configparser
-from glob import glob
-from pathlib import Path
-from re import L
-from xmlrpc.client import Boolean
-from kitchen.backend.type_check import SemanticAnalyser
 import typer
 import manim as m
 
 from kitchen import (
-    CFG_WRITE_ERROR, 
-    DIR_ERROR, 
     ERRORS, 
-    FILE_LOADING_ERROR, 
     FILE_LOADING_EXISTS_ERROR, 
     FILE_LOADING_NONE_ERROR, 
     FILE_LOADING_DIR_ERROR, 
@@ -31,14 +22,10 @@ from kitchen.helpers import (
 from kitchen.backend import (
     parse_table as pt,
     parser as p,
+    type_check as tc
 )
 
-from kitchen.manim import (
-    animation as anim,
-)
-CONFIG_DIR_PATH = Path(typer.get_app_dir(__app_name__))
-CONFIG_FILE_PATH = CONFIG_DIR_PATH / "config.ini"
-PARTIALS_PATH = ""
+from kitchen.manim import m_parse_tree, m_first, m_follow
 
 def init_app(cfg_path: str, spec_path = None) -> int:
     """Initialises the application by creating its configuration file and CFG path.
@@ -50,100 +37,17 @@ def init_app(cfg_path: str, spec_path = None) -> int:
         int: Status code.
     """    
     """Initialize the application configuration file."""
-    config_code = _init_config_file()
+    config_code = config.init_config_file()
     if config_code != SUCCESS:
         return config_code
 
     # create cfg path
-    cfg_code = _create_paths(cfg_path, spec_path)
+    cfg_code = config.create_paths(cfg_path, spec_path)
 
     if cfg_code != SUCCESS:
         return cfg_code
 
     return SUCCESS
-
-def _init_config_file() -> int:
-    """Initialises the configuration file directory and file. 
-
-    Returns:
-        int: Status code.
-    """    
-    try:
-        CONFIG_DIR_PATH.mkdir(exist_ok=True)
-    except OSError:
-        return DIR_ERROR
-    try:
-        CONFIG_FILE_PATH.touch(exist_ok=True)
-    except OSError:
-        return FILE_LOADING_ERROR
-    return SUCCESS
-
-def _create_paths(cfg_path: str, spec_path = None) -> int:
-    """Creates a path to the CFG in the configuration of the application.
-
-    Args:
-        cfg (str): Path to the CFG file.
-
-    Raises:
-        typer.Exit: Exits when CFG path could not be written to the configuration.
-
-    Returns:
-        int: Status code.
-    """    
-    # check that the cfg file exists
-    cfg_path = Path(cfg_path)
-    path_error = _validate_path([cfg_path])
-
-    if path_error:
-        typer.secho(
-            f'Loading the CFG file failed with "{ERRORS[path_error]}"',
-            fg=typer.colors.RED,
-        )
-        raise typer.Exit(1)
-
-    # load up the cfg config
-    config_parser = configparser.ConfigParser()
-    config_parser['General'] = {}
-    config_parser['General']['cfg_path'] = str(cfg_path)
-    config_parser['General']['spec_path'] = ''
-    typer.echo(CONFIG_FILE_PATH)
-
-    # load the specification path if it is provided
-    if spec_path != None:
-        spec_path = Path(spec_path)
-
-        if path_error:
-            typer.secho(
-                f'Loading the specification file failed with "{ERRORS[path_error]}"',
-                fg=typer.colors.RED,
-            )
-
-        # load up the cfg 
-        config_parser['General']['spec_path'] = str(spec_path)
-
-    try:
-        with CONFIG_FILE_PATH.open("w") as file:
-            config_parser.write(file)
-    except OSError:
-        return CFG_WRITE_ERROR
-
-    return SUCCESS
-
-# Helper function to validate that the given cfg path is valid
-def _validate_path(paths):
-    """Checks the validity of paths.
-
-    Args:
-        paths (List): List of paths to be validated.
-    """    
-    for path in paths:
-        if path is None:
-           return FILE_LOADING_NONE_ERROR
-        elif path.is_dir():
-            return FILE_LOADING_DIR_ERROR
-        elif not path.exists():
-            return FILE_LOADING_EXISTS_ERROR
-        return SUCCESS
 
 def load_app(cfg_path, spec_path = None, testing = False) -> None:
     """Loads the application given a CFG path.
@@ -235,7 +139,7 @@ def _init_parsing_ll1_via_cmd(inp, cfg, spec) -> int:
             else:
                 config.configure_output_file_name(config.LL1_PARSING, to_parse)
                 with m.tempconfig(config.OUTPUT_CONFIG):
-                    animation = anim.ManimParseTree()
+                    animation = m_parse_tree.ManimParseTree()
                     animation.setup_manim(to_parse, cfg, spec)
                     animation.render()       
     else:
@@ -317,7 +221,7 @@ Returns:
     else:
         config.configure_output_file_name(config.LL1_PARSING, to_parse)
         with m.tempconfig(config.OUTPUT_CONFIG):
-            animation = anim.ManimParseTree()
+            animation = m_parse_tree.ManimParseTree()
             animation.setup_manim(to_parse, cfg, spec)
             animation.render()       
     return SUCCESS
@@ -353,7 +257,7 @@ def _process_command(inp, cfg, spec) -> None:
 
         config.configure_output_file_name(config.FIRST_SET)
         with m.tempconfig(config.OUTPUT_CONFIG):
-            animation = anim.ManimFirstSet()
+            animation = m_first.MFirstSet()
             animation.setup_manim(cfg)
             animation.render()
       
@@ -375,7 +279,7 @@ def _process_command(inp, cfg, spec) -> None:
 
         config.configure_output_file_name(config.FOLLOW_SET)
         with m.tempconfig(config.OUTPUT_CONFIG):
-            animation = anim.ManimFollowSet()
+            animation = m_follow.MFollowSet()
             animation.setup_manim(cfg)
             animation.render()
 
@@ -403,7 +307,7 @@ def _process_command(inp, cfg, spec) -> None:
             config.OUTPUT_CONFIG["output_file"] = "Parsetable"
             config.configure_output_file_name(config.PARSETABLE)
             with m.tempconfig(config.OUTPUT_CONFIG):
-                animation = anim.ManimParseTable()
+                animation = m_parse_table.MParseTable()
                 animation.setup_manim(cfg)
                 animation.render()
         else:
@@ -421,7 +325,7 @@ def _process_command(inp, cfg, spec) -> None:
             else:
                 code = _init_parsing_ll1(to_sem, cfg, spec, semantic = True)
                 if code == SUCCESS:
-                    sem_analyser = SemanticAnalyser(cfg, cfg.parser_ll1.root, to_sem)
+                    sem_analyser = tc.SemanticAnalyser(cfg, cfg.parser_ll1.root, to_sem)
                     sem_analyser.init_analysis()
                 else:
                     display.fail_secho("Parsing failed with code " + str(code)+ ".Cannot generate semantic analysis.")

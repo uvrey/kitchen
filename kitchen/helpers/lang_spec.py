@@ -2,8 +2,7 @@
 
 import configparser
 from pathlib import Path
-from kitchen import SUCCESS
-from kitchen.helpers import display, cli_helper
+from kitchen.helpers import display, config
 import typer
 import re
 
@@ -18,8 +17,8 @@ def get_spec_path(config_file: Path) -> Path:
     return Path(config_parser["General"]["spec_path"])
 
 def get_spec(cfg):
-    if cli_helper.CONFIG_FILE_PATH.exists():
-            spec_path = get_spec_path(cli_helper.CONFIG_FILE_PATH)
+    if config.CONFIG_FILE_PATH.exists():
+            spec_path = get_spec_path(config.CONFIG_FILE_PATH)
     else:
         display.fail_secho(
             'Config file not found. Please run "kitchen init"',
@@ -155,7 +154,6 @@ def get_token_format(toks, values = False, types = False, as_list = False):
         if as_list: 
             return toks
         return " ".join(toks)
-
 
 class Token:
     def __init__(self, type, value):

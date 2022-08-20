@@ -61,6 +61,12 @@ def structure_secho(msg):
         fg = typer.colors.YELLOW
     ) 
 
+def highlight_error(s):
+    if s == "Error" :
+        return ['background-color: red']
+    else:
+        return ['background-color: white']
+
 def show_config_opts():
     info_secho("Options:\n\t Quality: -q <high | med | low>\n\t Preview: -p <y | n>\n\t Narration: -n <y / n>")
 
@@ -76,7 +82,7 @@ def pretty_print_dict(dict):
     """    
     structure_secho("\n".join("{}\t{}".format(k, v) for k, v in dict.items()))
 
-def pretty_print_config_settings(output_config, narr, theme = ""):
+def pretty_print_config_settings(output_config, narr):
     """Displays the
 
     Args:
@@ -116,28 +122,6 @@ def print_menu():
         
     df= pd.DataFrame(data=cmds,  columns = ["Command", "Shortcut", "Detail"])
     info_secho(df.to_markdown(index=False))
-
-
-    # general_secho(
-    #     " \\quit \t\t\t\\q\t\t Exit app\n\n" +
-    #     " \\config \t\t\\c\t\t Configure animation settings\n" +
-    #     # " \\load <cfg path> \t\\l <path>\t Load new CFG\n" +
-    #     " \\show cfg \t\t\\cfg\t\t Displays the current CFG\n\n" +
-
-    #     " \\dsl \t\t\t\t\t Launches the DSL design tool\n\n" +
-
-    #     " \\show first\t\t\\fs\t\t Displays the first set\n\n" +
-    #     " \\firstset\t\t\\gfs\t\t Generates first set animation\n" +
-
-    #     " \\show follow\t\t\\fw\t\t Displays the follow set\n\n" +
-    #     " \\followset\t\t\\gfw\t\t Generates follow set animation\n" +
-
-    #     " \\show parsetable\t\\pt\t\t Displays the LL(1) parse table\n" +
-    #     " \\parsetable\t\t\\vpt\t\t Visualises parse table construction\n\n" +
-       
-    #     " \\ll1 <input> \t\t\t\t [Default] Parse input with LL(1)\n" +
-    #     " \\ll1 \\v <input> \t\\v <input>\t Visualise parsing of input with LL(1)\n\n"  
-    # )
 
 def print_parsetree(root):
         """Helper function to print the parse tree

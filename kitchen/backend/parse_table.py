@@ -207,11 +207,7 @@ class ParsingTable:
         # print heading
         typer.echo(self.pt_dict)
 
-def highlight_error(s):
-    if s == "Error" :
-        return ['background-color: red']
-    else:
-        return ['background-color: white']
+
 
 
 
