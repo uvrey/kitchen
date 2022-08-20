@@ -60,12 +60,12 @@ class MFirstSet(m.Scene):
         cfg_line = self.manim_production_groups[production][:]
 
     # add the first set titles to the canvas
-        self.cfg.manim_firstset_lead[production] = m.Tex("First(" + production + "):", color = config.opp_col()
+        self.cfg.manim_firstset_lead[production] = m.Tex("First(" + production + "):", color = config.config.get_opp_col()
                                                     ).align_to(cfg_line, m.UP).shift(m.LEFT)
 
         self.play(
             m.FadeIn(self.cfg.manim_firstset_lead[production]),
-            m.FadeToColor(cfg_line, color=config.opp_col()),
+            m.FadeToColor(cfg_line, color=config.config.get_opp_col()),
             guide.animate.to_edge(m.RIGHT),
             keys.animate.to_edge(m.LEFT)
         )
@@ -166,7 +166,7 @@ class MFirstSet(m.Scene):
                     for ps in reversed(pstack):
                         # make sure the production in focus is shaded white
                         self.manim_production_groups[ps].fade_to(
-                            color=config.opp_col(), alpha=1)
+                            color=config.config.get_opp_col(), alpha=1)
 
                         # don't add # if we are down the stack
                         # begin adding to its first set
@@ -214,7 +214,7 @@ class MFirstSet(m.Scene):
 
                         # reset other colours to white
                         self.cfg.manim_firstset_contents[ps].fade_to(
-                            color=config.opp_col(), alpha=1)
+                            color=config.config.get_opp_col(), alpha=1)
 
                         # reset all cfg lines to white except the one we are looking at
                         keys.fade_to(color=m.DARK_GRAY, alpha=1)

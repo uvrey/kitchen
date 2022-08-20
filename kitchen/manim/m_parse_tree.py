@@ -18,7 +18,7 @@ from kitchen.manim import m_general as mg
 VCONFIG = {"radius": 0.25, "color": m.BLUE, "fill_opacity": 1}
 VCONFIG_TEMP = {"radius": 0.25, "color": m.GRAY}
 LCONFIG = {"vertex_spacing": (0.5, 1)}
-ECONFIG = {"color": config.opp_col()}
+ECONFIG = {"color": config.config.get_opp_col()}
 ECONFIG_TEMP = {"color": m.GRAY, "fill_opacity": 0.7}
 V_LABELS = {}
 
@@ -64,7 +64,7 @@ def create_vertex(g, vertex_id, parent_id, label, color=m.GRAY,  link=True):
 
     if link:
         g._add_edge(
-            [parent_id, vertex_id], edge_config={"color": config.opp_col()})
+            [parent_id, vertex_id], edge_config={"color": config.config.get_opp_col()})
     return v
 
 def reset_g(self, g, root, anim=[]):
@@ -223,7 +223,7 @@ class MParseTree(m.Scene):
 
     def _fade_in_mtable(self, highlight = False, row = -1, col = -1, first_time = False):
         # create fading area
-        rect = m.Rectangle(width=20, height=10, color=config.theme_col(), fill_opacity=0.9)
+        rect = m.Rectangle(width=20, height=10, color=config.get_theme_col(), fill_opacity=0.9)
 
         pt_title = mg.get_title_mobject("Parse table")
         pt_title.next_to(self.mtable, m.UP)
@@ -434,7 +434,7 @@ class MParseTree(m.Scene):
                             try:
                                 edge = g.edges[(parent_vertex_id, vertex_id)]
                                 anims.append(
-                                    m.FadeToColor(edge, color=config.opp_col()))
+                                    m.FadeToColor(edge, color=config.config.get_opp_col()))
                             except:
                                 pass
                         except KeyError:

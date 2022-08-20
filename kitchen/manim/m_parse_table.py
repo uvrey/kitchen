@@ -166,7 +166,7 @@ class MParseTable(m.Scene):
             # highlights the CFG line
             cfg_line = self.manim_production_groups[key][:]
             self.play(
-                    m.FadeToColor(cfg_line, color=config.opp_col())
+                    m.FadeToColor(cfg_line, color=config.config.get_opp_col())
             )
 
             for j, item in enumerate(self.cfg.first_set[key], start=0):
@@ -247,14 +247,14 @@ class MParseTable(m.Scene):
         t_old = self.mtable.get_entries_without_labels((row, col))
 
         self.play(
-            m.Indicate(t_old, color = config.opp_col())
+            m.Indicate(t_old, color = config.config.get_opp_col())
         )
 
         # set up new value with colour
         t_new = m.MathTex(mg.to_math_tex(new_val))
         t_new.scale_to_fit_width(GRID_ITEM_SCALE).scale(0.7)
         t_new.move_to(t_old)
-        t_new.fade_to(config.opp_col(), alpha=0.2)
+        t_new.fade_to(config.config.get_opp_col(), alpha=0.2)
 
         # fade out old value and into new value
         sounds.add_sound_to_scene(self, sounds.CLACK)

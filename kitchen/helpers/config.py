@@ -1,3 +1,12 @@
+""" Sets up and handles application configuration settings. """
+# kitchen/helpers/config.py
+
+import configparser
+from datetime import datetime
+import manim as m
+from pathlib import Path
+import typer
+
 from kitchen import (
         SUCCESS, 
         DARK, 
@@ -11,15 +20,10 @@ from kitchen import (
         FILE_LOADING_EXISTS_ERROR,
         ERRORS
     )
+
 from kitchen.helpers import (sounds, display, config)
-from datetime import datetime
-import manim as m
-from pathlib import Path
-import typer
-import configparser
 
 OUTPUT_CONFIG = None
-# set theme to dark by default
 THEME = DARK
 
 (
@@ -31,7 +35,6 @@ THEME = DARK
 
 CONFIG_DIR_PATH = Path(typer.get_app_dir(__app_name__))
 CONFIG_FILE_PATH = CONFIG_DIR_PATH / "config.ini"
-PARTIALS_PATH = ""
 
 def init_config_file() -> int:
     """Initialises the configuration file directory and file. 
@@ -49,8 +52,7 @@ def init_config_file() -> int:
         return FILE_LOADING_ERROR
     return SUCCESS
 
-# Helper function to validate that the given cfg path is valid
-def validate_path(paths):
+def validate_path(paths: list) -> int:
     """Checks the validity of paths.
 
     Args:
@@ -88,14 +90,15 @@ def create_paths(cfg_path: str, spec_path = None) -> int:
         )
         raise typer.Exit(1)
 
-    # load up the cfg config
+    # loads the config parser
     config_parser = configparser.ConfigParser()
     config_parser['General'] = {}
+
+    # sets up the default CFG and spec paths
     config_parser['General']['cfg_path'] = str(cfg_path)
     config_parser['General']['spec_path'] = ''
-    typer.echo(CONFIG_FILE_PATH)
 
-    # load the specification path if it is provided
+    # loads the specification path if it is provided
     if spec_path != None:
         spec_path = Path(spec_path)
 
@@ -105,7 +108,7 @@ def create_paths(cfg_path: str, spec_path = None) -> int:
                 fg=typer.colors.RED,
             )
 
-        # load up the cfg 
+        # sets the specifications path
         config_parser['General']['spec_path'] = str(spec_path)
 
     try:
@@ -113,15 +116,26 @@ def create_paths(cfg_path: str, spec_path = None) -> int:
             config_parser.write(file)
     except OSError:
         return CFG_WRITE_ERROR
-
     return SUCCESS
 
-
-def init_config():
+def init_config() -> None:
+    """Initialises the default configuration settings.
+    """    
     global OUTPUT_CONFIG
-    OUTPUT_CONFIG = {"quality": "medium_quality", "preview": True, 'flush_cache': True, "output_file": '', 'background_color': m.BLACK}
+    OUTPUT_CONFIG = {"quality": "medium_quality", 
+                    "preview": True, 
+                    'flush_cache': True, 
+                    "output_file": '', 
+                    'background_color': m.BLACK,
+                    'include_sound': True
+                    }
 
-def set_theme(tm):
+def set_theme(tm: int) -> None:
+    """Sets the animation theme.
+
+    Args:
+        tm (int): Theme code.
+    """    
     global THEME, OUTPUT_CONFIG
     THEME = tm
     if tm == DARK:
@@ -129,28 +143,56 @@ def set_theme(tm):
     else:
         OUTPUT_CONFIG["background_color"] = m.WHITE
 
-def opp_col():
-    if config.get_theme() == DARK:
+def get_opp_col():
+    """Retrieves the contrast colour of the current theme.
+
+    Returns:
+        Color: Manim Color.
+    """    
+    if _get_theme_code() == DARK:
         return m.WHITE
     else:
         return m.BLACK
 
-def theme_col():
+def get_theme_col():
+    """Retrieves the background colour of the given theme.
+
+    Returns:
+        Color: Manim Color.
+    """    
     if THEME == LIGHT:
         return m.WHITE
     else:
         return m.BLACK
 
-def get_theme():
-    return THEME
+def get_theme_name() -> str:
+    """Retrieves the name of the current theme.
 
-def get_theme_name():
+    Returns:
+        str: Theme name.
+    """    
     if THEME == LIGHT:
         return "light"
     else:
         return "dark " 
 
-def edit_config(inp):
+def _get_theme_code()  -> int:
+    """Retrieves the current theme code.
+
+    Returns:
+        int: Theme code.
+    """    
+    return THEME
+
+def edit_config(inp: str) -> int:
+    """Edits the configuration settings based on user preferences.
+
+    Args:
+        inp (str): User configuration selection.
+
+    Returns:
+        int: Status code.
+    """    
     code = False
     if inp != "":
         split_inp = inp.split(" ")
@@ -161,11 +203,25 @@ def edit_config(inp):
         _show_config()
     return code
 
-def get_time():
+def get_time() -> str:
+    """Retrieves the current time, for setting unique video file names.
+
+    Returns:
+        str: Formatted time.
+    """    
     now = datetime.now()
     return now.strftime("%d-%m_%H-%M-%S")
 
-def configure_output_file_name(file_type, inp = ""):
+def configure_output_file_name(file_type: int, inp = "") -> None:
+    """Sets unique file names for generated videos.
+
+    Args:
+        file_type (int): File type code.
+        inp (str, optional): LL(1) Parsing input. Defaults to "".
+
+    Returns:
+        str: Unique file name.
+    """    
     global OUTPUT_CONFIG
     file_name = ""
     if file_type == LL1_PARSING and inp != "":
@@ -182,7 +238,15 @@ def configure_output_file_name(file_type, inp = ""):
         OUTPUT_CONFIG["output_file"] = file_name
     return SUCCESS
     
-def _set_quality(inp) -> bool:
+def _set_quality(inp: str) -> bool:
+    """Edits the video quality settings.
+
+    Args:
+        inp (str): User input.
+
+    Returns:
+        bool: Success status.
+    """    
     global OUTPUT_CONFIG
     qs = ["low_quality", "medium_quality", "high_quality"]
     opts = ['low', 'med', 'high']
@@ -197,7 +261,15 @@ def _set_quality(inp) -> bool:
     except:
         return False
 
-def _set_theme(inp) -> bool:
+def _set_theme(inp: str) -> bool:
+    """Edits the video theme settings.
+
+    Args:
+        inp (str): User input.
+
+    Returns:
+        bool: Success status.
+    """    
     global OUTPUT_CONFIG
     global THEME
     ts = [DARK, LIGHT]
@@ -213,7 +285,15 @@ def _set_theme(inp) -> bool:
     except:
         return False
 
-def _set_preview(inp):
+def _set_preview(inp: str) -> None:
+    """Edits the video preview settings.
+
+    Args:
+        inp (str): User input.
+
+    Returns:
+        bool: Success status.
+    """    
     global OUTPUT_CONFIG
     ps = ['True', 'False']
     opts = ['y', 'n']
@@ -228,7 +308,15 @@ def _set_preview(inp):
     except:
         return False   
 
-def _set_narration(inp):
+def _set_narration(inp: str) -> None:
+    """Edits the video narration settings.
+
+    Args:
+        inp (str): User input.
+
+    Returns:
+        bool: Success status.
+    """    
     global OUTPUT_CONFIG
     opts = ["y", "n"]
     ns = [True, False]
@@ -247,7 +335,12 @@ def _set_narration(inp):
     except:
         return False   
 
-def _adjust_settings(inp):
+def _adjust_settings(inp: str) -> None:
+    """Handles all adjustments to the settings.
+
+    Args:
+        inp (str): User input.
+    """    
     qcode = _set_quality(inp)
     pcode = _set_preview(inp)
     ncode = _set_narration(inp)
@@ -256,7 +349,9 @@ def _adjust_settings(inp):
         display.fail_secho("Invalid configuration.\n")
     return
 
-def _show_config():
+def _show_config() -> None:
+    """Initialises display of configuration settings.
+    """    
     global OUTPUT_CONFIG
     display.info_secho("Current configuration settings:")
     display.pretty_print_config_settings(OUTPUT_CONFIG, sounds.get_config())

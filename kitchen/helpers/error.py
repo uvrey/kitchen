@@ -74,12 +74,12 @@ def ERR_manim_parsing_error(scene, msg=[], raw_msg = ""):
         msg_group = m.VGroup()
 
         for ms in msg:
-            msg_txt = m.Tex(display.to_tex(ms), color=c.opp_col())
+            msg_txt = m.Tex(display.to_tex(ms), color=c.config.get_config.get_opp_col())
             msg_group.add(msg_txt)
         msg_group.arrange(m.DOWN)
         
         # create fading area
-        rect = m.Rectangle(width=20, height=10, color=c.theme_col(), fill_opacity=0.9)
+        rect = m.Rectangle(width=20, height=10, color=c.get_theme_col(), fill_opacity=0.9)
 
         scene.play(
             m.FadeIn(rect),

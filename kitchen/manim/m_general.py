@@ -17,9 +17,6 @@ from kitchen.helpers import (
 
 from kitchen.backend import *
 
-# set global configs
-m.config.include_sound = True
-
 def get_title_mobject(title):
     return m.Tex(title, tex_template=m.TexFontTemplates.french_cursive)
 
@@ -36,12 +33,12 @@ def display_msg(self, msg, raw_msg= "", anim=[]):
         msg_group = m.VGroup()
 
         for ms in msg:
-            msg_txt = m.Tex(to_tex(ms), color=config.opp_col())
+            msg_txt = m.Tex(to_tex(ms), color=config.config.get_opp_col())
             msg_group.add(msg_txt)
         msg_group.arrange(m.DOWN)
         
         # create fading area
-        rect = m.Rectangle(width=20, height=10, color=config.theme_col(), fill_opacity=0.9)
+        rect = m.Rectangle(width=20, height=10, color=config.get_theme_col(), fill_opacity=0.9)
 
         self.play(
             m.FadeIn(rect),
@@ -86,7 +83,7 @@ def get_tokens_from_input(inp, spec = None) -> list:
 # Helper function to put a message on the screen
 def notify(self, message, next_to_this):
     # returns a keys group, which is the cfg representation
-    msg_text = m.Text(message, color=config.opp_col(), weight=m.BOLD).scale(0.5).next_to(
+    msg_text = m.Text(message, color=config.config.get_opp_col(), weight=m.BOLD).scale(0.5).next_to(
         next_to_this, m.RIGHT)
     self.play(
         m.Write(msg_text),
@@ -98,8 +95,8 @@ def notify(self, message, next_to_this):
 
 def fullscreen_notify(self, message):
     err_msg = message
-    err_m_msg = m.Tex(err_msg, color=config.opp_col())
-    rect = m.Rectangle(width=20, height=10, color=config.theme_col(), fill_opacity=0.85)
+    err_m_msg = m.Tex(err_msg, color=config.config.get_opp_col())
+    rect = m.Rectangle(width=20, height=10, color=config.get_theme_col(), fill_opacity=0.85)
     err_m_msg.move_to(rect.get_center())
     self.play(
         m.FadeIn(rect),
@@ -132,7 +129,7 @@ def get_token_colour(self):
         if not self.token_has_this_colour[index]:
             self.token_has_this_colour[index] = True
             return col
-    return config.opp_col()
+    return config.config.get_opp_col()
 
 # fades the scene out
 def fade_scene(self):
@@ -229,7 +226,7 @@ def get_guide(arr_right = False):
         guide_group_inner = m.VGroup()
         guide_group_inner.add(m.Square().set_fill(
             square_colors[i], opacity=1).scale(0.5))
-        guide_group_inner.add(m.Tex(labels[i], color = config.opp_col()))
+        guide_group_inner.add(m.Tex(labels[i], color = config.config.get_opp_col()))
         guide_group_inner.arrange_in_grid(rows = 1, buff = 0.8)
         guide_group_outer.add(guide_group_inner)
     
