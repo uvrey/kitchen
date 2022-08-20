@@ -96,12 +96,15 @@ def map_token_lists(self, lhs, rhs):
     return map_group
 
 class MParseTree(m.Scene):
-    # Parse LL(1) in the CLI
-    def setup(self):
-        self.frame_width = m.config["frame_width"]
-        self.frame_height = m.config["frame_height"]
 
     def setup_manim(self, inp, cfg, spec = None):
+        """Sets up the structures which the animation will make use of.
+
+        Args:
+            inp (str): Input to be parsed.
+            cfg (ContextFreeGrammar): Loaded CFG.
+            spec (Specification, optional): Specification Object, which contains the language specification. Defaults to None.
+        """     
         self.inp = inp
         self.inp_list = lang_spec.clean_inp_stream(inp.split(" "))
         self.spec = spec

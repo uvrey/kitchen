@@ -7,11 +7,13 @@ from kitchen.manim import m_general as mg
 
 
 class MFollowSet(m.Scene):
-    def setup(self):
-        self.frame_width = m.config["frame_width"]
-        self.frame_height = m.config["frame_height"]
     
-    def setup_manim(self, cfg):        
+    def setup_manim(self, cfg):  
+        """Sets up the structures which the animation will make use of.
+
+        Args:
+            cfg (ContextFreeGrammar): Loaded CFG.
+        """              
         self.cfg = cfg
 
     def construct(self):     

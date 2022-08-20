@@ -1,8 +1,7 @@
 """ Creates the Kitchen CLI"""
 # kitchen/cli.py
-from unittest.mock import NonCallableMagicMock
+
 import typer
-from pathlib import Path
 from typing import Optional
 
 from kitchen import (
@@ -140,7 +139,8 @@ def run() -> None:
 # TODO
 @app.command(name="dsl-tool")
 def init_dsl() -> None:
-    dsl_tool.main()
+    # dsl_tool.main(
+    pass
 
 @app.command(name="show-cfg")
 def show_cfg() -> None:

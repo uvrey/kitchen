@@ -1,7 +1,7 @@
 """ Generates a visualisation of the parse table calculation. """
 # kitchen/manim/m_parse_table.py
 
-from sys import displayhook
+from typing import List
 import manim as m
 
 from kitchen import (
@@ -11,11 +11,12 @@ from kitchen import (
         SUCCESS
 )
 
-from kitchen.helpers import config, display, error, sounds
+from kitchen.helpers import config, error, sounds
+from kitchen.backend import context_free_grammar as cfg
 from kitchen.manim import m_general as mg
 
 class MParseTable(m.Scene):
-    def setup_manim(self, cfg):
+    def setup_manim(self, cfg: cfg.ContextFreeGrammar):
         """Sets up the structures which the animation will make use of.
 
         Args:
@@ -52,7 +53,7 @@ class MParseTable(m.Scene):
             row_vals.append(row)
         return row_vals
 
-    def _init_m_table(self, row_vals, row_labels, col_labels):
+    def _init_m_table(self, row_vals: List, row_labels: List, col_labels: List):
         """Initialises the Manim MathTable structure.
 
         Args:
@@ -207,7 +208,7 @@ class MParseTable(m.Scene):
         sounds.narrate("The parse table is complete. Yay!", self)
         return SUCCESS
 
-    def vis_add_to_parsetable(self, nt, t, prod):
+    def vis_add_to_parsetable(self, nt: str, t: str, prod: str):
         """Adds a new entry to the parse table visualisation.
 
         Args:
@@ -225,14 +226,14 @@ class MParseTable(m.Scene):
                 return ERROR
             else:
                 self.pt_dict[nt][t] = prod
-                self.swap(mg.row(self.nts, nt), mg.col(self.ts, t), mg.to_tex(prod))
+                self.swap(mg.row(self.nts, nt), mg.col(self.ts, t), prod)
 
         except KeyError:
             self.pt_dict[nt][t] = prod
-            self.swap(mg.row(self.nts, nt), mg.col(self.ts, t), mg.to_tex(prod))
+            self.swap(mg.row(self.nts, nt), mg.col(self.ts, t), prod)
         return SUCCESS
 
-    def swap(self, row, col, new_val) -> m.MathTable:
+    def swap(self, row: int, col: int, new_val: str) -> m.MathTable:
         """Swaps two elements in a parse table visualisation.
 
         Args:

@@ -1,16 +1,21 @@
-import re
+""" Generates a visualisation of the first set calculation. """
+# kitchen/manim/m_first.py
+
 import manim as m
+import re
 
 from kitchen import CFG_SCALE_HEIGHT, RE_PRODUCTION, RE_TERMINAL, TEXT_SCALE
 from kitchen.helpers import sounds, config, display, error
 from kitchen.manim import m_general as mg
 
 class MFirstSet(m.Scene):
-    def setup(self):
-        self.frame_width = m.config["frame_width"]
-        self.frame_height = m.config["frame_height"]
 
-    def setup_manim(self, cfg):        
+    def setup_manim(self, cfg): 
+        """Sets up the structures which the animation will make use of.
+
+        Args:
+            cfg (ContextFreeGrammar): Loaded CFG.
+        """                    
         self.cfg = cfg
 
     def construct(self):
