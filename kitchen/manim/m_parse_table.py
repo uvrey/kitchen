@@ -1,13 +1,13 @@
 """ Generates a visualisation of the parse table calculation. """
 # kitchen/manim/m_parse_table.py
 
-from typing import List
 import manim as m
 
 from kitchen import (
         CFG_SCALE_HEIGHT, 
         CFG_SCALE_WIDTH, 
         ERROR, 
+        GRID_ITEM_SCALE,
         SUCCESS
 )
 
@@ -53,13 +53,13 @@ class MParseTable(m.Scene):
             row_vals.append(row)
         return row_vals
 
-    def _init_m_table(self, row_vals: List, row_labels: List, col_labels: List):
+    def _init_m_table(self, row_vals: list, row_labels: list, col_labels: list):
         """Initialises the Manim MathTable structure.
 
         Args:
-            row_vals (List): Row values.
-            row_labels (List): Row labels.
-            col_labels (List): Column labels.
+            row_vals (list): Row values.
+            row_labels (list): Row labels.
+            col_labels (list): Column labels.
 
         Returns:
             MathTable: Initialised Manim MathTable structure.

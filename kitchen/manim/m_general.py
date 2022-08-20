@@ -17,8 +17,6 @@ from kitchen.helpers import (
 
 from kitchen.backend import *
 
-GRID_ITEM_SCALE = 0.4
-
 # set global configs
 m.config.include_sound = True
 
