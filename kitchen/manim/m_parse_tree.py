@@ -10,10 +10,17 @@ from kitchen import (
     RE_PRODUCTION, 
     SUCCESS
 )
+
 from kitchen.backend import stack
 from kitchen.helpers import lang_spec, config, sounds, error, display
 from kitchen.manim import m_general as mg
 
+VCONFIG = {"radius": 0.25, "color": m.BLUE, "fill_opacity": 1}
+VCONFIG_TEMP = {"radius": 0.25, "color": m.GRAY}
+LCONFIG = {"vertex_spacing": (0.5, 1)}
+ECONFIG = {"color": config.opp_col()}
+ECONFIG_TEMP = {"color": m.GRAY, "fill_opacity": 0.7}
+V_LABELS = {}
 
 def create_tokens(tokens):
     # Write equations
@@ -81,7 +88,7 @@ def map_token_lists(self, lhs, rhs):
         small_group = m.VGroup()
         lh = m.Text(il, slant=m.ITALIC, weight=m.BOLD)
         arrow = m.Arrow(start=m.LEFT, end=m.RIGHT, buff=0).next_to(lh, m.RIGHT)
-        rh = m.Text(rhs[index], weight=m.BOLD, color=mg.mg.get_token_colour(self)).next_to(
+        rh = m.Text(rhs[index], weight=m.BOLD, color=mg.get_token_colour(self)).next_to(
             arrow, m.RIGHT)
         small_group.add(lh, arrow, rh)
         map_group.add(small_group)
@@ -289,7 +296,7 @@ class MParseTree(m.Scene):
             except:
                 tex = m.MathTex("\\text{"+t+"}")
                 m_tok_gp.add(tex)
-                m_tok[t.type] = tex
+                m_tok[t] = tex
         m_tok_gp.arrange(m.RIGHT)
 
         # show the parsing table
@@ -462,7 +469,7 @@ class MParseTree(m.Scene):
                     mg.display_msg(self, ["We must find the entry at ParseTable["+top+"]["+next+"]"], raw_msg = "Let's consider the parse table entry at non-terminal " + top + "'s row and terminal " + next + "'s column.")
 
                     # highlight parse table row
-                    self._fade_in_mtable(highlight  = True, row = row(self.nts, top), col = col(self.ts, next))
+                    self._fade_in_mtable(highlight  = True, row = mg.row(self.nts, top), col = mg.col(self.ts, next))
                     
                     #  copy the cfg_line rather than manipulate it directly
                     cfg_line = self.manim_production_groups[prods[0].strip(
@@ -591,10 +598,10 @@ class MParseTree(m.Scene):
         reset_g(self, g, start_symbol, anim=[m.FadeOut(self.s.mstack)])
 
         sounds.add_sound_to_scene(self, sounds.YAY)
-        mg.display_msg(self, ["Successfully parsed `" + lang_spec.get_token_types(original_tokens) +
+        mg.display_msg(self, ["Successfully parsed `" + lang_spec.get_token_format(original_tokens) +
                                 "'!"], raw_msg= "Parsing successful! That was a valid input.")
 
-        display.success_secho("Successfully parsed '" + lang_spec.get_token_types(original_tokens) +
+        display.success_secho("Successfully parsed '" + lang_spec.get_token_format(original_tokens) +
                               "'!\nParse tree:")
         display.print_parsetree(self.root)
         return SUCCESS

@@ -17,12 +17,6 @@ from kitchen.helpers import (
 
 from kitchen.backend import *
 
-VCONFIG = {"radius": 0.25, "color": m.BLUE, "fill_opacity": 1}
-VCONFIG_TEMP = {"radius": 0.25, "color": m.GRAY}
-LCONFIG = {"vertex_spacing": (0.5, 1)}
-ECONFIG = {"color": config.opp_col()}
-ECONFIG_TEMP = {"color": m.GRAY, "fill_opacity": 0.7}
-V_LABELS = {}
 GRID_ITEM_SCALE = 0.4
 
 # set global configs

@@ -202,7 +202,7 @@ def find_ll1(
     if code == SUCCESS:
         cfg.parser_ll1.parse_ll1(cfg.start_symbol, inp, testing=True)
     else:
-        typer.echo("problem setting up parser")
+        typer.echo("Problem setting up parser.")
     return SUCCESS
 
 @app.callback()
@@ -211,7 +211,7 @@ def main(
         None,
         "--version",
         "-v",
-        help="Show the application's version and exit.",
+        help="Shows the application's version and exit.",
         callback=_version_callback,
         is_eager=True,
     )

@@ -75,6 +75,7 @@ solve parsing bug with bla_complex - it was not LL(1) compatible :)
 first set animation not moving CFG to the left :)
 PT table spacing on large outputs :) 
 update menu :)
+restructure directory :)
 """
 
 """
@@ -119,6 +120,9 @@ gray lines for tables
 """
 TODO - ADMIN
 complete documentation
+type hints
+neaten up imports
+
 README
 clean up code   
 clean git repo
@@ -129,6 +133,8 @@ PAPER
 USER TESTING
 - ethics approval
 - conduct tests
+
+
 """ 
 
 """ *********************************************************
@@ -150,6 +156,11 @@ For any production S -> A | B, it must be the case that:
     At most one of A and B can derive the empty string
     if B can derive the empty string, then A does not derive any 
     string beginning with a terminal in Follow(A)
+
+# Find First(α) and for each terminal in First(α), make entry A –> α in the table.
+# If First(α) contains ε (epsilon) as terminal than, find the Follow(A) and for each terminal in Follow(A), make entry A –> α in the table.
+# If the First(α) contains ε and Follow(A) contains $ as terminal, then make entry A –> α in the table for the $. 
+
 """
 
 """
@@ -174,4 +185,7 @@ Max number of token colours
 Difficult grammars not handled
 Checking for conflicts
 Sound may get corrupted when animation is cancelled before it is finished - so it can't clear the cache
+Known issues:
+- No sound: clear partial movie directory and restart.
+
 """

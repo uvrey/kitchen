@@ -25,7 +25,7 @@ from kitchen.backend import (
     type_check as tc
 )
 
-from kitchen.manim import m_parse_tree, m_first, m_follow
+from kitchen.manim import (m_first, m_follow, m_parse_table, m_parse_tree)
 
 def init_app(cfg_path: str, spec_path = None) -> int:
     """Initialises the application by creating its configuration file and CFG path.
@@ -139,7 +139,7 @@ def _init_parsing_ll1_via_cmd(inp, cfg, spec) -> int:
             else:
                 config.configure_output_file_name(config.LL1_PARSING, to_parse)
                 with m.tempconfig(config.OUTPUT_CONFIG):
-                    animation = m_parse_tree.ManimParseTree()
+                    animation = m_parse_tree.MParseTree()
                     animation.setup_manim(to_parse, cfg, spec)
                     animation.render()       
     else:
@@ -221,7 +221,7 @@ Returns:
     else:
         config.configure_output_file_name(config.LL1_PARSING, to_parse)
         with m.tempconfig(config.OUTPUT_CONFIG):
-            animation = m_parse_tree.ManimParseTree()
+            animation = m_parse_tree.MParseTree()
             animation.setup_manim(to_parse, cfg, spec)
             animation.render()       
     return SUCCESS

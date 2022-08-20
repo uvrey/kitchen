@@ -3,9 +3,11 @@ import typer
 import manim as m
 import re
 import pandas as pd
+
 from kitchen import (
     RE_TERMINAL,
 )
+
 from kitchen.helpers import (
     display,
     error
@@ -84,25 +86,20 @@ class ParsingTable:
         """        
         return self.ts.index(t) + 1
 
-# Find First(α) and for each terminal in First(α), make entry A –> α in the table.
-# If First(α) contains ε (epsilon) as terminal than, find the Follow(A) and for each terminal in Follow(A), make entry A –> α in the table.
-# If the First(α) contains ε and Follow(A) contains $ as terminal, then make entry A –> α in the table for the $. 
     def populate_table(self):
         """Populates the whole table with the first and follow set, if appropriate
         """
 
-        for i, key in enumerate(self.first_set.keys(), start=0):
+        for key in self.first_set.keys():
             for j, item in enumerate(self.first_set[key], start=0):
                 # if the first set contains epsilon, it may disappear. So, we need to add elements in the follow set too.
                 if item == "#":
                     for f in self.follow_set[key]:
-                        
+                        prod = key + " -> " + item
                         if f == "$":
                             # make A->a in column of "$"
-                            prod = key + " -> " + item
                             self.add_to_parsetable(key, "$", prod)
                         else:
-                            prod = key + "-> " + item
                             self.add_to_parsetable(key, f, prod)
                 else:
                     # add item to the parse table
@@ -124,12 +121,6 @@ class ParsingTable:
                 self.pt_dict[nt][t] = production
         except KeyError:
             self.pt_dict[nt][t] = production
-
-    def init_manim_parsetable(self):
-        self.m_parsetable = ParsingTable()
-        rows = self.nts
-        cols = sorted(self.ts)
-        self.m_parsetable.init_table([], [], rows, cols)
 
     def get_row_contents(self):
         """Gets the rows as a list of lists. 

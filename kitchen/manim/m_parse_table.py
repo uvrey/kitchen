@@ -1,31 +1,49 @@
+""" Generates a visualisation of the parse table calculation. """
+# kitchen/manim/m_parse_table.py
+
+from sys import displayhook
 import manim as m
 
-from kitchen import CFG_SCALE_HEIGHT, CFG_SCALE_WIDTH, ERROR, SUCCESS
-from kitchen.helpers import sounds, config
+from kitchen import (
+        CFG_SCALE_HEIGHT, 
+        CFG_SCALE_WIDTH, 
+        ERROR, 
+        SUCCESS
+)
+
+from kitchen.helpers import config, display, error, sounds
 from kitchen.manim import m_general as mg
 
 class MParseTable(m.Scene):
-    def setup(self):
-        self.frame_width = m.config["frame_width"]
-        self.frame_height = m.config["frame_height"]
-
-    def construct(self):
-        self.vis_populate_table()
-
-    def init_pt_dict(self):
-        # set up parsing table structure
-        for n in self.nts:
-            for t in self.ts:
-                self.pt_dict[n] = {}
-                self.pt_dict[n][t] = None
-
     def setup_manim(self, cfg):
+        """Sets up the structures which the animation will make use of.
+
+        Args:
+            cfg (ContextFreeGrammar): Loaded CFG.
+        """        
         self.ts = sorted(cfg.terminals)
         self.nts = sorted(cfg.nonterminals)
         self.cfg = cfg
 
-    # initialise the row values for the manim table
-    def init_row_contents(self):
+    def construct(self):
+        """Creates a scene to visualise the parsing table construction.
+        """        
+        self._vis_populate_table()
+
+    def _init_pt_dict(self):
+        """Set up parsing table structure.
+        """
+        for n in self.nts:
+            for t in self.ts:
+                self.pt_dict[n] = {}
+                self.pt_dict[n][t] = "Error"
+
+    def _init_row_contents(self):
+        """Initialises the row values in the parse table.
+
+        Returns:
+            List: List of lists, where these contain the row contents of the parse table.
+        """        
         row_vals = []
         for n in self.nts:
             row = []
@@ -33,67 +51,90 @@ class MParseTable(m.Scene):
                 row.append(".")
             row_vals.append(row)
         return row_vals
-    
-    def tear_down(self):
-        mg.clear_narrs()
 
-    def vis_populate_table(self):
-        """Visualises the algorithm which constructs the parsing table
+    def _init_m_table(self, row_vals, row_labels, col_labels):
+        """Initialises the Manim MathTable structure.
 
         Args:
-            scene (_type_): _description_
+            row_vals (List): Row values.
+            row_labels (List): Row labels.
+            col_labels (List): Column labels.
+
+        Returns:
+            MathTable: Initialised Manim MathTable structure.
+        """        
+        row_labels = row_labels
+        col_labels = col_labels
+
+        table = m.MathTable(
+            row_vals,
+            row_labels=[m.MathTex(mg.to_math_tex(rl)) for rl in row_labels],
+            col_labels=[m.MathTex(mg.to_math_tex(cl)) for cl in col_labels],
+            include_outer_lines=True)
+
+        lab = table.get_labels()
+        lab.set_color(m.LIGHT_GRAY)
+        table.get_horizontal_lines()[2].set_stroke(width=3, color=m.LIGHT_GRAY)
+        table.get_vertical_lines()[2].set_stroke(width=3, color=m.LIGHT_GRAY)
+        return table
+
+    def _vis_populate_table(self):
+        """Visualises the algorithm that constructs the parsing table.
+
+        Args:
+            scene (Scene): Manim parse table object, which extends a Manim Scene.
         """
-        # make sure parse table is fully reset
         self.pt_dict = {}
-        self.init_pt_dict()
+        self._init_pt_dict()
 
         all_elements = m.VGroup()
 
-        # set up the title
+        # sets up the title
         ll1_title = mg.get_title_mobject("LL(1) parsing: parse table")
         sounds.narrate("Let's find the parse table for this grammar.", self)
         keys = mg.get_manim_cfg_group(self)
         keys.scale_to_fit_height(CFG_SCALE_HEIGHT/3)
         all_elements.add(keys)
 
-        # show key for colour coding
+        # shows key for colour coding
         cfg_heading = m.Tex("Context-Free Grammar", tex_template = m.TexFontTemplates.french_cursive).next_to(keys, m.UP).align_to(keys.get_center)
         cfg_heading.scale(0.6)
 
-        # draw establishing table animations
+        # draws establishing table animations
         row_labels = self.nts
         col_labels = mg.ts_m_epsilon(self)
 
-        # build up the row values
-        row_vals = mg.init_row_contents(self)
+        # builds up the row values
+        row_vals = self._init_row_contents()
 
-        # add the table
-        self.mtable = self.init_m_table(
+        # adds the table to the element group
+        self.mtable = self._init_m_table(
             row_vals, row_labels, col_labels)
         self.mtable.get_row_labels().fade_to(color=m.RED, alpha=1)
         self.mtable.get_col_labels().fade_to(color=m.TEAL, alpha=1)
         self.mtable.scale_to_fit_height(CFG_SCALE_HEIGHT)
         all_elements.add(self.mtable)
 
-        # add the guide 
+        # adds the guide 
         guide = mg.get_guide(arr_right= True)
         guide.scale(0.6)
         
-        # arrange all items
+        # arranges all items
         all_elements.arrange_in_grid(rows = 1, buff = 1.2)
         all_elements.center()
 
-        # scale everything nicely
+        # scales everything nicely
         all_elements.scale_to_fit_width(CFG_SCALE_WIDTH)
-        # make sure elements are showing
+
+        # makes sure elements are showing
         if all_elements.height > CFG_SCALE_HEIGHT or len(self.ts) > 4:
             all_elements.scale_to_fit_height(CFG_SCALE_HEIGHT)
 
-
+        # adds cfg's heading
         cfg_heading.next_to(keys, m.UP)
 
-        # play start of scene
         sounds.add_sound_to_scene(self, sounds.MOVE)
+
         self.play(
             ll1_title.animate.to_edge(m.UP),
             guide.animate.to_edge(m.DOWN),
@@ -102,59 +143,60 @@ class MParseTable(m.Scene):
                         for k in keys)),
         )
 
-        # add typing sound as the labels are drawn
         sounds.add_sound_to_scene(self, sounds.TYPE)
+
         self.play(
            m.Write((self.mtable).get_labels()),
             run_time=1
         )
-
+        
+        # fades in table lines
         self.play(
             m.Create((self.mtable).get_horizontal_lines()[2]),
             m.Create((self.mtable).get_vertical_lines()[2]),
             run_time=2
         )
 
-        # populate the whole table with the first and follow set, if appropriate
-        for i, key in enumerate(self.cfg.first_set.keys(), start=0):
-            # reset all lines to gray
+        # populates the whole table with the first and follow set, if appropriate
+        for key in self.cfg.first_set.keys():
+            # resets all lines to gray
             keys.fade_to(m.GRAY, 1)
 
-            # highlight the CFG line
+            # highlights the CFG line
             cfg_line = self.manim_production_groups[key][:]
             self.play(
                     m.FadeToColor(cfg_line, color=config.opp_col())
             )
 
             for j, item in enumerate(self.cfg.first_set[key], start=0):
-                # if the first set contains epsilon, may disappear
+
+                # handles case where a first set contains an epsilon
                 if item == "#":
+
                     for f in self.cfg.follow_set[key]:
+                        # adds production to table if # in First(A) and $ in Follow(A)
+                        prod = key + " -> " + item
+
                         if f == "$":
-                            mprod = key + " \\to $"
-                            prod = key + " -> $"
+                            code = self.vis_add_to_parsetable(key, "$", prod)
                         else:
-                            mprod = key + " \\to \epsilon"
-                            prod = key + " -> #"
+                            code = self.vis_add_to_parsetable(key, f, prod)
+                        
+                        # narrates events
                         mg.display_msg(self, ["Following " + prod + "adds #", " to First(" + mg.to_tex(key) + ")"], raw_msg = "If we follow "+key+"'s production, we find an epsilon. So, we add this production to the parse table.")
                         self.wait()
 
-                        code = self.vis_add_to_parsetable(key, f, prod, mprod)
                         if code == ERROR:
                             sounds.add_sound_to_scene(self, sounds.FAIL)
                             return
                 else:
-
-                    # add item to the parse table
+                    # adds item to the parse table
                     prod = self.cfg.firstset_index[key][j]
-                    mprod = prod
-                    tmp_prod = prod.replace(
-                        "->", "\\to").strip().replace("#", "\epsilon")
                     mg.display_msg(self, ["Following " + prod + " adds " +
                                  self.cfg.first_set[key][j], " to First(" + key + ")"], raw_msg = "If we follow " + key + "'s production, we encounter terminal " + self.cfg.first_set[key][j] + ". So, let's add this production to the parse table at row " + key + " and column " + self.cfg.first_set[key][j])
- 
+                    
                     code = self.vis_add_to_parsetable(
-                         key, item, prod, tmp_prod)
+                         key, item, prod)
                     if code == ERROR:
                         sounds.add_sound_to_scene(self, sounds.FAIL)
                         return
@@ -165,25 +207,33 @@ class MParseTable(m.Scene):
         sounds.narrate("The parse table is complete. Yay!", self)
         return SUCCESS
 
-    def vis_add_to_parsetable(self, nt, t, prod, mprod):
+    def vis_add_to_parsetable(self, nt, t, prod):
+        """Adds a new entry to the parse table visualisation.
 
+        Args:
+            nt (str): Non-terminal (row).
+            t (str): Terminal (column).
+            prod (str): Production to be added.
+
+        Returns:
+            int: Status code. 
+        """        
         try:
-            if self.pt_dict[nt][t] != None:
+            if self.pt_dict[nt][t] != "Error":
                 mg.display_msg(self, ["Cannot add entry: There is already a production", "at ParseTable[" + nt +", " + t +"].", "NOTE: This grammar cannot be parsed with LL(1)." ], raw_msg = "There's already an entry, so this grammar is unsuitable for LL(1) parsing.")
                 error.ERR_too_many_productions_ll1(nt, t)
                 return ERROR
             else:
                 self.pt_dict[nt][t] = prod
-                self.swap(row(self.nts, nt), col(self.ts, t), mprod)
+                self.swap(mg.row(self.nts, nt), mg.col(self.ts, t), mg.to_tex(prod))
 
         except KeyError:
             self.pt_dict[nt][t] = prod
-            self.swap(row(self.nts, nt), col(self.ts, t), mprod)
+            self.swap(mg.row(self.nts, nt), mg.col(self.ts, t), mg.to_tex(prod))
         return SUCCESS
 
-    # swap a current entry
     def swap(self, row, col, new_val) -> m.MathTable:
-        """Swaps two elements in a manim parse table.
+        """Swaps two elements in a parse table visualisation.
 
         Args:
             row (int): Row of element to be swapped.
@@ -200,7 +250,7 @@ class MParseTable(m.Scene):
         )
 
         # set up new value with colour
-        t_new = m.MathTex(mg.to_math_tex()(new_val))
+        t_new = m.MathTex(mg.to_math_tex(new_val))
         t_new.scale_to_fit_width(GRID_ITEM_SCALE).scale(0.7)
         t_new.move_to(t_old)
         t_new.fade_to(config.opp_col(), alpha=0.2)
@@ -216,51 +266,10 @@ class MParseTable(m.Scene):
             m.ApplyWave(t_new),
         )
 
-        # pause
+        # pause before concluding
         self.wait()
 
-    def init_m_table(self, row_vals, row_labels, col_labels):
-        row_labels = row_labels
-        col_labels = col_labels
-
-        table = m.MathTable(
-            row_vals,
-            row_labels=[m.MathTex(mg.to_math_tex()(rl)) for rl in row_labels],
-            col_labels=[m.MathTex(mg.to_math_tex()(cl)) for cl in col_labels],
-            include_outer_lines=True)
-
-        # Table
-        lab = table.get_labels()
-        lab.set_color(m.LIGHT_GRAY)
-        table.get_horizontal_lines()[2].set_stroke(width=3, color=m.LIGHT_GRAY)
-        table.get_vertical_lines()[2].set_stroke(width=3, color=m.LIGHT_GRAY)
-        return table
-
-    def init_table(self, x_vals, y_vals, row_labels, col_labels):
-        """Set up Table MObject prior to being drawn.
-
-        Args:
-            x_vals (List): List of x values.
-            y_vals (List): List of y values.
-            row_labels (List): X labels.
-            col_labels (List): Y Labels. 
+    def tear_down(self):
+        """Concludes the scene by clearing the narrations directory.
         """        
-
-        self.xs = x_vals
-        self.ys = y_vals
-        self.row_labels = row_labels
-        self.col_labels = col_labels
-
-        self.table = m.MathTable(
-            [self.xs, self.ys],
-            row_labels=[m.MathTex(mg.to_math_tex()(rl)) for rl in self.row_labels],
-            col_labels=[m.MathTex(mg.to_math_tex()(cl)) for cl in self.col_labels],
-            include_outer_lines=True)
-
-        # Table
-        lab = self.table.get_labels()
-        lab.set_color(m.LIGHT_GRAY)
-        self.table.get_horizontal_lines()[2].set_stroke(
-            width=8, color=m.LIGHT_GRAY)
-        self.table.get_vertical_lines()[2].set_stroke(
-            width=8, color=m.LIGHT_GRAY)
+        mg.clear_narrs()

@@ -1,7 +1,5 @@
 import manim as m
 import re
-import typer
-import anytree
 
 from kitchen import CFG_SCALE_HEIGHT, CFG_SCALE, RE_PRODUCTION, RE_TERMINAL, RE_NONTERMINAL
 from kitchen.helpers import sounds, config, display
