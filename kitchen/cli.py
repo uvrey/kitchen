@@ -4,19 +4,25 @@ from unittest.mock import NonCallableMagicMock
 import typer
 from pathlib import Path
 from typing import Optional
+
 from kitchen import (
     __app_name__,
      __version__, 
-     ERRORS, 
      SUCCESS, 
-     cli_helper, 
-     context_free_grammar as cfg, 
-     display_helper,
-     dsl_tool,
-     sounds,
      ERROR,
-     lang_spec,
-     config)
+)
+
+from kitchen.backend import (
+  context_free_grammar as cfg, 
+)
+
+from kitchen.helpers import (
+    cli_helper, 
+    display_helper,
+    sounds,
+    lang_spec,
+    config
+)
 
 app = typer.Typer()
 

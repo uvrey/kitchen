@@ -1,11 +1,6 @@
-""" Top-level        cfg_heading.next_to(keys, m.UP/232# # # # 
-        all_elemeall_elements.arrange_in_grid()rows = 1, buff = 1.45
-        # 
-        #  package for Kitchen """
+""" Top level package for Kitchen """
 # kitchen/__init__.py
-from sqlite3 import DateFromTicks
 import manim as m
-import typer
 from pathlib import Path
 
 __app_name__= "kitchen"
@@ -14,7 +9,6 @@ __version__ = "0.1.0"
 RE_TERMINAL = r'[a-z][a-z]*|$|#|\+|-|/|\*|\(|\)|,|='
 RE_NONTERMINAL = r'[A-Z][A-Z]*'
 RE_PRODUCTION = r'[A-Z][A-Z]*|[a-z][a-z]*|$|#|\+|-|/|\*|\(|\)|,|='
-
 
 TEXT_SCALE = 1
 CFG_SCALE_HEIGHT = 6.25*m.config["frame_height"]/10
