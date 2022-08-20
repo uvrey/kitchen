@@ -4,12 +4,12 @@ from typer.testing import CliRunner
 import os
 import pytest
 from pathlib import Path
-from kitchen import __app_name__, __version__, cli, ERROR
+from kitchen import __app_name__, __version__, app
 
 runner = CliRunner()
 
 def test_version():
-    result = runner.invoke(cli.app, ["--version"])
+    result = runner.invoke(app.app, ["--version"])
     assert result.exit_code == 0
     assert f"{__app_name__} v{__version__}\n" in result.stdout
 
@@ -28,6 +28,6 @@ def sample_path():
 ])
 
 def test_init(sample, out, sample_path):
-    result = runner.invoke(cli.app, ["init",  "-cfg", sample_path + sample])
+    result = runner.invoke(app.app, ["init",  "-cfg", sample_path + sample])
     assert out in result.stdout
 

@@ -5,7 +5,7 @@ from typer.testing import CliRunner
 import os
 import pytest
 from pathlib import Path
-from kitchen import __app_name__, __version__, cli, ERROR
+from kitchen import __app_name__, __version__, app
 
 runner = CliRunner()
 
@@ -42,8 +42,8 @@ def test_fw(sample_path, fw_out_path, sample_cfg):
         sample_cfg (str): Name of CFG file
         fs_out_path (str): Path to expected outputs directory
     """    
-    runner.invoke(cli.app, ["init-tests",  "-cfg", sample_path + sample_cfg])
-    result = runner.invoke(cli.app, ["test-fw"])
+    runner.invoke(app.app, ["init-tests",  "-cfg", sample_path + sample_cfg])
+    result = runner.invoke(app.app, ["test-fw"])
     out_fs = get_contents(sample_cfg, fw_out_path)
     show_differences(out_fs, result.stdout)
     assert out_fs in result.stdout
