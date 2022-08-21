@@ -1,8 +1,10 @@
+""" Generates a visualisation of the parse table calculation. """
+# kitchen/backend/parse_table.py
 
-import typer
 import manim as m
-import re
 import pandas as pd
+import re
+import typer
 
 from kitchen import (
     RE_TERMINAL,
@@ -18,9 +20,9 @@ class ParsingTable:
         """Initialises a ParsingTable object.
 
         Args:
-            terminals (List): List of terminals. 
-            nonterminals (List): List of non-terminals. 
-            cfgd (Dictionary): Dictionary containing non-terminals and their productions. 
+            terminals (list): List of terminals. 
+            nonterminals (list): List of non-terminals. 
+            cfgd (dict): Dictionary containing non-terminals and their productions. 
         """        
         self.first_set = {}
         self.follow_set = {}
@@ -31,25 +33,12 @@ class ParsingTable:
         self.init_parsetable()
         self.calculated = False
 
-        """ initialises the parsing table """
-    def show_structures(self) -> None:
-        """Displays the structures involved in forming the parse table. 
-        """        
-        display.info_secho("First set:")
-        display.pretty_print_dict(self.first_set)
-        display.info_sechotyper.echo("Follow set")
-        display.pretty_print_dict(self.follow_set)
-        display.info_sechotyper.echo("Terminals")
-        display.pretty_print_dictpprint.pprint(self.ts)
-        display.info_sechotyper.echo("Non terminals")
-        display.pretty_print_dictpprint.pprint(self.nts)
-
     def set_internals(self, fs, fw, fs_index):
         """Sets up the internal components of the parsing table. 
 
         Args:
-            fs (Dictionary): First set
-            fw (Dictionary): Follow set
+            fs (Dictionary): First set.
+            fw (Dictionary): Follow set.
             fs_index (Dictionary): First set indices.
         """        
         self.firstset_index = fs_index
@@ -65,7 +54,7 @@ class ParsingTable:
                 self.pt_dict[n][t] = "Error"
 
     def row(self, nt):
-        """Obtain the row index of a given non-terminal.
+        """Obtains the row index of a given non-terminal.
 
         Args:
             nt (String): Non-terminal
@@ -76,10 +65,10 @@ class ParsingTable:
         return self.nts.index(nt) + 1
 
     def col(self, t):
-        """Obtain the column index of a terminal.
+        """Obtains the column index of a terminal.
 
         Args:
-            t (String): Terminal
+            t (String): Terminal.
 
         Returns:
             int: Column index
@@ -89,7 +78,6 @@ class ParsingTable:
     def populate_table(self):
         """Populates the whole table with the first and follow set, if appropriate
         """
-
         for key in self.first_set.keys():
             for j, item in enumerate(self.first_set[key], start=0):
                 # if the first set contains epsilon, it may disappear. So, we need to add elements in the follow set too.
@@ -110,9 +98,9 @@ class ParsingTable:
         """Adds a production to the parsetable at a given index. 
 
         Args:
-            nt (String): Non-terminal
-            t (String): Terminal
-            production (String): Production at ParseTable[nt, t]
+            nt (str): Non-terminal.
+            t (str): Terminal.
+            production (str): Production at ParseTable[nt, t].
         """
         try:
             if self.pt_dict[nt][t] != "Error":
@@ -126,7 +114,7 @@ class ParsingTable:
         """Gets the rows as a list of lists. 
 
         Returns:
-            List: Row contents lists.
+            list: Row contents lists.
         """        
         row_vals = []
         for n in self.nts:
@@ -148,20 +136,6 @@ class ParsingTable:
             row_vals.append(row)
         return row_vals
 
-    def init_row_contents(self):
-        """Initialises the row contents (MANIM)
-
-        Returns:
-            List: Row values.
-        """        
-        row_vals = []
-        for n in self.nts:
-            row = []
-            for t in self.ts:
-                row.append(".")
-            row_vals.append(row)
-        return row_vals
-
     def ts_m_epsilon(self):
         """Replaces an epsilon terminal with its LaTeX equivalent.
 
@@ -175,14 +149,6 @@ class ParsingTable:
             else:
                 ts_m.append(t)
         return ts_m
-
-    def dbg_ll1(self):
-        typer.echo(self.stack)
-        typer.echo(self.parents)
-        typer.echo("------")
-        self.print_pt(self.root)
-
-    # helper function to print the parsing table
 
     def print_parse_table(self):
         """Prints the parse table.

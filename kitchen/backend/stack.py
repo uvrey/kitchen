@@ -1,3 +1,6 @@
+""" Stack class. """
+# kitchen/backend/stack.py
+
 import manim as m
 from typer import *
 from anytree import *

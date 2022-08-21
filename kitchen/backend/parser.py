@@ -1,13 +1,24 @@
 """ General parser generator for Kitchen """
 # kitchen/parser.py
-from tracemalloc import start
-import typer
+
 import anytree
 import re
+import typer
 
 from kitchen import (
-    RE_NONTERMINAL, ERROR, RE_PRODUCTION, RE_TERMINAL, SUCCESS, PARSING_ERROR,)
-from kitchen.helpers import (display, error, lang_spec)
+        RE_NONTERMINAL, 
+        ERROR, 
+        RE_PRODUCTION, 
+        RE_TERMINAL, 
+        SUCCESS, 
+        PARSING_ERROR
+        )
+
+from kitchen.helpers import (
+        display, 
+        error, 
+        lang_spec
+        )
 
 def init_input(self, inp) -> int:
     """Helper function to (re-)initialise the input of a Parser.

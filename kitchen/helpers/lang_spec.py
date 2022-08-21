@@ -1,13 +1,18 @@
-""" For reading and working with language specification files """
+""" Reads and handles language specification files. """
+# kitchen/helpers/lang_spec.py
 
 import configparser
 from pathlib import Path
-from kitchen.helpers import display, config
 import typer
 import re
 
+from kitchen.helpers import (
+        display, 
+        config
+)
+
 def get_spec_path(config_file: Path) -> Path:
-    """Obtains the path to the currently-loaded language specification file
+    """Obtains the path to the currently-loaded language specification file.
 
     Returns:
         Path: Path to the CFG file.
@@ -31,14 +36,20 @@ def get_spec(cfg):
     else:
         return None
     
-def clean_inp_stream(inps):
+def clean_inp_stream(inps) -> list:
     cleaned = []
     for i in inps:
         cleaned.append(i.strip())
     return cleaned
 
 class Specification:
-    def __init__(self, spec_path, cfg):
+    def __init__(self, spec_path: str, cfg):
+        """Initialises the Specification object.
+
+        Args:
+            spec_path (str): Path to spec file.
+            cfg (ContextFreeGrammar): Loaded CFG.
+        """        
         # store token/ regex sequences 
         self.path = spec_path
         self.spec_contents = spec_path.read_text()
@@ -49,7 +60,10 @@ class Specification:
         # associate spec regex with token types
         self.read_to_spec()
 
-    def read_to_spec(self):
+    def read_to_spec(self) -> None:
+        """Reads the contents of the language specification file to the 
+           Specification object.
+        """        
         contents = self.spec_contents.split("\n")
         line_count = 0
         read_toks = False
@@ -77,7 +91,12 @@ class Specification:
         # if line_count != len(self.cfg.terminals):
         #     display.fail_secho("Note: Some terminals in the CFG are missing regex definitions :(")
     
-    def _process_reserved_words(self, line):
+    def _process_reserved_words(self, line: str) -> None:
+        """Processes reserved words in the specification.
+
+        Args:
+            line (str): Line to be processed.
+        """        
         split = line.split(" ")
         cleaned_specs = clean_inp_stream(split)
         try:
@@ -85,7 +104,12 @@ class Specification:
         except:
             display.fail_secho("Some error with reserved words occurred.")
 
-    def _process_regex_spec(self, line):
+    def _process_regex_spec(self, line: str) -> None:
+        """Processes the regex specifications inside the file.
+
+        Args:
+            line (str): Line to be processed.
+        """        
         split = line.split(" ")
         cleaned_specs = clean_inp_stream(split)
         try:
@@ -100,17 +124,35 @@ class Specification:
             display.fail_secho("Some error with regex processing occurred.")
             return
 
-    def show_contents(self):
+    def show_contents(self) -> None:
+        """Displays the contents of the specification file.
+        """        
         display.structure_secho(self.spec_contents)
 
-    def _match(self, inp):
+    def _match(self, inp: str) -> str:
+        """Matches an input to a token in the specification file. 
+
+        Args:
+            inp (str): Input to be matched.
+
+        Returns:
+            str: Token.
+        """        
         for key in self.token_spec:
             if inp in self.reserved_words:
                 return inp
             if re.match(self.token_spec[key], inp):
                 return key
 
-    def get_tokens_from_input(self, inp):
+    def get_tokens_from_input(self, inp: str) -> list:
+        """Obtains tokens from several inputs in one string.
+
+        Args:
+            inp (str): Input to be processed.
+
+        Returns:
+            list: Token stream.
+        """        
         tokens = []
         inp_stream = inp.strip().split(" ")
         cleaned_stream = clean_inp_stream(inp_stream)
@@ -121,7 +163,17 @@ class Specification:
             return None
         return tokens
 
-def get_index_by_token_type(tokens, t):
+def get_index_by_token_type(tokens: list, t) -> int:
+    """Gets the index of some token in a token list, given that the list may
+       contain either Token objects or strings. 
+
+    Args:
+        tokens (list): Token list.
+        t (str/ Token): Token to be located.
+
+    Returns:
+        int: Index of t in tokens.
+    """    
     for i, t in enumerate(tokens, start = 0):
         try:
             if tokens.type == t:
@@ -129,19 +181,20 @@ def get_index_by_token_type(tokens, t):
         except:
             return tokens.index(t)
 
-def get_token_format(toks, values = False, types = False, as_list = False):
-    """Creates list of token types or returns the list itself if it is empty
+def get_token_format(tokens, values = False, types = False, as_list = False) -> None:
+    """Creates list of token types or returns the list itself if it is empty.
 
     Args:
-        toks (_type_): _description_
-        as_list (bool, optional): _description_. Defaults to False.
+        tokens (list): List of tokens.
+        as_list (bool, optional): If list format is required. 
+                                  Defaults to False.
 
     Returns:
-        _type_: _description_
+        str/ list: Tokens formatted as a string or a list.
     """    
     ts = []
     try:
-        for t in toks:
+        for t in tokens:
             if types:
                 ts.append(t.type)
             elif values:
@@ -152,11 +205,17 @@ def get_token_format(toks, values = False, types = False, as_list = False):
             return " ".join(ts)
     except:
         if as_list: 
-            return toks
-        return " ".join(toks)
+            return tokens
+        return " ".join(tokens)
 
 class Token:
-    def __init__(self, type, value):
+    def __init__(self, type: str, value: str):
+        """Initialises a Token object.
+
+        Args:
+            type (str): Token type, from the specification file.
+            value (str): Token value, based on processed input.
+        """        
         self.type = type
         self.value = value
     

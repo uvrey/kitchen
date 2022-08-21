@@ -1,3 +1,5 @@
+""" Generates semantic analysis. """
+# kitchen/backend/type_check.py
 
 import manim as m
 from kitchen.helpers import (display)

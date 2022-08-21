@@ -1,4 +1,6 @@
-# Program for printing error messages
+""" Displays and handles error messages. """
+# kitchen/helpers/error.py
+
 import typer
 import manim as m
 

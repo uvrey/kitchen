@@ -1,4 +1,5 @@
-""" Configuration for the application """
+""" Driver functions for the CLI application. """
+# kitchen/backend/cli_helper.py
 
 import typer
 import manim as m
@@ -255,7 +256,7 @@ def _init_parsing_vis_shortcut(inp, cfg, spec) -> int:
     return SUCCESS
 
 def _process_command(inp, cfg, spec) -> None:
-    """Helper function to process a command from the user.
+    """Processes a command from the user.
 
     Args:
         inp (String): User input.
