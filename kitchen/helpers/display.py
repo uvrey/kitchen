@@ -3,8 +3,12 @@
 
 import typer
 import anytree
-from kitchen.helpers import sounds, config
 import pandas as pd
+
+from kitchen.helpers import (
+        sounds, 
+        config
+    )
 
 def info_secho(msg):
     """Helper function to echo an informative message. 
@@ -18,7 +22,7 @@ def info_secho(msg):
     ) 
 
 def general_secho(msg):
-    """Helper function to echo an informative message. 
+    """Helper function to echo a general message. 
 
     Args:
         msg (str): Message to be shown.
@@ -62,15 +66,32 @@ def structure_secho(msg):
     ) 
 
 def highlight_error(s):
+    """Highlights the background of a string.
+
+    Args:
+        s (str): Input string.
+
+    Returns:
+        list: Background style specification.
+    """    
     if s == "Error" :
         return ['background-color: red']
     else:
         return ['background-color: white']
 
 def show_config_opts():
-    info_secho("Options:\n\t Quality: -q <high | med | low>\n\t Preview: -p <y | n>\n\t Narration: -n <y / n>")
+    """Shows the configuration options.
+    """    
+    opts_str = ("Options:\n\tQuality: -q <high | med | low>\n\t" +
+                "Preview: -p <y | n>\n\tNarration: -n <y / n>")
+    info_secho(opts_str)
 
 def show_tokens(tokens):
+    """Displays the tokens.
+
+    Args:
+        tokens (list): Token list to be shown.
+    """    
     for t in tokens:
         structure_secho("Token < Type: " + t.type + ", Value: " + t.value + " >")
 
@@ -83,10 +104,10 @@ def pretty_print_dict(dict):
     structure_secho("\n".join("{}\t{}".format(k, v) for k, v in dict.items()))
 
 def pretty_print_config_settings(output_config, narr):
-    """Displays the
+    """Displays the configuration settings.
 
     Args:
-        config (_type_): _description_
+        config (list): Output configuration.
     """    
     if narr == sounds.NARR: narr_setting = True
     else: narr_setting = False
@@ -125,19 +146,35 @@ def print_menu():
     info_secho(df.to_markdown(index=False))
 
 def print_parsetree(root):
-        """Helper function to print the parse tree
+        """Helper function to print the parse tree.
 
         Args:
-            root (_type_): _description_
+            root (Node): Root node of the parse tree.
         """        
         for pre, fill, node in anytree.RenderTree(root):
             structure_secho("%s%s" % (pre, node.id))
 
-def to_tex(item):
+def to_tex(item: str):
+    """Converts a string to Tex format.
+
+    Args:
+        item (str): Item to be converted to Tex.
+
+    Returns:
+        str: Tex item.
+    """    
     tex_item = item.replace(r'$', r'\$')
     tex_item = tex_item.replace(r'\varepsilon', r'$\varepsilon$').replace(r'#', r'$\varepsilon$').replace("\\subseteq", "$\\subseteq$").replace("->", "$\\to$").replace("(", "$($").replace(")", "$)$")
     return tex_item
 
 def to_math_tex(item):
+    """Converts a string to MathTex format.
+
+    Args:
+        item (str): Item to be converted to MathTex.
+
+    Returns:
+        str: MathTex item.
+    """    
     tex_item = item.replace(r'$', r'\$').replace("#", r'\varepsilon').replace("->", "\\to")
     return tex_item
