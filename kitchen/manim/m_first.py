@@ -47,8 +47,22 @@ class MFirstSet(m.Scene):
             self.cfg.manim_firstset_contents[key] = m.VGroup()
         mg.clear_narrs()
 
-    # animates a visualisation of the first set
+
     def vis_first_set(self, keys, guide, start, production, pstack):
+        """Generates a visualisation of the first set.
+
+        Args:
+            keys (VGroup): CFG keys as a group of Mobjects.
+            guide (VGroup): Colour code guide.
+            start (str): Start symbol string representation.
+            production (str): Production being handled (may be a terminal or
+                              a non-terminal).
+            pstack (list): Stack of encountered productions.
+        """        
+
+        # prevents deep recursion
+        if production in pstack and len(pstack) > 1:
+            return
 
         #  global vis_has_epsilon
         pstack.append(production)
@@ -105,13 +119,15 @@ class MFirstSet(m.Scene):
                                         self.manim_firstset_lead[ps], m.RIGHT)
 
                                     # fade in new terminal and corresponding element of the cfg
-                                cfg_element = self.manim_prod_dict[production][i][j]
-                                sounds.add_sound_to_scene(self, sounds.CLICK)
-                                self.play(
-                                    m.FadeIn(new_element),
-                                    m.Circumscribe(cfg_element, color=m.TEAL, shape = m.Circle),
-                                    m.FadeToColor(cfg_element, color=m.TEAL, shape = m.Circle),
-                                )
+                                    cfg_element = self.manim_prod_dict[production][i][j]
+                                    sounds.add_sound_to_scene(self, sounds.CLICK)
+                                    self.play(
+                                        m.FadeIn(new_element),
+                                        m.Circumscribe(cfg_element, color=m.TEAL, shape = m.Circle),
+                                        m.FadeToColor(cfg_element, color=m.TEAL, shape = m.Circle),
+                                    )
+                                else:
+                                    mg.display_msg(self, ["Note: Since First("+ps+") may lead to ", "the same production via more than one", "production, the CFG is ambiguous."], raw_msg = "This CFG is ambiguous, since more than one production leads to the same terminal.")
                             break
                         else:
                             # highlight the non-terminal
@@ -163,7 +179,7 @@ class MFirstSet(m.Scene):
                     terminal_to_write = mg.to_tex(first_terminal[0])
 
                         # appends this terminal to the first set of previous non-terminals
-                    for ps in reversed(pstack):
+                    for ps in pstack:
                         # make sure the production in focus is shaded white
                         self.manim_production_groups[ps].fade_to(
                             color=config.config.get_opp_col(), alpha=1)
@@ -182,6 +198,8 @@ class MFirstSet(m.Scene):
                                 new_element)
                             self.cfg.manim_firstset_contents[ps].arrange_in_grid(row=1, buff = 0.5).next_to(
                                 self.cfg.manim_firstset_lead[ps], m.RIGHT)
+                        else:
+                            mg.display_msg(self, ["Note: Since First("+ps+") may lead to ", "the same production via more than one", "production, the CFG is ambiguous."], raw_msg = "This CFG is ambiguous, since more than one production leads to the same terminal.")
 
                         # Notify as to what is happening
                         msg = []
