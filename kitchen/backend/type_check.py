@@ -76,6 +76,7 @@ first set animation not moving CFG to the left :)
 PT table spacing on large outputs :) 
 update menu :)
 restructure directory :)
+documentation progress :)
 """
 
 """
@@ -90,6 +91,7 @@ long names look weird in parsing vids - place above node and highlight the colou
 Fix manim parsing by adding improved algorithm  
 Get parsing colours to match LL(1) tokens
 implement semantic analysis
+check cleaning of follow set and first/ follow algorithms
 
 GRAMMARS
 validate grammars and language spec

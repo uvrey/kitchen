@@ -166,7 +166,9 @@ class MFollowSet(m.Scene):
                                     m.FadeToColor(next_cfg_element, color=m.RED),
                                 )
                             
-                            mg.display_msg(self, ["{First ("+next_item+") - #}", "\\subseteq Follow (" + item + ")"], raw_msg = "The first set of " + next_item + " without epsilon is a subset of " + item + "'s follow set.")
+                            # TODO fix these follow set printings
+                            mg.display_msg(self, ["{First ("+next_item+") - #}", \
+                            "\\subseteq Follow (" + item + ")"], raw_msg = "The first set of " + next_item + " without epsilon is a subset of " + item + "'s follow set.")
 
                             for t in tmp_follow:
                                 if t != "#":
@@ -193,7 +195,6 @@ class MFollowSet(m.Scene):
         self.clean_follow_set(self.cfg.start_symbol, [])
         sounds.narrate("Time to simplify the sets.", self)
         self.wait()
-
 
         # transform current follow sets to cleaned versions
         for key in reversed(self.cfg.follow_set.keys()):

@@ -82,14 +82,17 @@ def get_prods(cfg_contents) -> list:
     return prods
 
 def populate_manim_cfg(cfg_dict, lead_to) -> Dict:
-    """_summary_Returns an equivalent cfg in manim where each non-terminal has an associated set of MObject
+    """Returns an equivalent cfg in manim where each production has its 
+       associated set of MObjects.
 
     Args:
         cfg_dict (Dictionary): Dictionary of the CFG productions.
-        lead_to (Dictionary): Dictionary holding the Mobjects for each CFG element.
+        lead_to (Dictionary): Dictionary holding the Mobjects for each 
+                              CFG element.
 
     Raises:
-        typer.Abort: If Left Recursion is detected, the app session is terminated.
+        typer.Abort: If Left Recursion is detected, the app session is 
+                     terminated.
 
     Returns:
         Dictionary: A dictionary of the Mobjects which a non-terminal leads to.
@@ -129,7 +132,7 @@ class ContextFreeGrammar:
         """Initialises the ContextFreeGrammar object.
 
         Args:
-            cfg_path (Path): Path to the provided CFG file
+            cfg_path (Path): Path to the provided CFG file.
         """
         # set up the cfg information
         self._cfg_path = cfg_path
@@ -182,7 +185,7 @@ class ContextFreeGrammar:
         """ Initialises the structures to be used in the CFG. 
 
         Args:
-            prods (List): List of productions.
+            prods (list): List of productions.
         """
         # initialise base structures
         self.start_symbol = self.prods[0][0]
@@ -221,13 +224,14 @@ class ContextFreeGrammar:
         self.start_symbol = list(self.cfg_dict.keys())[0]
 
     def get_next_production(self, first_set) -> int:
-        """Helper function to get the index of the first-encountered production with an empty first set.
+        """Helper function to get the index of the first-encountered 
+           production with an empty first set.
 
         Args:
-            first_set (Dictionary): The first set of a given CFG.
+            first_set (dict): The first set of a given CFG.
 
-        String: The production which requires a first set to be calculated. 
-            Integer: 
+        Returns: 
+            int: The production which requires a first set to be calculated. 
         """    
         for item in first_set.items():
             if item[1] == []:
@@ -235,12 +239,12 @@ class ContextFreeGrammar:
         return -1
 
     def show_contents(self) -> None:
-        """Helper function to display the CFG contents.
+        """Displays the CFG contents.
         """        
-        typer.echo(self.cfg_contents)
+        display.structure_secho(self.cfg_contents)
 
     def show_first_set(self) -> None:
-        """Helper function to display the first set. 
+        """Displays the first set. 
         """        
         if not self.first_set_calculated:
             self._calculate_first_set(self.start_symbol, [])
@@ -252,31 +256,35 @@ class ContextFreeGrammar:
         self.first_set_calculated = True
 
     def show_first_set_testing(self) -> None:
+        """Drives tests of the first set calculation.
+        """        
         self._calculate_first_set(self.start_symbol, [])
         self._clean_first_set()
         typer.echo(self.first_set) 
 
     def reset_first_set(self, calculate_again = True) -> None:
-        """Resets the first sets in preparation for another calculation
+        """Resets the first sets in preparation for another calculation.
         """        
         self.first_set = {}
 
-        # reset structures
+        # resets structures
         for p_seq in self.prods:
             self.first_set[p_seq[0]] = []
             self.firstset_index[p_seq[0]] = []
 
-        # calculate first set
+        # calculates first set
         if calculate_again:
             self._calculate_first_set(self.start_symbol, [])
             self.first_set_calculated = True
 
     def _calculate_first_set(self, production, pstack) -> None:
-        """Recursively calculates the first set and stores it to the internal first set structure
+        """Recursively calculates the first set and stores it to the 
+           internal first set structure.
 
         Args:
-            production (String): The production being examined. Initially it is the start symbol.
-            pstack (List): The production stack. 
+            production (str): The production being examined. 
+                              Initially this is the start symbol.
+            pstack (list): The production stack. 
         """        
         global has_epsilon
 
@@ -284,8 +292,7 @@ class ContextFreeGrammar:
         if production in pstack and len(pstack) > 1:
             return
 
-      #  typer.echo("looking at " + production)
-
+        # builds the production stack
         pstack.append(production)
 
         # if production does not have a first set
@@ -311,14 +318,10 @@ class ContextFreeGrammar:
                                 # add First(Y) - #
                                 if current_item not in self.first_set[ps]:
                                     # add production which led to this to the parse table
-                                    # typer.echo("WE GOT TO " + current_item + " VIA ")
-                                    # typer.echo(self.fstack[j])
-                              #      typer.echo("fset index at " + ps)
                                     self.firstset_index[ps].append(
                                         self.fstack[j])
                                     self.first_set[ps].append(current_item)
                                 else:
-                              #      display.info_secho("2")
                                     self.is_ambiguous = True
 
                             # reset the fstack and break since we are just interested in the first production
@@ -330,7 +333,6 @@ class ContextFreeGrammar:
                             if current_item != production:
                                 # we should add A without epsilon if we are the top level production
                                 had_eps = "#" in self.first_set[current_item]
-                                # typer.echo("recursing on " + current_item)
                                 self._calculate_first_set(
                                         current_item, pstack)
                                 has_eps = "#" in self.first_set[current_item]
@@ -370,13 +372,6 @@ class ContextFreeGrammar:
                     if self.fstack != []:            
                         self.fstack.pop()
 
-                    # display.info_secho("....")
-                    # display.structure_secho(pstack)
-                    # typer.echo(self.firstset_index)
-                    # display.structure_secho(self.first_set)
-                    # typer.echo(self.fstack)
-                    # display.success_secho("....")
-
             # by this point, we have recursively found a bunch of first sets
             # so let's find those that are still empty
             if len(pstack) == 1:
@@ -392,7 +387,8 @@ class ContextFreeGrammar:
             error.ERR_key_not_given_in_CFG(production)
 
     def _clean_first_set(self) -> None:
-        """Helper function to standardise the appearance of the first set by placing epsilons at the end of the list.
+        """Helper function to standardise the appearance of the first set by 
+           placing epsilons at the end of the list.
         """        
         for key in self.first_set.keys():
             for i in self.first_set[key]:
@@ -412,7 +408,7 @@ class ContextFreeGrammar:
         self.follow_set_calculated = True
 
     def show_follow_set_testing(self) -> None:
-        """Displays the calculated follow sets for each non-terminal
+        """Displays the calculated follow sets for each non-terminal.
         """        
         self._calculate_follow_set(True)
         nt_follow = {}
@@ -422,34 +418,34 @@ class ContextFreeGrammar:
         typer.echo(nt_follow)
 
     def reset_follow_set(self, calculate_again = True) -> None:
-        """Resets the first sets in preparation for another calculation
+        """Resets the first sets in preparation for another calculation.
         """        
-        # reset the follow set structure and set non-terminal sets to empty
+        # resets the follow set structure and set non-terminal sets to empty
         self.follow_set = {}
         for p_seq in self.prods:
             self.follow_set[p_seq[0]] = []
 
-        # obtain the productions
+        # obtains the productions
         tmp = []
         for t in list(chain(*self.lead_to)):
             splitp = list(filter(None, re.findall(RE_PRODUCTION, t)))
             tmp.append(splitp)
 
-        # create an empty follow set for the terminals
+        # creates an empty follow set for the terminals
         for t in set(list(chain(*tmp))):
             if re.match(RE_TERMINAL, t) and t != "#":
                 self.follow_set[t] = []
 
         if calculate_again:
-            # calculate the follow set
+            # calculates the follow set
             self._calculate_follow_set(True)
             self.follow_set_calculated = True
 
     def _calculate_follow_set(self, is_start_symbol) -> None:
-        """Algorithm for calculating the follow set of a given CFG.
+        """Calculates the follow set of a given CFG.
 
         Args:
-            is_start_symbol (bool): Whether or not we begin with the start symbol.
+            is_start_symbol (bool): Whether or not to begin as the start symbol.
         """
         for production in self.cfg_dict.keys():
             # Rule 1
@@ -494,7 +490,6 @@ class ContextFreeGrammar:
                                         else:
                                             self.follow_set[item].append(next_item)
                           
-
         # clean the follow set
         start_symbol = list(self.cfg_dict.keys())[0]
         self.is_cleaned = []
@@ -502,10 +497,10 @@ class ContextFreeGrammar:
         self.clean_follow_set(start_symbol, [])
 
     def get_reset_cleaned_set(self) -> Dict:
-        """Helper function to obtain a dictionary which holds whether or not the follow sets have been cleaned.
+        """Obtains a dictionary which holds whether or not the follow sets have been cleaned.
 
         Returns:
-            Dictionary: Contains {NT: False} for each non-terminal NT.
+            dict: Contains {NT: False} for each non-terminal NT.
         """        
         tmp_c = {}
         for fc in self.follow_set.keys():
@@ -513,7 +508,8 @@ class ContextFreeGrammar:
         return tmp_c
 
     def clean_follow_set(self, start, pstack) -> None:
-        """Cleans the follow set after the calculation: Replaces non-terminals with their respective follow sets and removes epsilon elements. 
+        """Cleans the follow set after the calculation: Replaces non-terminals 
+           with their respective follow sets and removes epsilon elements. 
 
         Args:
             start (String): The start symbol.
@@ -525,12 +521,13 @@ class ContextFreeGrammar:
         # clean up the sets
         items = self.follow_set[start]
 
-        # loop through the items in a given follow set and replace non-terminals with
-        # their associated follow sets
+        # loop through the items in a given follow set and replace 
+        # non-terminals with their associated follow sets
         for index, item in enumerate(items, start=0):
             # we have an item in the set
             if re.match(RE_NONTERMINAL, item):
-                # temporarily remove the non-terminal from the list to prevent recursion
+                # temporarily remove the non-terminal from the list to 
+                # prevent recursion
                 items.remove(item)
                 tmp_nts.append(item)
                 self.clean_follow_set(item, pstack)
@@ -552,7 +549,7 @@ class ContextFreeGrammar:
             pstack.pop()
     
     def set_parser_ll1(self, parser) -> int:
-        """Sets the internal parser. 
+        """Sets the CFG's internal parser. 
 
         Args:
             parser (ParserLL1): ParserLL1 Object
@@ -563,12 +560,22 @@ class ContextFreeGrammar:
         return SUCCESS
 
     def setup_parsetable(self) -> int:
+        """Sets the CFG's internal parse table.
+
+        Returns:
+            int: Status code.
+        """        
         self.parsetable = pt.ParsingTable(self.terminals, self.nonterminals, self.cfg_dict)
         self.parsetable.set_internals(
                 self.first_set, self.follow_set, self.firstset_index)
         return SUCCESS
 
     def calculate_parsetable(self) -> int:
+        """Calculates the parse table.
+
+        Returns:
+            int: Status code.
+        """        
         self.parsetable.populate_table()
         self.parsetable_calculated = True
         return SUCCESS

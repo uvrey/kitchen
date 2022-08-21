@@ -4,13 +4,10 @@ import typer
 import manim as m
 
 from kitchen import (
-    ERRORS, 
-    FILE_LOADING_EXISTS_ERROR, 
-    FILE_LOADING_NONE_ERROR, 
-    FILE_LOADING_DIR_ERROR, 
-    AMBIGUOUS_ERROR,
-    SUCCESS, 
     __app_name__,
+    AMBIGUOUS_ERROR,
+    ERRORS, 
+    SUCCESS
 )
 
 from kitchen.helpers import (
@@ -25,10 +22,16 @@ from kitchen.backend import (
     type_check as tc
 )
 
-from kitchen.manim import (m_first, m_follow, m_parse_table, m_parse_tree)
+from kitchen.manim import (
+    m_first, 
+    m_follow, 
+    m_parse_table, 
+    m_parse_tree
+)
 
 def init_app(cfg_path: str, spec_path = None) -> int:
-    """Initialises the application by creating its configuration file and CFG path.
+    """Initialises the application by creating its configuration file and
+       CFG path.
 
     Args:
         cfg_path (str): CFG path.
@@ -36,7 +39,7 @@ def init_app(cfg_path: str, spec_path = None) -> int:
     Returns:
         int: Status code.
     """    
-    """Initialize the application configuration file."""
+
     config_code = config.init_config_file()
     if config_code != SUCCESS:
         return config_code
@@ -50,12 +53,17 @@ def init_app(cfg_path: str, spec_path = None) -> int:
     return SUCCESS
 
 def load_app(cfg_path, spec_path = None, testing = False) -> None:
-    """Loads the application given a CFG path.
+    """Loads the application's paths.
+
     Args:
-        path (String): Path to the CFG file.
+        cfg_path (str): Path to the CFG file.
+        spec_path (str, optional): Path to the spec file. Defaults to None.
+        testing (bool, optional): Testing state. Defaults to False.
+
     Raises:
         typer.Exit: When CFG loading is unsuccesful. 
     """    
+
     app_init_error = init_app(cfg_path, spec_path)
     if app_init_error:
         if not testing:
@@ -73,6 +81,15 @@ def load_app(cfg_path, spec_path = None, testing = False) -> None:
                         fg=typer.colors.GREEN)
 
 def _set_parsetable(cfg) -> int:
+    """Sets the up and calculates the parsetable structures.
+
+    Args:
+        cfg (ContextFreeGrammar): Loaded CFG.
+
+    Returns:
+        int: Status code.
+    """    
+
     if not cfg.parsetable_calculated:
     # reset cfg structures before we begin if needed
         if not cfg.first_set_calculated:
@@ -118,7 +135,7 @@ def handle_input(inp, cfg, spec) -> None:
             error.ERR_ambiguous_grammar()
 
 def _init_parsing_ll1_via_cmd(inp, cfg, spec) -> int:
-    """Initialises LL(1) parsing via the command \\ll1 <input>
+    """Initialises LL(1) parsing via the command \ll1 <input>
 
     Args:
         inp (str): Input string to be parsed
@@ -148,7 +165,8 @@ def _init_parsing_ll1_via_cmd(inp, cfg, spec) -> int:
     return SUCCESS
 
 def _init_parsing_ll1(inp, cfg, spec, semantic = False) -> int:
-    """Initialise parsing using LL(1) by associating the CFG with its own LL(1) Parser object.
+    """Initialises parsing using LL(1) by associating the CFG with its 
+       own LL(1) Parser object.
 
     Args:
         inp (str): Input string to be parsed
@@ -157,8 +175,7 @@ def _init_parsing_ll1(inp, cfg, spec, semantic = False) -> int:
     Returns:
         int: Status code
     """    
-    # calculate the parse table if it has not yet been done so
-
+    # calculates the parse table if this has not yet been done 
     code = SUCCESS
     if not cfg.parsetable_calculated:
         code = _set_parsetable(cfg)
@@ -176,11 +193,13 @@ def _init_parsing_ll1(inp, cfg, spec, semantic = False) -> int:
     return code
             
 def _set_cfg_parser_ll1(inp, cfg, spec) -> int:
-    """Initialises a new ParserLL1 object if it has not been initialised in this app session yet.
+    """Initialises a new ParserLL1 object if it has not been initialised 
+       in this app session yet.
 
     Args:
-        inp (str): Input string to be parsed
-        cfg (ContextFreeGrammar): ContextFreeGrammar object    Args:
+        inp (str): Input string to be parsed.
+        cfg (ContextFreeGrammar): ContextFreeGrammar object.
+        spec (Specification): Specification object.
 
     Returns:
         int: Status code
@@ -191,27 +210,36 @@ def _set_cfg_parser_ll1(inp, cfg, spec) -> int:
     return code
 
 def _prepare_to_parse(cfg):
-        if not cfg.first_set_calculated:
-            cfg.reset_first_set()
+    """Sets up the LL(1) parsing structures.
 
-        if not cfg.follow_set_calculated:
-            cfg.reset_follow_set()
+    Args:
+        cfg (ContextFreeGrammar): Loaded CFG.
 
-        if not cfg.is_ambiguous:
-            if not cfg.parsetable_calculated:
-                cfg.setup_parsetable()
-                cfg.calculate_parsetable()
-            return SUCCESS
-        else:
-            return AMBIGUOUS_ERROR
+    Returns:
+        int: Status code.
+    """    
+    if not cfg.first_set_calculated:
+        cfg.reset_first_set()
+
+    if not cfg.follow_set_calculated:
+        cfg.reset_follow_set()
+
+    if not cfg.is_ambiguous:
+        if not cfg.parsetable_calculated:
+            cfg.setup_parsetable()
+            cfg.calculate_parsetable()
+        return SUCCESS
+    else:
+        return AMBIGUOUS_ERROR
 
 def _init_parsing_vis_shortcut(inp, cfg, spec) -> int:
-    """Initialises the visualisation of LL(1) parsing on some input, via the app shortcut '\\v <input>'.
+    """Initialises the visualisation of LL(1) parsing on some input, 
+       via the app shortcut '\\v <input>'.
 
     Args:
         inp (str): Input string
 
-Returns:
+    Returns:
         int: Status code
     """    
     to_parse = inp.strip()[2:].strip()
@@ -231,7 +259,8 @@ def _process_command(inp, cfg, spec) -> None:
 
     Args:
         inp (String): User input.
-        cfg (ContextFreeGrammar): ContextFreeGrammar Object based on loaded CFG.
+        cfg (ContextFreeGrammar): ContextFreeGrammar Object based on 
+                                  loaded CFG.
 
     Raises:
         typer.Exit: Exits the application when the user requests this. 
