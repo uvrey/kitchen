@@ -9,7 +9,6 @@ from kitchen.helpers import sounds, config, display, error
 from kitchen.manim import m_general as mg
 
 class MFirstSet(m.Scene):
-
     def setup_manim(self, cfg): 
         """Sets up the structures which the animation will make use of.
 
@@ -19,6 +18,8 @@ class MFirstSet(m.Scene):
         self.cfg = cfg
 
     def construct(self):
+        """Constructs the scene.
+        """        
         sounds.narrate("Let's find the first set!", self)
         display.info_secho("Visualising the First Set:")
 
@@ -39,7 +40,8 @@ class MFirstSet(m.Scene):
         mg.display_msg(self, ["Successfully found the first set :)"], raw_msg= "Woohoo! We got the first set!")
 
     def tear_down(self):
-        # clear first set structures for if the animation is regenerated
+        """Clear first set structures at the end of the animation.
+        """        
         self.cfg.vis_has_epsilon = False
         self.cfg.manim_firstset_lead = {}
         for key in self.cfg.first_set.keys():

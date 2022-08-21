@@ -1,30 +1,40 @@
 """ Generates semantic analysis. """
 # kitchen/backend/type_check.py
 
-import manim as m
-from kitchen.helpers import (display)
 import anytree
 import pandas as pd
+import manim as m
+
+from kitchen.helpers import display
 
 class SemanticAnalyser:
     def __init__(self, cfg, root, inp):
+        """Initialises the SemanticAnalyser.
+
+        Args:
+            cfg (ContextFreeGrammar): Loaded CFG.
+            root (Node): Root of parse tree.
+            inp (str): Input to be analysed.
+        """        
         self.cfg = cfg
         self.root = root
         self.input = inp
         self.symbol = {'Symbol': [], 'Type': []}
 
-    # TODO get +/ = to associate names and vals
-    # 1.	If a variable(identifier) is created/defined on the left hand side of an assignment, it should check if it has already been defined, in which case it should generate an appropriate semantic error. 
-    # 2.	If a variable(identifier) is used in the right hand side of an assignment it should check if it has been defined already, and if not it should generate an appropriate semantic error.
-    # TODO get context of expression; when is it LHS, when is it RHS?
-
     def _call_error(self, msg = ""):
+        """Display an error in the type-checking process.
+
+        Args:
+            msg (str, optional): Details. Defaults to "".
+        """        
         display.fail_secho("Type Error: "+ msg)
         self.print_symbol_table()
         return 
 
-    # plan: check if types are the same on either side. if so, we check rhs and lhs accordingly
     def init_analysis(self):
+        """Analyses a given input based on two basic semantic rules:
+           Variable uniqueness and mutability.
+        """        
         lhs = True
         lh_type = None
         for node in anytree.PreOrderIter(self.root):
@@ -54,6 +64,8 @@ class SemanticAnalyser:
         self.print_symbol_table()
 
     def print_symbol_table(self):
+        """Displays the symbol table.
+        """        
         display.info_secho("Symbol Table:")
         df = pd.DataFrame.from_dict(self.symbol).to_markdown()
         display.structure_secho(df)
@@ -79,6 +91,7 @@ PT table spacing on large outputs :)
 update menu :)
 restructure directory :)
 documentation progress :)
+neaten up imports :)
 """
 
 """
@@ -89,11 +102,15 @@ get lots of test cases written
 
 MANIM
 check epsilon bug in LL(1) parsing video
-long names look weird in parsing vids - place above node and highlight the colour to opp of bg? 
+long names look weird in parsing vids - place above node and highlight the 
+colour to opp of bg? 
 Fix manim parsing by adding improved algorithm  
 Get parsing colours to match LL(1) tokens
 implement semantic analysis
 check cleaning of follow set and first/ follow algorithms
+
+LATEX
+- first and follow set not using _to_tex properly - DVI issue.
 
 GRAMMARS
 validate grammars and language spec
@@ -124,8 +141,9 @@ gray lines for tables
 """
 TODO - ADMIN
 complete documentation
-type hints
-neaten up imports
+- line length
+- type hints
+- function return types
 
 README
 clean up code   
@@ -137,8 +155,6 @@ PAPER
 USER TESTING
 - ethics approval
 - conduct tests
-
-
 """ 
 
 """ *********************************************************
@@ -161,9 +177,12 @@ For any production S -> A | B, it must be the case that:
     if B can derive the empty string, then A does not derive any 
     string beginning with a terminal in Follow(A)
 
-# Find First(α) and for each terminal in First(α), make entry A –> α in the table.
-# If First(α) contains ε (epsilon) as terminal than, find the Follow(A) and for each terminal in Follow(A), make entry A –> α in the table.
-# If the First(α) contains ε and Follow(A) contains $ as terminal, then make entry A –> α in the table for the $. 
+# Find First(α) and for each terminal in First(α), make entry A –> α 
+# in the table.
+# If First(α) contains ε (epsilon) as terminal than, find the Follow(A) 
+# and for each terminal in Follow(A), make entry A –> α in the table.
+# If the First(α) contains ε and Follow(A) contains $ as terminal, then 
+# make entry A –> α in the table for the $. 
 
 """
 
@@ -188,8 +207,8 @@ Single line of input accepted
 Max number of token colours 
 Difficult grammars not handled
 Checking for conflicts
-Sound may get corrupted when animation is cancelled before it is finished - so it can't clear the cache
+Sound may get corrupted when animation is cancelled before it is finished 
+- so it can't clear the cache
 Known issues:
 - No sound: clear partial movie directory and restart.
-
 """
