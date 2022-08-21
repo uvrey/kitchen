@@ -21,7 +21,6 @@ To run Kitchen, you will need to install several packages.
 In this installation, we will use pip and Chocolatey. Ensure Pip is upgraded by running:
 ```python -m pip install -–upgrade pip```
 
-
 **2. Install manim and other dependencies; remembering to use Powershell as admin. **
   ```choco install manimce```  
   Alternatively:   ```python3 -m pip install manim```
@@ -62,6 +61,10 @@ Then, install the requirements:
 
 ```python3 -m kitchen --help```
 ```python3 -m kitchen -v ```
+
+## Documentation
+For complete documentation, run the following in the command-line:
+``` python3 -m pdoc --http localhost:8080 kitchen```
   
 ## Running tests
 Execute `python -m pytest tests/` from this project’s root directory.

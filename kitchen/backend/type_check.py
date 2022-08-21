@@ -145,12 +145,15 @@ complete documentation
 - type hints
 - function return types
 
-README
+how to autogenerate documentation
+
+README 
+- better installation guidelines
 clean up code   
 clean git repo
 
 PAPER
-- write and edit
+- write and edit draft
 
 USER TESTING
 - ethics approval
