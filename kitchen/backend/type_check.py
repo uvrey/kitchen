@@ -105,6 +105,7 @@ weird token issue :)
 parsing nodes size setting :)
 Fix manim parsing by adding improved algorithm  HIGH :)
 make start symbol root :)
+Print first and followsets as dataframes :)
 """
 
 """
@@ -130,9 +131,7 @@ RuntimeWarning: invalid value encountered in double_scalars
 original tokens not showing at end of ll1 parsing manim
 visualising with tokens
 
-
 LATEX
-
 
 GRAMMARS
 validate grammars and language spec MED
@@ -140,7 +139,7 @@ validate grammars and language spec MED
 CLI
 - some terminals missing regex error - investigate MED
 - Notes on regex spec - necessary?  MED
-- Print first and followsets as dataframes
+
 """ 
 
 """
