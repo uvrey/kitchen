@@ -155,7 +155,8 @@ def add_sound_to_scene(scene, sound_spec):
         elif sound_spec==MOVE:
             scene.add_sound(os.getcwd() + r'\assets\sounds\move.wav')
     except OSError:
-        display.fail_secho("Sound not found - please check your assets folder.")
+        display.fail_secho("Sound not found - please check your assets \
+            folder.")
         return SOUND_ERROR
 
     return SUCCESS

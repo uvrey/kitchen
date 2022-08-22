@@ -67,7 +67,8 @@ def create_vertex(g, vertex_id, parent_id, label, color=m.GRAY,  link=True):
 
     if link:
         g._add_edge(
-            [parent_id, vertex_id], edge_config={"color": config.config.get_opp_col()})
+            [parent_id, vertex_id], edge_config={"color": \
+                config.get_opp_col()})
     return v
 
 def reset_g(self, g, root, anim=[]):
@@ -90,8 +91,10 @@ def map_token_lists(self, lhs, rhs):
     for index, il in enumerate(lhs, start=0):
         small_group = m.VGroup()
         lh = m.Text(il, slant=m.ITALIC, weight=m.BOLD)
-        arrow = m.Arrow(start=m.LEFT, end=m.RIGHT, buff=0).next_to(lh, m.RIGHT)
-        rh = m.Text(rhs[index], weight=m.BOLD, color=mg.get_token_colour(self)).next_to(
+        arrow = m.Arrow(start=m.LEFT, end=m.RIGHT, buff=0)\
+            .next_to(lh, m.RIGHT)
+        rh = m.Text(rhs[index], weight=m.BOLD, 
+        color=mg.get_token_colour(self)).next_to(
             arrow, m.RIGHT)
         small_group.add(lh, arrow, rh)
         map_group.add(small_group)
@@ -106,7 +109,8 @@ class MParseTree(m.Scene):
         Args:
             inp (str): Input to be parsed.
             cfg (ContextFreeGrammar): Loaded CFG.
-            spec (Specification, optional): Specification Object, which contains the language specification. Defaults to None.
+            spec (Specification, optional): Specification Object, 
+            which contains the language specification. Defaults to None.
         """     
         self.inp = inp
         self.inp_list = lang_spec.clean_inp_stream(inp.split(" "))
@@ -129,7 +133,7 @@ class MParseTree(m.Scene):
     def tear_down(self):
         self.mtable = None
         self.root = None
-        mg.clear_narrs()
+        sounds.clear_narrs()
 
     # shows the input stream and its association with the token stream
     def intro(self):
@@ -159,7 +163,9 @@ class MParseTree(m.Scene):
         
         self.play(
             m.LaggedStart(*(m.FadeIn(t, shift=m.UP)
-                        for t in map_token_lists(self, self.inp_list, lang_spec.get_token_format(self.tokens, types=True, as_list=True)))),
+                        for t in map_token_lists(self, self.inp_list, 
+                        lang_spec.get_token_format(self.tokens, types=True, 
+                        as_list=True)))),
         )
         self.wait()
 
@@ -186,7 +192,7 @@ class MParseTree(m.Scene):
         return table
 
     def init_m_ll1_parsetable(self):
-        """Sets up the parse table structure without generating an animation_summary_
+        """Sets up the parse table structure without generating an animation.
         """        
         # draw establishing table animations
         row_labels = self.nts[:]
@@ -223,9 +229,11 @@ class MParseTree(m.Scene):
             row_vals.append(row)
         return row_vals
 
-    def _fade_in_mtable(self, highlight = False, row = -1, col = -1, first_time = False):
+    def _fade_in_mtable(self, highlight = False, row = -1, col = -1, 
+        first_time = False):
         # create fading area
-        rect = m.Rectangle(width=20, height=10, color=config.get_theme_col(), fill_opacity=0.9)
+        rect = m.Rectangle(width=20, height=10, color=config.get_theme_col(), 
+        fill_opacity=0.9)
 
         pt_title = mg.get_title_mobject("Parse table")
         pt_title.next_to(self.mtable, m.UP)
@@ -285,7 +293,8 @@ class MParseTree(m.Scene):
 
         # draw LL(1) representation title
         ll1_title = mg.get_title_mobject("LL(1) parsing")
-        mg.display_msg(self, ["LL(1) Parsing Algorithm"], script = "Let's apply the L L 1 parsing algorithm")
+        mg.display_msg(self, ["LL(1) Parsing Algorithm"], script = 
+        "Let's apply the L L 1 parsing algorithm")
         keys = mg.get_manim_cfg_group(self).to_edge(m.DOWN)
 
         # create the input group here
@@ -330,11 +339,17 @@ class MParseTree(m.Scene):
             if tokens == []:
                 sounds.add_sound_to_scene(self, sounds.FAIL)
                 if re.match(RE_TERMINAL, self.s.stack[-1]):
-                    error.ERR_parsing_error(self.root, "Expected " + self.s.stack[-1]+".")
-                    error.ERR_manim_parsing_error(self,  ["Expected `" + self.s.stack[-1] + "'", "Parsing unsuccessful."], script = "We expected to see " + self.s.stack[-1]  + " so parsing is unsuccessful.")
+                    error.ERR_parsing_error(self.root, "Expected " + 
+                    self.s.stack[-1]+".")
+                    error.ERR_manim_parsing_error(self,  ["Expected `" 
+                    + self.s.stack[-1] + "'", "Parsing unsuccessful."], 
+                    script = "We expected to see " + self.s.stack[-1]  +
+                    " so parsing is unsuccessful.")
                 else:
-                    error.ERR_parsing_error(self.root)
-                    error.ERR_manim_parsing_error(self, ["Parsing unsuccessful. "], script = "Parsing unsuccessful.")
+                    error.ERR_parsing_error(self.root) 
+                    error.ERR_manim_parsing_error(self, \
+                    ["Parsing unsuccessful. "], script = \
+                    "Parsing unsuccessful.")
                 return
 
             top = self.s.stack[-1]
@@ -350,7 +365,8 @@ class MParseTree(m.Scene):
                     anims = []
                     tokens = tokens[1:]
 
-                    sounds.narrate("The next token " + next + " matches the top of the stack!", self)
+                    sounds.narrate("The next token " + next + 
+                    " matches the top of the stack!", self)
                     self.wait()
 
                     # highlight parents
@@ -372,32 +388,48 @@ class MParseTree(m.Scene):
                                 p = self.parents[-i]
                                 if re.match(RE_NONTERMINAL, p.id):
 
-                                    # if we have encountered the first set which the production can fall under
+                                    # if we have encountered the first set 
+                                    # which the production can fall under
                                     if popped.id in self.cfg.first_set[p.id]:
                                         parent = p
-                                        # remove children if they were previously added
+                                        # remove children if they were 
+                                        # previously added
                                         if p.height != 0:
                                             p.children = []
                                         anytree.Node(
-                                            popped.id, parent=p, id=popped.id, manim=m.Tex(popped.id, color = m.BLACK))
+                                            popped.id, parent=p, id=popped.id, 
+                                            manim=m.Tex(popped.id, 
+                                            color = m.BLACK))
 
                                         # check for epsilons
                                         rhs = self.parents[-i + 1:]
                                         for r in rhs:
-                                            if re.match(RE_NONTERMINAL, r.id) and r.id != p.id and r.height == 0:
-                                                if "#" in self.cfg.first_set[r.id]:
-                                                    new_node = anytree.Node(
-                                                        "#", parent=r, id="eps", manim=m.MathTex(r'\varepsilon'))
-                                                    vertex_id = r.id + "_" + new_node.id
+                                            if re.match(RE_NONTERMINAL, r.id)\
+                                                and r.id != p.id and r.height\
+                                                    == 0:
+                                                if "#" in self.cfg.first_set\
+                                                [r.id]:
+                                                    new_node = anytree.Node(\
+                                                        "#", parent=r, 
+                                                        id="eps", 
+                                                        manim=m.MathTex\
+                                                            (r'\varepsilon'))
+                                                    vertex_id = r.id + "_" +\
+                                                    new_node.id
                                                     parent_id = r.id
                                                     if r.id != start_symbol:
-                                                        parent_id = r.parent.id + "_" + r.id
+                                                        parent_id = r.parent.id 
+                                                        + "_" + r.id
                                                     v = create_vertex(
-                                                        g, vertex_id, parent_id, r'\varepsilon', color = m.BLUE)
+                                                        g, vertex_id, 
+                                                        parent_id, 
+                                                        r'\varepsilon', 
+                                                        color = m.BLUE)
                                                     reset_g(
                                                         self, g, start_symbol)
 
-                                        # pop as many productions off as necessary
+                                        # pop as many productions off as 
+                                        # necessary
                                         for j in range(i - 1):
                                             self.parents.pop()
                                         done = True
@@ -416,7 +448,8 @@ class MParseTree(m.Scene):
                         if parent.id == start_symbol:
                             parent_vertex_id = parent.id
                         else:
-                            parent_vertex_id = parent.parent.id + "_"+ parent.id
+                            parent_vertex_id = parent.parent.id + "_" + \
+                            parent.id
 
                         # check if we already have a vertex
                         try:
@@ -425,30 +458,41 @@ class MParseTree(m.Scene):
                             # confirm the path by adding the colour
                             rendered_label = m.MathTex(
                                 mg.to_math_tex()(top), color = m.BLACK)
-                            new_vertex.fade_to(self.tok_cols[lang_spec.get_index_by_token_type(original_tokens, top)], 1)
+                            new_vertex.fade_to(self.tok_cols[lang_spec\
+                                .get_index_by_token_type(original_tokens, \
+                                    top)], 1)
                             rendered_label.move_to(new_vertex.get_center())
                             new_vertex.add(rendered_label)
                             
                             sounds.add_sound_to_scene(self, sounds.CLICK)
                             self.play(
-                                m.Circumscribe(new_vertex, color=self.tok_cols[lang_spec.get_index_by_token_type(original_tokens, top)], shape = m.Circle),
+                                m.Circumscribe(new_vertex, color=self.tok_cols\
+                                    [lang_spec.get_index_by_token_type(\
+                                    original_tokens, top)], 
+                                    shape = m.Circle),
                             )
                             try:
                                 edge = g.edges[(parent_vertex_id, vertex_id)]
                                 anims.append(
-                                    m.FadeToColor(edge, color=config.config.get_opp_col()))
+                                    m.FadeToColor(edge, color=config.\
+                                        get_opp_col()))
                             except:
                                 pass
                         except KeyError:
                             # create and add new vertex
                             
                             new_vertex = create_vertex(
-                                g, vertex_id, parent_vertex_id, vertex_id.split("_")[
-                                    1].strip(), color=self.tok_cols[lang_spec.get_index_by_token_type(original_tokens, next)])
+                                g, vertex_id, parent_vertex_id, 
+                                vertex_id.split("_")[
+                                    1].strip(), 
+                                    color=self.tok_cols[lang_spec\
+                                        .get_index_by_token_type\
+                                            (original_tokens, next)])
                             reset_g(self, g, start_symbol)
 
                         # pop off the stack and 'flash'
-                        self.s.pop(anim=anims, vertex=new_vertex, matching=True, msg="\\text{Matched }" +
+                        self.s.pop(anim=anims, vertex=new_vertex, 
+                        matching=True, msg="\\text{Matched }" +
                                 mg.to_tex(self.s.stack[-1]) + "\\text{!}")
 
 
@@ -456,25 +500,38 @@ class MParseTree(m.Scene):
                     sounds.add_sound_to_scene(sounds.YAY, self)
                     self.play(m.ApplyWave(m_tok_gp))
                     self.play(
-                        m.LaggedStart(m.Indicate(m_tok[next], color=self.tok_cols[lang_spec.get_index_by_token_type(original_tokens, next)], scale_factor=1.5),
-                                   m.FadeToColor(m_tok[next], color=self.tok_cols[lang_spec.get_index_by_token_type(original_tokens, next)])),
+                        m.LaggedStart(m.Indicate(m_tok[next], 
+                        color=self.tok_cols[lang_spec\
+                            .get_index_by_token_type(original_tokens, next)],
+                            scale_factor=1.5),
+                            m.FadeToColor(m_tok[next], 
+                            color=self.tok_cols[lang_spec\
+                                .get_index_by_token_type(original_tokens,\
+                                next)])),
                     )
 
                 else:
                     sounds.add_sound_to_scene(self, sounds.FAIL)
                     error.ERR_parsing_error(self.root, 
                         "Unexpected token [" + top + "]")
-                    error.ERR_manim_parsing_error(self, ["Invalid input: '" + top + "'"], script = top + " leads to a parsing error, so this input is not valid." )
+                    error.ERR_manim_parsing_error(self, ["Invalid input: '" +
+                     top + "'"], script = top + " leads to a parsing error,\
+                         so this input is not valid." )
                     return
 
             elif re.match(RE_NONTERMINAL, top):
                 try:
                     pt_entry = self.cfg.parsetable.pt_dict[top][next]
                     prods = pt_entry.split("->")
-                    mg.display_msg(self, ["We must find the entry at ParseTable["+top+"]["+next+"]"], script = "Let's consider the parse table entry at non-terminal " + top + "'s row and terminal " + next + "'s column.")
+                    mg.display_msg(self, ["We must find the entry at \
+                        ParseTable["+top+"]["+next+"]"], script = "Let's \
+                            consider the parse table entry at non-terminal " +
+                            top + "'s row and terminal " + next + "'s \
+                            column.")
 
                     # highlight parse table row
-                    self._fade_in_mtable(highlight  = True, row = mg.row(self.nts, top), col = mg.col(self.ts, next))
+                    self._fade_in_mtable(highlight  = True, 
+                    row = mg.row(self.nts, top), col = mg.col(self.ts, next))
                     
                     #  copy the cfg_line rather than manipulate it directly
                     cfg_line = self.manim_production_groups[prods[0].strip(
@@ -499,8 +556,8 @@ class MParseTree(m.Scene):
                             v_id = parent_id + "_" + popped_off
 
                             if parent_id != start_symbol:
-                                parent_id = self.parents[-1].parent.parent.id + \
-                                    "_" + self.parents[-1].parent.id
+                                parent_id = self.parents[-1].parent.parent.id 
+                                + "_" + self.parents[-1].parent.id
 
                             # highlight edge and vertex
                             anims = []
@@ -516,7 +573,8 @@ class MParseTree(m.Scene):
 
                                 sounds.add_sound_to_scene(self, sounds.CLICK)
                                 self.play(
-                                    m.Circumscribe(vertex, color=m.BLUE, shape = m.Circle),
+                                    m.Circumscribe(vertex, color=m.BLUE, 
+                                    shape = m.Circle),
                                 )
                             except:
                                 pass
@@ -524,14 +582,19 @@ class MParseTree(m.Scene):
               
                     sounds.add_sound_to_scene(self, sounds.POP)
                     self.s.pop(anim=anims,
-                               msg="\\text{Replacing }" + mg.to_tex(popped_off) + "\\text{...}")
+                               msg="\\text{Replacing }" + 
+                               mg.to_tex(popped_off) + "\\text{...}")
 
                     # add sequence of productions to the stack
                     ps = list(filter(None, re.findall(
                         RE_PRODUCTION, prods[1])))
                     nodes_to_append = []
 
-                    mg.display_msg(self, [mg.to_tex(popped_off) + " is a non-terminal,", "so we can replace it with", "its sub-productions: ",  prods[1]], script="Let's replace " + popped_off + " with its sub productions")
+                    mg.display_msg(self, [mg.to_tex(popped_off) + " is a \
+                        non-terminal,", "so we can replace it with", 
+                        "its sub-productions: ",  prods[1]], 
+                        script="Let's replace " + popped_off + 
+                        " with its sub productions")
 
                     for p in reversed(ps):
                         # add to the tree
@@ -544,7 +607,8 @@ class MParseTree(m.Scene):
                                 vertex = g[vertex_id]
 
                             except KeyError:
-                                # create the new vertex only if it doesn't exist already
+                                # create the new vertex only if it doesn't 
+                                # exist already
                                 vertex_id = top + "_" + new_node.id
                                 v = create_vertex(
                                     g, vertex_id, start_symbol, new_node.id)
@@ -559,20 +623,23 @@ class MParseTree(m.Scene):
                                 parent_id = get_parent_id(parent, start_symbol)
                                 typer.echo(parent_id)
                                 create_v_if_exists(
-                                    self, g, start_symbol, parent.id + "_" + p.strip(), p.strip(), parent_id)
+                                    self, g, start_symbol, parent.id + "_" +
+                                    p.strip(), p.strip(), parent_id)
 
                             else:
                                 if p != "#":
                                     new_node = anytree.Node(
                                         p, id=p, manim=m.Tex(p))
 
-                        # we don't need to match epsilon, and we also only want non-terminals as parent nodes
+                        # we don't need to match epsilon, and we also only 
+                        # want non-terminals as parent nodes
                         if p != "#" and p != "$":
                             new_prod = prods[0].strip() + " -> " + p
                             self.s.push(p, mg.to_tex(new_prod))
                             nodes_to_append.append(new_node)
 
-                        # TODO NEW! only append parents once whole list has been processed
+                        # TODO NEW! only append parents once whole list has 
+                        # been processed
                         for t in nodes_to_append:
                             self.parents.append(t)
 
@@ -582,9 +649,13 @@ class MParseTree(m.Scene):
 
                 except KeyError:
                     sounds.add_sound_to_scene(self, sounds.FAIL)
-                    mg.display_msg(self, ["No such entry at ParseTable[" + top + ", " + next + "].", "Invalid input: `" + next + "'"], script = next + " leads to a parsing error, so this input is not valid." )
+                    mg.display_msg(self, ["No such entry at ParseTable[" + 
+                    top + ", " + next + "].", "Invalid input: `" + next + "'"],
+                    script = next + " leads to a parsing error, so this \
+                        input is not valid." )
                     error.ERR_parsing_error(self.root, 
-                        "No such entry at ParseTable[" + top + ", " + next + "].")
+                        "No such entry at ParseTable[" + top + ", " + next +
+                        "].")
                     return
 
             # transform the tree
@@ -594,7 +665,9 @@ class MParseTree(m.Scene):
         if len(tokens) > 0:
             sounds.add_sound_to_scene(self, sounds.FAIL)
             error.ERR_parsing_error(self.root)
-            error.ERR_manim_parsing_error(self, ["The stack is not emptied,", "but parsing has concluded."], script = "Since the stack is not emptied, parsing is unsuccessful.")
+            error.ERR_manim_parsing_error(self, ["The stack is not emptied,", 
+            "but parsing has concluded."], script = "Since the stack is not \
+                emptied, parsing is unsuccessful.")
             return
 
         # fade out the stack and transform the parse tree
@@ -603,10 +676,12 @@ class MParseTree(m.Scene):
         reset_g(self, g, start_symbol, anim=[m.FadeOut(self.s.mstack)])
 
         sounds.add_sound_to_scene(self, sounds.YAY)
-        mg.display_msg(self, ["Successfully parsed `" + lang_spec.get_token_format(original_tokens) +
-                                "'!"], script= "Parsing successful! That was a valid input.")
+        mg.display_msg(self, ["Successfully parsed `" + lang_spec\
+            .get_token_format(original_tokens) + "'!"], 
+            script= "Parsing successful! That was a valid input.")
 
-        display.success_secho("Successfully parsed '" + lang_spec.get_token_format(original_tokens) +
+        display.success_secho("Successfully parsed '" + 
+        lang_spec.get_token_format(original_tokens) +
                               "'!\nParse tree:")
         display.print_parsetree(self.root)
         return SUCCESS

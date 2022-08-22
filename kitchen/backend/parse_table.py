@@ -22,7 +22,8 @@ class ParsingTable:
         Args:
             terminals (list): List of terminals. 
             nonterminals (list): List of non-terminals. 
-            cfgd (dict): Dictionary containing non-terminals and their productions. 
+            cfgd (dict): Dictionary containing non-terminals and their 
+            productions. 
         """        
         self.first_set = {}
         self.follow_set = {}
@@ -76,11 +77,13 @@ class ParsingTable:
         return self.ts.index(t) + 1
 
     def populate_table(self):
-        """Populates the whole table with the first and follow set, if appropriate
+        """Populates the whole table with the first and follow set, if 
+        appropriate
         """
         for key in self.first_set.keys():
             for j, item in enumerate(self.first_set[key], start=0):
-                # if the first set contains epsilon, it may disappear. So, we need to add elements in the follow set too.
+                # if the first set contains epsilon, it may disappear. So, 
+                # we need to add elements in the follow set too.
                 if item == "#":
                     for f in self.follow_set[key]:
                         prod = key + " -> " + item
@@ -126,8 +129,7 @@ class ParsingTable:
                         if re.match(RE_TERMINAL, item):
                             row.append(item)
                         else:
-                            tmp = item.replace(
-                                "->", "\\to").strip().replace("#", "\\varepsilon")
+                            tmp = display.to_math_tex(item)
                             row.append(tmp)
                     else:
                         row.append("")
@@ -144,10 +146,7 @@ class ParsingTable:
         """        
         ts_m = []
         for t in self.ts:
-            if t == "#":
-                ts_m.append("\\varepsilon")
-            else:
-                ts_m.append(t)
+            ts_m.append(display.to_math_tex(t))
         return ts_m
 
     def print_parse_table(self):

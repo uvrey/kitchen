@@ -93,7 +93,8 @@ def show_tokens(tokens):
         tokens (list): Token list to be shown.
     """    
     for t in tokens:
-        structure_secho("Token < Type: " + t.type + ", Value: " + t.value + " >")
+        structure_secho("Token < Type: " + t.type + ", Value: " + t.value + 
+        " >")
 
 def pretty_print_dict(dict):
     """Prints a nicely-formatted dictionary.
@@ -164,7 +165,10 @@ def to_tex(item: str):
         str: Tex item.
     """    
     tex_item = item.replace(r'$', r'\$')
-    tex_item = tex_item.replace(r'\varepsilon', r'$\varepsilon$').replace(r'#', r'$\varepsilon$').replace("\\subseteq", "$\\subseteq$").replace("->", "$\\to$").replace("(", "$($").replace(")", "$)$")
+    tex_item = tex_item.replace(r'\varepsilon', r'$\varepsilon$')\
+        .replace(r'#', r'$\varepsilon$').replace("\\subseteq", \
+        "$\\subseteq$").replace("->", "$\\to$").replace("(", "$($")\
+            .replace(")", "$)$")
     return tex_item
 
 def to_math_tex(item):
@@ -176,5 +180,6 @@ def to_math_tex(item):
     Returns:
         str: MathTex item.
     """    
-    tex_item = item.replace(r'$', r'\$').replace("#", r'\varepsilon').replace("->", "\\to")
+    tex_item = item.replace(r'$', r'\$').replace("#", r'\varepsilon')\
+    .replace("->", "\\to")
     return tex_item

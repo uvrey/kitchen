@@ -88,8 +88,9 @@ class Specification:
                             else:
                                 self._process_reserved_words(line.strip())
 
-        # if line_count != len(self.cfg.terminals):
-        #     display.fail_secho("Note: Some terminals in the CFG are missing regex definitions :(")
+        # if line_count != len(self.cfg.terminals): TODO
+        #     display.fail_secho("Note: Some terminals in the CFG are 
+        # missing regex definitions :(")
     
     def _process_reserved_words(self, line: str) -> None:
         """Processes reserved words in the specification.
@@ -118,8 +119,9 @@ class Specification:
             # add regex for each terminal
             if t_found in self.cfg.terminals:
                 self.token_spec[t_found] = regex
-            # else:
-            #     display.info_secho("Note: " + t_found + " is defined in specificiation but does not appear in CFG.")
+            # else: TODO
+            #     display.info_secho("Note: " + t_found + " is defined 
+            # in specificiation but does not appear in CFG.")
         except:
             display.fail_secho("Some error with regex processing occurred.")
             return
@@ -181,7 +183,8 @@ def get_index_by_token_type(tokens: list, t) -> int:
         except:
             return tokens.index(t)
 
-def get_token_format(tokens, values = False, types = False, as_list = False) -> None:
+def get_token_format(tokens, values = False, types = False, as_list = False) \
+-> None:
     """Creates list of token types or returns the list itself if it is empty.
 
     Args:

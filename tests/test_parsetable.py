@@ -55,7 +55,8 @@ def get_contents(sample_cfg, pt_out_path):
         fs_out_path (str): Path to the expected outputs file
 
     Returns:
-        str: contents of the expected output file corresponding to the first set to be tested
+        str: contents of the expected output file corresponding to the 
+        first set to be tested
     """    
     filename = os.getcwd() + pt_out_path + sample_cfg
     file = open(filename, 'r')

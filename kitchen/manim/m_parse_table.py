@@ -43,7 +43,8 @@ class MParseTable(m.Scene):
         """Initialises the row values in the parse table.
 
         Returns:
-            List: List of lists, where these contain the row contents of the parse table.
+            List: List of lists, where these contain the row contents of the 
+            parse table.
         """        
         row_vals = []
         for n in self.nts:
@@ -83,7 +84,8 @@ class MParseTable(m.Scene):
         """Visualises the algorithm that constructs the parsing table.
 
         Args:
-            scene (Scene): Manim parse table object, which extends a Manim Scene.
+            scene (Scene): Manim parse table object, which extends a 
+            Manim Scene.
         """
         self.pt_dict = {}
         self._init_pt_dict()
@@ -98,7 +100,9 @@ class MParseTable(m.Scene):
         all_elements.add(keys)
 
         # shows key for colour coding
-        cfg_heading = m.Tex("Context-Free Grammar", tex_template = m.TexFontTemplates.french_cursive).next_to(keys, m.UP).align_to(keys.get_center)
+        cfg_heading = m.Tex("Context-Free Grammar", tex_template = \
+            m.TexFontTemplates.french_cursive).next_to(keys, m.UP)\
+                .align_to(keys.get_center)
         cfg_heading.scale(0.6)
 
         # draws establishing table animations
@@ -158,7 +162,8 @@ class MParseTable(m.Scene):
             run_time=2
         )
 
-        # populates the whole table with the first and follow set, if appropriate
+        # populates the whole table with the first and follow set, if 
+        # appropriate
         for key in self.cfg.first_set.keys():
             # resets all lines to gray
             keys.fade_to(m.GRAY, 1)
@@ -175,7 +180,8 @@ class MParseTable(m.Scene):
                 if item == "#":
 
                     for f in self.cfg.follow_set[key]:
-                        # adds production to table if # in First(A) and $ in Follow(A)
+                        # adds production to table if # in First(A) and 
+                        # $ in Follow(A)
                         prod = key + " -> " + item
 
                         if f == "$":
@@ -184,7 +190,11 @@ class MParseTable(m.Scene):
                             code = self.vis_add_to_parsetable(key, f, prod)
                         
                         # narrates events
-                        mg.display_msg(self, ["Following " + prod + "adds #", " to First(" + mg.to_tex(key) + ")"], script = "If we follow "+key+"'s production, we find an epsilon. So, we add this production to the parse table.")
+                        mg.display_msg(self, ["Following " + prod + 
+                        "adds #", " to First(" + mg.to_tex(key) + ")"], 
+                        script = "If we follow "+key+"'s production, we \
+                            find an epsilon. So, we add this production \
+                            to the parse table.")
                         self.wait()
 
                         if code == ERROR:
@@ -194,7 +204,15 @@ class MParseTable(m.Scene):
                     # adds item to the parse table
                     prod = self.cfg.firstset_index[key][j]
                     mg.display_msg(self, ["Following " + prod + " adds " +
-                                 self.cfg.first_set[key][j], " to First(" + key + ")"], script = "If we follow " + key + "'s production, we encounter terminal " + self.cfg.first_set[key][j] + ". So, let's add this production to the parse table at row " + key + " and column " + self.cfg.first_set[key][j])
+                                 self.cfg.first_set[key][j], " to \
+                                    First(" + key + ")"], script = "If we \
+                                    follow " + key + "'s production, we \
+                                    encounter terminal " + 
+                                    self.cfg.first_set[key][j] + 
+                                    ". So, let's add this production to \
+                                    the parse table at row " + key + 
+                                    " and column " + self.cfg.first_set\
+                                    [key][j])
                     
                     code = self.vis_add_to_parsetable(
                          key, item, prod)
@@ -221,7 +239,12 @@ class MParseTable(m.Scene):
         """        
         try:
             if self.pt_dict[nt][t] != "Error":
-                mg.display_msg(self, ["Cannot add entry: There is already a production", "at ParseTable[" + nt +", " + t +"].", "NOTE: This grammar cannot be parsed with LL(1)." ], script = "There's already an entry, so this grammar is unsuitable for LL(1) parsing.")
+                mg.display_msg(self, ["Cannot add entry: There is already a \
+                    production", "at ParseTable[" + nt +", " + t +"].", 
+                    "NOTE: This grammar cannot be parsed with LL(1)." ], 
+                    script = "There's already an entry, so this grammar \
+                        is unsuitable for LL(1) parsing.")
+                        
                 error.ERR_too_many_productions_ll1(nt, t)
                 return ERROR
             else:

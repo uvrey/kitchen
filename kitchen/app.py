@@ -42,11 +42,13 @@ def get_cfg() -> cfg.ContextFreeGrammar:
     """Helper function to obtain the created cfg from the config path
 
     Raises:
-        typer.Exit: Closes the app session if the configuration file is not found.
+        typer.Exit: Closes the app session if the configuration file is 
+        not found.
         typer.Exit: Closes the app session if the CFG file path is not found. 
 
     Returns:
-        cfg.ContextFreeGrammar: ContextFreeGrammar object associated with the given CFG.
+        cfg.ContextFreeGrammar: ContextFreeGrammar object associated with 
+        the given CFG.
     """    
     if config.CONFIG_FILE_PATH.exists():
         cfg_path = cfg.get_cfg_path(config.CONFIG_FILE_PATH)
@@ -129,7 +131,9 @@ def run() -> None:
     spec = lang_spec.get_spec(cfg)
 
     if spec == None:
-        display.info_secho("Note:\tNo language specification has been provided, so the given \n\tinput will be interpreted as tokens directly.")
+        display.info_secho("Note:\tNo language specification has been \
+            provided, so the given \n\tinput will be interpreted as \
+                tokens directly.")
 
     display.success_secho("CFG loaded successfully.")
     while (True):
@@ -219,7 +223,10 @@ def main(
     """Displays application options.
 
     Args:
-        version (Optional[bool], optional): Version option. Defaults to typer.Option( None, "--version", "-v", help="Show the application's version and exit.", callback=_version_callback, is_eager=True, ).
+        version (Optional[bool], optional): Version option. 
+        Defaults to typer.Option( None, "--version", "-v",
+         help="Show the application's version and exit.", 
+         callback=_version_callback, is_eager=True, ).
     """
     return
 

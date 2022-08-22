@@ -60,26 +60,31 @@ class ParserLL1:
         # look for any epsilons that came before and add.
         for node in self.root.descendants:
             if re.match(RE_NONTERMINAL, node.id):
-                if len(node.children) == 0 and "#" in self.cfg.first_set[node.id]:
+                if len(node.children) == 0 and "#" in \
+                self.cfg.first_set[node.id]:
                     anytree.Node("#", parent=node, id= "#", token = None)
         return SUCCESS
 
-    def _parsing_successful(self, tokens, semantic: bool, testing = False, verbose = True):
+    def _parsing_successful(self, tokens, semantic: bool, testing = False, 
+        verbose = True):
         types = lang_spec.get_token_format(tokens, types=True)
         values = lang_spec.get_token_format(tokens, values=True)
         
         if not semantic:
             if testing:
                 display.success_secho("Success.")
-                display.structure_secho(anytree.RenderTree(self.root, style= anytree.AsciiStyle()).by_attr("id"))
+                display.structure_secho(anytree.RenderTree(self.root, 
+                style= anytree.AsciiStyle()).by_attr("id"))
                 return
 
             if verbose:
-                display.success_secho("\nSuccessfully parsed token stream '" + types +
-                                            "'\nfrom input stream '" + values + "'.\n\nParse tree:")
+                display.success_secho("\nSuccessfully parsed token stream '" + 
+                types + "'\nfrom input stream '" + values + 
+                "'.\n\nParse tree:")
                 display.print_parsetree(self.root)
 
-    def parse_ll1(self, start_symbol, inp="", semantic = False, testing = False) -> int:
+    def parse_ll1(self, start_symbol, inp="", semantic = False, 
+        testing = False) -> int:
         """LL(1) Parser, which generates a parse tree and stores this to self.root
         Args:
             input (str): Input string to be parsed
@@ -98,7 +103,8 @@ class ParserLL1:
         # display.show_tokens(self.tokens)
 
         if None in self.tokens:
-            display.fail_secho("Not all tokens from the input stream were matched :(\nParsing failed.")
+            display.fail_secho("Not all tokens from the input stream were \
+                matched :(\nParsing failed.")
             return
 
         # set up structures
@@ -116,11 +122,14 @@ class ParserLL1:
             if tokens == []:
                 if re.match(RE_TERMINAL, self.stack[-1]):
                     if not semantic:
-                        error.ERR_parsing_error(self.root, "Expected " + self.stack[-1])
+                        error.ERR_parsing_error(self.root, "Expected " + 
+                        self.stack[-1])
                 else:
                     # parsing is successful if the remaining non-terminal may tend to epsilon
-                    if "#" in self.cfg.first_set[self.stack[-1]] and len(self.stack) == 1:
-                        self._parsing_successful(original_tokens, semantic, testing)
+                    if "#" in self.cfg.first_set[self.stack[-1]] and \
+                    len(self.stack) == 1:
+                        self._parsing_successful(original_tokens, semantic, 
+                        testing)
                         return SUCCESS
                     if not semantic:
                         error.ERR_parsing_error(self.root)
@@ -160,12 +169,10 @@ class ParserLL1:
             elif re.match(RE_NONTERMINAL, top):
 
                 try:
-                  #  display.success_secho("trying to find entry at " + str(top) + ", " + str(next))
                     pt_entry = self.pt_dict[top][next]
                     prods = pt_entry.split("->")
                   
                     self.stack.pop()
-                    # display.fail_secho("finding productions of " + prods[0])
 
                     if top != start_symbol:
                         # append new non-terminal path to the tree
@@ -184,13 +191,17 @@ class ParserLL1:
                     for p in ps:
                         # add to the tree
                         if top == start_symbol:
-                            new_node = anytree.Node(p, parent=self.root, id=p, tmp_p = self.root.id, tmp_parent = self.root, token = None)
+                            new_node = anytree.Node(p, parent=self.root, id=p, 
+                            tmp_p = self.root.id, tmp_parent = self.root, 
+                            token = None)
                         else:
                             # add connecting node if it is a non-terminal
                             new_node = anytree.Node(
-                                p, id=p, parent = None, tmp_p=prods[0].strip(), tmp_parent = self.parents[-1], token = None)
+                                p, id=p, parent = None, tmp_p=prods[0].strip(),
+                                tmp_parent = self.parents[-1], token = None)
                                     
-                        # we don't need to match epsilon, and we also only want non-terminals as parent nodes
+                        # we don't need to match epsilon, and we also only 
+                        # want non-terminals as parent nodes
                         if p != "#":
                             stack_to_append.append(p)
                             nodes_to_append.append(new_node)

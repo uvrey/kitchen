@@ -52,7 +52,8 @@ def ERR_get_general_error(line):
     Returns:
         typer.Style: Formatted string.
     """    
-    return typer.style("Error (line " + str(line) + ")", fg=typer.colors.WHITE, bg=typer.colors.RED)
+    return typer.style("Error (line " + str(line) + ")", fg=typer.colors.WHITE,
+        bg=typer.colors.RED)
 
 def ERR_input_too_long():
     """Displays error when provided input is too long.
@@ -108,7 +109,8 @@ def ERR_too_many_productions_ll1(nt, t):
     """    
     err = typer.style("Error:", fg=typer.colors.WHITE, bg=typer.colors.RED)
     typer.echo(err + " When building the parsing table, [" + nt + ", " + t +
-               "] contains more than one production - this CFG is not feasible to parse with LL(1).")
+               "] contains more than one production - this CFG is not \
+                feasible to parse with LL(1).")
 
 def ERR_parsing_error(root = None, detail=""):
     """Displays a parsing error.
@@ -122,7 +124,8 @@ def ERR_parsing_error(root = None, detail=""):
     else:
         detail_msg = detail
     err = typer.style("Error:", fg= typer.colors.WHITE, bg=typer.colors.RED)
-    pt_state = typer.style("\nCurrent state of parse tree:", fg=typer.colors.RED)
+    pt_state = typer.style("\nCurrent state of parse tree:", 
+        fg=typer.colors.RED)
     typer.echo(err + " Parsing failed. " + detail_msg + pt_state)
     
     if root != None:
@@ -167,7 +170,8 @@ def ERR_manim_parsing_error(scene, msg=[], script = ""):
         msg_group.arrange(m.DOWN)
         
         # create fading area
-        rect = m.Rectangle(width=20, height=10, color=c.theme_col(), fill_opacity=0.9)
+        rect = m.Rectangle(width=20, height=10, color=c.theme_col(), 
+        fill_opacity=0.9)
 
         scene.play(
             m.FadeIn(rect),

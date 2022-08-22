@@ -21,7 +21,7 @@ from kitchen import (
         ERRORS
     )
 
-from kitchen.helpers import (sounds, display, config)
+from kitchen.helpers import sounds, display
 
 OUTPUT_CONFIG = None
 THEME = DARK
@@ -104,7 +104,8 @@ def create_paths(cfg_path: str, spec_path = None) -> int:
 
         if path_error:
             typer.secho(
-                f'Loading the specification file failed with "{ERRORS[path_error]}"',
+                f'Loading the specification file failed with \
+                    "{ERRORS[path_error]}"',
                 fg=typer.colors.RED,
             )
 
@@ -256,7 +257,8 @@ def _set_quality(inp: str) -> bool:
             display.fail_secho("\t Options: -q <high | med | low>")
         else:
             OUTPUT_CONFIG["quality"] = qs[opts.index(inp[q_index + 1])]
-            display.success_secho("Success: set 'quality' to '" + OUTPUT_CONFIG["quality"] + "'\n")
+            display.success_secho("Success: set 'quality' to '" + 
+            OUTPUT_CONFIG["quality"] + "'\n")
             return True
     except:
         return False
@@ -280,7 +282,8 @@ def _set_theme(inp: str) -> bool:
             display.fail_secho("\t Options: -t <dark | light>")
         else:
             set_theme(ts[opts.index(inp[t_index + 1])])
-            display.success_secho("Success: set 'theme' to '" + inp[t_index + 1] + "'\n")
+            display.success_secho("Success: set 'theme' to '" + 
+            inp[t_index + 1] + "'\n")
             return True
     except:
         return False
@@ -303,7 +306,8 @@ def _set_preview(inp: str) -> None:
             display.fail_secho("\t Options: -p <y | n>")
         else:
             OUTPUT_CONFIG["preview"] = ps[opts.index(inp[p_index + 1])]
-            display.success_secho("Success: set 'preview' to '" + OUTPUT_CONFIG["preview"] + "'\n")
+            display.success_secho("Success: set 'preview' to '" + 
+            OUTPUT_CONFIG["preview"] + "'\n")
             return True
     except:
         return False   
@@ -328,7 +332,8 @@ def _set_narration(inp: str) -> None:
                 sounds.set_config(sounds.NARR)
             else:
                 sounds.set_config(sounds.NO_NARR)
-            display.success_secho("Success: set 'narration' to '" + str(narr) + "'\n")
+            display.success_secho("Success: set 'narration' to '" + 
+            str(narr) + "'\n")
             return True
         else:
             display.fail_secho("\t Options: -n <y | n>")          

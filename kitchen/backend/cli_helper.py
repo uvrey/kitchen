@@ -75,11 +75,11 @@ def load_app(cfg_path, spec_path = None, testing = False) -> None:
         raise typer.Exit(1)
     else:
         if not testing:
-            typer.secho(f"Initialisation successful!\n\t The cfg path is " + cfg_path, 
-                        fg=typer.colors.GREEN)
+            typer.secho(f"Initialisation successful!\n\t The cfg path is " + 
+            cfg_path, fg=typer.colors.GREEN)
             if spec_path != None:
-                typer.secho(f"\t The language specification path is " + cfg_path, 
-                        fg=typer.colors.GREEN)
+                typer.secho(f"\t The language specification path is " + 
+                cfg_path, fg=typer.colors.GREEN)
 
 def _set_parsetable(cfg) -> int:
     """Sets the up and calculates the parsetable structures.
@@ -114,7 +114,8 @@ def _show_parsetable(cfg) -> None:
     """Displays the calculated parse table. 
 
     Args:
-        cfg (ContextFreeGrammar): CFG for which the parse table is to be calculated.
+        cfg (ContextFreeGrammar): CFG for which the parse table is to be 
+        calculated.
     """    
     code = _set_parsetable(cfg)
     if code == SUCCESS:
@@ -122,7 +123,8 @@ def _show_parsetable(cfg) -> None:
     return code
 
 def handle_input(inp, cfg, spec) -> None:
-    """Handles user input by performing commands or otherwise parsing using the default method, LL(1)
+    """Handles user input by performing commands or otherwise parsing using 
+    the default method, LL(1)
 
     Args:
       inp (String): User input. 
@@ -355,10 +357,12 @@ def _process_command(inp, cfg, spec) -> None:
             else:
                 code = _init_parsing_ll1(to_sem, cfg, spec, semantic = True)
                 if code == SUCCESS:
-                    sem_analyser = tc.SemanticAnalyser(cfg, cfg.parser_ll1.root, to_sem)
+                    sem_analyser = tc.SemanticAnalyser(cfg, 
+                    cfg.parser_ll1.root, to_sem)
                     sem_analyser.init_analysis()
                 else:
-                    display.fail_secho("Parsing failed with code " + str(code)+ ".Cannot generate semantic analysis.")
+                    display.fail_secho("Parsing failed with code " + 
+                    str(code)+ ".Cannot generate semantic analysis.")
        
     elif inp == "\\show cfg" or inp == "\\cfg":
         cfg.show_contents()

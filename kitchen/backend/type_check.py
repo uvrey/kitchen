@@ -41,14 +41,17 @@ class SemanticAnalyser:
             if node.token != None:
                 try:
                     if not lhs:
-                        if node.token.value not in self.symbol['Symbol'] and lh_type == node.token.type:
-                            self._call_error(node.token.value + " has not yet been defined.")
+                        if node.token.value not in self.symbol['Symbol'] \
+                            and lh_type == node.token.type:
+                            self._call_error(node.token.value + 
+                            " has not yet been defined.")
                             return
                         lhs = True
                     else:
                         if node.token.value != "=":
                             if node.token.value in self.symbol['Symbol']:
-                                self._call_error(node.token.value + " has already been defined.")
+                                self._call_error(node.token.value + 
+                                " has already been defined.")
                                 return
                             else:
                                 lh_type = node.token.type
@@ -59,7 +62,8 @@ class SemanticAnalyser:
                     self.symbol['Type'].append(node.token.type)
 
                 except:
-                    self._call_error("Cannot semantically analyse only a token stream.")
+                    self._call_error("Cannot semantically analyse only \
+                        a token stream.")
                     return
         self.print_symbol_table()
 
