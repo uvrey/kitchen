@@ -28,7 +28,7 @@ class Stack:
             [left_edge + height*m.UP, left_edge, left_edge + m.RIGHT, 
             (left_edge + m.RIGHT) + height*m.UP])
         self.mstack.set_stroke(width=2)
-        self.mstack.fade_to(color=config.get_opp_col(), alpha = 0.6)
+        self.mstack.fade_to(color=config.get_opp_col(), alpha = 0.5)
 
 
     def pop(self, msg, vertex=None, anim=[], matching=False):
@@ -39,7 +39,7 @@ class Stack:
             self.stack.pop()
 
             m_msg = m.MathTex(msg).next_to(self.mstack, m.DOWN)
-            m_msg.scale(0.4)
+            m_msg.scale(0.8)
 
             if self.texts != []:
                 # animate fading out
@@ -63,7 +63,6 @@ class Stack:
                         m.FadeIn(m_msg),
                         m.Indicate(top_text, color=m.BLUE),
                         m.FadeToColor(top_text, m.BLUE),
-                        run_time=0.5,
                     )
 
                     sounds.add_sound_to_scene(self.scene, sounds.TWINKLE)
@@ -98,7 +97,7 @@ class Stack:
         if msg != None:
             m_msg = m.Tex(msg, color = config.get_opp_col())\
                 .next_to(self.mstack, m.DOWN)
-            m_msg.scale(0.4)
+            m_msg.scale(0.8)
 
 
         # add to backend stack
@@ -113,6 +112,7 @@ class Stack:
         else:
             # align above last element
             t = m.MathTex(a).shift(self.le).fade_to(color=m.RED, alpha=1)
+            t.scale(0.6)
             if re.match(RE_TERMINAL, a):
                 t.fade_to(color=m.TEAL, alpha=1)
             t.move_to(self.texts[-1].get_top()).shift(m.UP*0.5)

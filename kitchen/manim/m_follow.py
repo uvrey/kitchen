@@ -54,12 +54,12 @@ class MFollowSet(m.Scene):
 
         # draws follow set title
         fw_title = mg.get_title_mobject("follow set calculation") 
-        guide = mg.get_guide().scale(CFG_SCALE)
+        guide = mg.get_guide(arr_right = True).scale(CFG_SCALE)
 
         # sets the stage
         self.play(
             fw_title.animate.to_edge(m.UP),
-            guide.animate.to_edge(m.RIGHT),
+            guide.animate.to_edge(m.DOWN),
             m.FadeIn(keys)
         )
         

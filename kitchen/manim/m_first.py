@@ -31,7 +31,8 @@ class MFirstSet(m.Scene):
         keys.scale_to_fit_height(CFG_SCALE_HEIGHT/3)
 
         # show key for colour coding
-        guide = mg.get_guide().scale_to_fit_height(CFG_SCALE_HEIGHT/4)
+        guide = mg.get_guide(arr_right = True).scale_to_fit_height\
+            (CFG_SCALE_HEIGHT/4)
 
         self.vis_first_set(keys, guide, self.cfg.start_symbol, 
         self.cfg.start_symbol, [])
@@ -84,7 +85,7 @@ class MFirstSet(m.Scene):
         self.play(
             m.FadeIn(self.cfg.manim_firstset_lead[production]),
             m.FadeToColor(cfg_line, color=config.get_opp_col()),
-            guide.animate.to_edge(m.RIGHT),
+            guide.animate.to_edge(m.DOWN),
             keys.animate.to_edge(m.LEFT)
         )
 

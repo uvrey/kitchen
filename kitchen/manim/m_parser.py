@@ -334,7 +334,7 @@ class MParseTree(m.Scene):
         # create the input group here
         m_tok = {}
         m_tok_gp = m.VGroup()
-        m_tok_gp.add(m.Tex("Token stream: ")).scale(0.7)
+        m_tok_gp.add(m.Tex("Token stream: ")).scale(0.4)
 
         for t in self.tokens:
             try:
