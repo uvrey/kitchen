@@ -118,6 +118,11 @@ Get parsing colours to match LL(1) tokens   LOW
 implement semantic analysis HIGH
 Scaling large grammars - fs, fw, pt, ll1 LOW
 
+RuntimeWarning: invalid value encountered in double_scalars
+original tokens not showing at end of ll1 parsing manim
+visualising with tokens
+
+
 LATEX
 
 
@@ -146,6 +151,8 @@ another algorithm? (easy?)
 Neaten up cli_helper parsing code
 Code style choices
 gray lines for tables
+
+message formatting going over lines thanks to \
 """ 
 
 """

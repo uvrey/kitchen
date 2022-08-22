@@ -3,6 +3,7 @@
 # kitchen/manim/m_parser.py
 
 from dataclasses import replace
+from distutils.log import info
 from tracemalloc import start
 import manim as m
 import re
@@ -10,6 +11,7 @@ import typer
 import anytree
 
 from kitchen import ( 
+    CFG_SCALE_WIDTH,
     RE_TERMINAL, 
     RE_NONTERMINAL, 
     RE_PRODUCTION, 
@@ -42,10 +44,15 @@ def create_tokens(tokens):
 
 def create_vertex(g, node, label, color=m.GRAY,  link=True):
     global m
-    display.fail_secho("creating a vertex " + node.vertex_id + " with parent " + node.parent_id)
+    display.fail_secho("creating a vertex " + node.vertex_id + " with parent " 
+    + node.parent_id)
     
-    V_LABELS[node.vertex_id] = label
-    pos = g[node.parent_id].get_center()+m.DOWN
+    if len(label) > 2:
+        V_LABELS[node.vertex_id] = label[0:2]
+    else:
+        V_LABELS[node.vertex_id] = label
+
+    pos = g[node.parent_id].get_center() + m.DOWN
     v = g._add_vertex(
         node.vertex_id, vertex_config={"color": color}, position=pos)
     v.fill_colour = color
@@ -54,6 +61,21 @@ def create_vertex(g, node, label, color=m.GRAY,  link=True):
         g._add_edge(
             [node.parent_id, node.vertex_id], edge_config={"color": \
                 config.get_opp_col()})
+    
+    if len(label) > 2:
+        # add label above
+        new_vertex = g[node.vertex_id]
+
+        # fade vertex
+        new_vertex.fade_to(color, alpha = 1)
+
+        # add the new label above
+        rendered_label = m.MathTex(
+            mg.to_math_tex(label), color = config.get_opp_col())\
+                .scale_to_fit_width(new_vertex.width * 2)
+        rendered_label.move_to(new_vertex.get_center() + 0.5*new_vertex.width\
+             * m.UP)
+        new_vertex.add(rendered_label)
     return v
 
 def reset_g(self, g, root, anim=[]):
@@ -319,7 +341,8 @@ class MParseTree(m.Scene):
         m_tok = {}
         m_tok_gp = m.VGroup()
         m_tok_gp.add(m.Tex("Token stream: ")).scale(0.7)
-        for t in tokens:
+
+        for t in self.tokens:
             try:
                 tex = m.MathTex("\\text{"+t.value+"}")
                 m_tok_gp.add(tex)
@@ -344,7 +367,7 @@ class MParseTree(m.Scene):
         # create our first label
         V_LABELS[start_symbol] = start_symbol
         g = m.Graph([start_symbol], [], vertex_config=VCONFIG,
-                  labels=V_LABELS, label_fill_color=config.get_opp_col())
+                  labels = V_LABELS, label_fill_color=config.get_opp_col())
 
         g.to_edge(m.UP).shift(m.DOWN)
         self.add(g)
@@ -386,8 +409,8 @@ class MParseTree(m.Scene):
 
                 if top == next:
                     anims = []
-                    prev_token = tokens[0]
-                    tokens = tokens[1:]
+                    prev_token = self.tokens[0]
+                    tokens = self.tokens[1:]
 
                     sounds.narrate("The next token " + next + 
                     " matches the top of the stack!", self)
@@ -458,6 +481,8 @@ class MParseTree(m.Scene):
                             top + "'s row and terminal " + next.strip() + "'s \
                             column.")
                 # try:
+                display.fail_secho("finding entry at " + top + ", " + next)
+                self.cfg.parsetable.print_parse_table()
                 pt_entry = self.cfg.parsetable.pt_dict[top][next]
                 prods = pt_entry.split("->")
 
@@ -548,7 +573,7 @@ class MParseTree(m.Scene):
                     m.FadeOut(cfg_line)
                 )
 
-                # except:
+                # except: TODO
                 #     error.ERR_parsing_error(self.root,
                 #             "ParseTable[" + top + ", " + next + "] is empty.")
                 #     sounds.add_sound_to_scene(self, sounds.FAIL)
@@ -562,7 +587,9 @@ class MParseTree(m.Scene):
                 #     return 
 
         # in case parsing finishes but there are still tokens left in the stack
-        if len(tokens) > 0:
+        if len(self.tokens) > 0:
+            display.info_secho("AT END, tokens are?")
+            typer.echo(self.tokens)
             sounds.add_sound_to_scene(self, sounds.FAIL)
             error.ERR_parsing_error(self.root)
             error.ERR_manim_parsing_error(self, ["The stack is not emptied,", 

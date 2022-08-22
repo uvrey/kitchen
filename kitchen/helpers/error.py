@@ -165,7 +165,7 @@ def ERR_manim_parsing_error(scene, msg=[], script = ""):
         msg_group = m.VGroup()
 
         for ms in msg:
-            msg_txt = m.Tex(display.to_tex(ms), color=c.opp_col())
+            msg_txt = m.Tex(display.to_tex(ms), color=c.get_opp_col())
             msg_group.add(msg_txt)
         msg_group.arrange(m.DOWN)
         
