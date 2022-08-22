@@ -117,9 +117,6 @@ def get_tokens_from_input(inp, spec = None) -> list:
         tokens = spec.get_tokens_from_input(inp)
         return tokens
     else:
-        display.info_secho("Note:\tNo language specification has been \
-            provided, so the given \n\tinput will be interpreted as tokens\
-                directly.")
         return list(filter(None, inp.split(" ")))
 
 def set_up_token_colour(self):
