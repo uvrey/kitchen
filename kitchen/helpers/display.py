@@ -1,6 +1,7 @@
 """ Contains functions for displaying information to the console. """
 # kitchen/helpers/display.py
 
+from turtle import heading
 import typer
 import anytree
 import pandas as pd
@@ -62,7 +63,7 @@ def structure_secho(msg):
     """    
     typer.secho(
         f'{msg}',
-        fg = typer.colors.YELLOW
+        fg = typer.colors.CYAN
     ) 
 
 def highlight_error(s):
@@ -117,6 +118,10 @@ def pretty_print_config_settings(output_config, narr):
     structure_secho("\tPreview: " + str(output_config["preview"]))
     structure_secho("\tAnimation Theme: " + config.get_theme_name())
     structure_secho("\tNarration: " + str(narr_setting))
+
+def print_set(set, name=""):
+    df= pd.DataFrame(data=set,  columns = set.keys(), index = [name])
+    structure_secho(df.transpose().to_markdown())
 
 def print_welcome():
     """Helper function to print the welcome screen.

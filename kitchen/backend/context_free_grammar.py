@@ -255,7 +255,7 @@ class ContextFreeGrammar:
             self.first_set_calculated = True
 
         display.info_secho("Showing first set:")
-        display.pretty_print_dict(self.first_set)
+        display.print_set(self.first_set, "First set")
         self.first_set_calculated = True
 
     def show_first_set_testing(self) -> None:
@@ -414,7 +414,7 @@ class ContextFreeGrammar:
             self.follow_set_calculated = True
 
         display.info_secho("Showing follow set:")
-        display.pretty_print_dict(self.follow_set)
+        display.print_set(self.follow_set, "Follow set")
         self.follow_set_calculated = True
 
     def show_follow_set_testing(self) -> None:

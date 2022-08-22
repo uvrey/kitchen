@@ -97,6 +97,10 @@ restructure directory :)
 documentation progress :)
 neaten up imports :)
 set up pdoc :)
+verify m follow/ m first set :)
+line length :)
+check cleaning of follow set and first/ follow algorithms :)
+first and follow set not using _to_tex properly - DVI issue. :)
 """
 
 """
@@ -106,32 +110,33 @@ TESTING
 get lots of test cases written
 
 MANIM
-check epsilon bug in LL(1) parsing video
+check epsilon bug in LL(1) parsing video MED
 long names look weird in parsing vids - place above node and highlight the 
-colour to opp of bg? 
-Fix manim parsing by adding improved algorithm  
-Get parsing colours to match LL(1) tokens
-implement semantic analysis
-check cleaning of follow set and first/ follow algorithms
+colour to opp of bg? MED
+Fix manim parsing by adding improved algorithm  HIGH
+Get parsing colours to match LL(1) tokens   LOW
+implement semantic analysis HIGH
+Scaling large grammars - fs, fw, pt, ll1 LOW
 
 LATEX
-- first and follow set not using _to_tex properly - DVI issue.
+
 
 GRAMMARS
-validate grammars and language spec
+validate grammars and language spec MED
 
 CLI
-- some terminals missing regex error - investigate
-- Notes on regex spec - necessary?
+- some terminals missing regex error - investigate MED
+- Notes on regex spec - necessary?  MED
+- Print first and followsets as dataframes
 """ 
 
 """
-TODO - INTEGRATION
-start dsl tool from the typer app
+TODO - INTEGRATION 
+start dsl tool from the typer app HIGH
 """ 
 
 """
-TODO - DETAILS
+TODO - DETAILS LOW
 scaling FS and FW properly
 cfg_1 parsing has sound not found error
 remove debugging output
@@ -144,9 +149,8 @@ gray lines for tables
 """ 
 
 """
-TODO - ADMIN
+TODO - ADMIN LOW
 complete documentation
-- line length
 - type hints
 - function return types
 

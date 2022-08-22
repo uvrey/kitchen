@@ -21,7 +21,7 @@ from kitchen.manim import m_general as mg
 VCONFIG = {"radius": 0.25, "color": m.BLUE, "fill_opacity": 1}
 VCONFIG_TEMP = {"radius": 0.25, "color": m.GRAY}
 LCONFIG = {"vertex_spacing": (0.5, 1)}
-ECONFIG = {"color": config.config.get_opp_col()}
+ECONFIG = {"color": config.get_opp_col()}
 ECONFIG_TEMP = {"color": m.GRAY, "fill_opacity": 0.7}
 V_LABELS = {}
 
