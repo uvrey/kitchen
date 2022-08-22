@@ -337,7 +337,6 @@ class MParseTree(m.Scene):
         keys = mg.get_manim_cfg_group(self).to_edge(m.DOWN)
 
         # create the input group here
-        # BUG inputs could have the same names as each other
         m_tok = {}
         m_tok_gp = m.VGroup()
         m_tok_gp.add(m.Tex("Token stream: ")).scale(0.7)
@@ -376,7 +375,7 @@ class MParseTree(m.Scene):
         # begin parsing
         while self.s.stack != []:
             # in case we run out of input before the stack is empty
-            if tokens == []:
+            if self.tokens == []:
                 if re.match(RE_TERMINAL, self.stack[-1]):
                     error.ERR_parsing_error(self.root, "Expected " + 
                     self.s.stack[-1]+".")
@@ -400,9 +399,9 @@ class MParseTree(m.Scene):
 
             top = self.s.stack[-1]
             try:
-                next = tokens[0].type
+                next = self.tokens[0].type
             except:
-                next = tokens[0]
+                next = self.tokens[0]
 
             # draw initial node if top is start symbol
             if re.match(RE_TERMINAL, top) or top == "$":
@@ -433,7 +432,7 @@ class MParseTree(m.Scene):
                         display.fail_secho("TODO!")
 
                     # if we have matched our last token
-                    if len(tokens) == 1:
+                    if len(self.tokens) == 1:
                         self.check_for_epsilons()
 
                     # pop off the stack and 'flash'
@@ -582,8 +581,6 @@ class MParseTree(m.Scene):
 
         # in case parsing finishes but there are still tokens left in the stack
         if len(self.tokens) > 0:
-            display.info_secho("AT END, tokens are?")
-            typer.echo(self.tokens)
             sounds.add_sound_to_scene(self, sounds.FAIL)
             error.ERR_parsing_error(self.root)
             error.ERR_manim_parsing_error(self, ["The stack is not emptied,", 

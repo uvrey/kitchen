@@ -101,6 +101,7 @@ verify m follow/ m first set :)
 line length :)
 check cleaning of follow set and first/ follow algorithms :)
 first and follow set not using _to_tex properly - DVI issue. :)
+weird token issue
 """
 
 """
