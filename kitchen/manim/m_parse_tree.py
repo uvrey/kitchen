@@ -189,8 +189,8 @@ class MParseTree(m.Scene):
         """Sets up the parse table structure without generating an animation_summary_
         """        
         # draw establishing table animations
-        row_labels = self.nts
-        col_labels = mg.ts_m_epsilon(self)
+        row_labels = self.nts[:]
+        col_labels = self.ts[:]
 
         # gets the row values
         row_vals = self.get_row_contents()
@@ -285,7 +285,7 @@ class MParseTree(m.Scene):
 
         # draw LL(1) representation title
         ll1_title = mg.get_title_mobject("LL(1) parsing")
-        mg.display_msg(self, ["LL(1) Parsing Algorithm"], raw_msg = "Let's apply the L L 1 parsing algorithm")
+        mg.display_msg(self, ["LL(1) Parsing Algorithm"], script = "Let's apply the L L 1 parsing algorithm")
         keys = mg.get_manim_cfg_group(self).to_edge(m.DOWN)
 
         # create the input group here
@@ -331,10 +331,10 @@ class MParseTree(m.Scene):
                 sounds.add_sound_to_scene(self, sounds.FAIL)
                 if re.match(RE_TERMINAL, self.s.stack[-1]):
                     error.ERR_parsing_error(self.root, "Expected " + self.s.stack[-1]+".")
-                    error.ERR_manim_parsing_error(self,  ["Expected `" + self.s.stack[-1] + "'", "Parsing unsuccessful."], raw_msg = "We expected to see " + self.s.stack[-1]  + " so parsing is unsuccessful.")
+                    error.ERR_manim_parsing_error(self,  ["Expected `" + self.s.stack[-1] + "'", "Parsing unsuccessful."], script = "We expected to see " + self.s.stack[-1]  + " so parsing is unsuccessful.")
                 else:
                     error.ERR_parsing_error(self.root)
-                    error.ERR_manim_parsing_error(self, ["Parsing unsuccessful. "], raw_msg = "Parsing unsuccessful.")
+                    error.ERR_manim_parsing_error(self, ["Parsing unsuccessful. "], script = "Parsing unsuccessful.")
                 return
 
             top = self.s.stack[-1]
@@ -464,14 +464,14 @@ class MParseTree(m.Scene):
                     sounds.add_sound_to_scene(self, sounds.FAIL)
                     error.ERR_parsing_error(self.root, 
                         "Unexpected token [" + top + "]")
-                    error.ERR_manim_parsing_error(self, ["Invalid input: '" + top + "'"], raw_msg = top + " leads to a parsing error, so this input is not valid." )
+                    error.ERR_manim_parsing_error(self, ["Invalid input: '" + top + "'"], script = top + " leads to a parsing error, so this input is not valid." )
                     return
 
             elif re.match(RE_NONTERMINAL, top):
                 try:
                     pt_entry = self.cfg.parsetable.pt_dict[top][next]
                     prods = pt_entry.split("->")
-                    mg.display_msg(self, ["We must find the entry at ParseTable["+top+"]["+next+"]"], raw_msg = "Let's consider the parse table entry at non-terminal " + top + "'s row and terminal " + next + "'s column.")
+                    mg.display_msg(self, ["We must find the entry at ParseTable["+top+"]["+next+"]"], script = "Let's consider the parse table entry at non-terminal " + top + "'s row and terminal " + next + "'s column.")
 
                     # highlight parse table row
                     self._fade_in_mtable(highlight  = True, row = mg.row(self.nts, top), col = mg.col(self.ts, next))
@@ -531,7 +531,7 @@ class MParseTree(m.Scene):
                         RE_PRODUCTION, prods[1])))
                     nodes_to_append = []
 
-                    mg.display_msg(self, [mg.to_tex(popped_off) + " is a non-terminal,", "so we can replace it with", "its sub-productions: ",  prods[1]], raw_msg="Let's replace " + popped_off + " with its sub productions")
+                    mg.display_msg(self, [mg.to_tex(popped_off) + " is a non-terminal,", "so we can replace it with", "its sub-productions: ",  prods[1]], script="Let's replace " + popped_off + " with its sub productions")
 
                     for p in reversed(ps):
                         # add to the tree
@@ -582,7 +582,7 @@ class MParseTree(m.Scene):
 
                 except KeyError:
                     sounds.add_sound_to_scene(self, sounds.FAIL)
-                    mg.display_msg(self, ["No such entry at ParseTable[" + top + ", " + next + "].", "Invalid input: `" + next + "'"], raw_msg = next + " leads to a parsing error, so this input is not valid." )
+                    mg.display_msg(self, ["No such entry at ParseTable[" + top + ", " + next + "].", "Invalid input: `" + next + "'"], script = next + " leads to a parsing error, so this input is not valid." )
                     error.ERR_parsing_error(self.root, 
                         "No such entry at ParseTable[" + top + ", " + next + "].")
                     return
@@ -594,7 +594,7 @@ class MParseTree(m.Scene):
         if len(tokens) > 0:
             sounds.add_sound_to_scene(self, sounds.FAIL)
             error.ERR_parsing_error(self.root)
-            error.ERR_manim_parsing_error(self, ["The stack is not emptied,", "but parsing has concluded."], raw_msg = "Since the stack is not emptied, parsing is unsuccessful.")
+            error.ERR_manim_parsing_error(self, ["The stack is not emptied,", "but parsing has concluded."], script = "Since the stack is not emptied, parsing is unsuccessful.")
             return
 
         # fade out the stack and transform the parse tree
@@ -604,7 +604,7 @@ class MParseTree(m.Scene):
 
         sounds.add_sound_to_scene(self, sounds.YAY)
         mg.display_msg(self, ["Successfully parsed `" + lang_spec.get_token_format(original_tokens) +
-                                "'!"], raw_msg= "Parsing successful! That was a valid input.")
+                                "'!"], script= "Parsing successful! That was a valid input.")
 
         display.success_secho("Successfully parsed '" + lang_spec.get_token_format(original_tokens) +
                               "'!\nParse tree:")

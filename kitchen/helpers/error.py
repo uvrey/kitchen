@@ -145,13 +145,13 @@ def ERR_ambiguous_grammar():
                " parsing to it.")
     typer.echo(msg_str)
 
-def ERR_manim_parsing_error(scene, msg=[], raw_msg = ""):
+def ERR_manim_parsing_error(scene, msg=[], script = ""):
     """Visualise the parsing error in Manim. 
 
     Args:
         scene (Scene): Scene to be animated. 
         msg (list, optional): Message to be displayed. Defaults to [].
-        raw_msg (str, optional): Narration script. Defaults to "".
+        script (str, optional): Narration script. Defaults to "".
 
     Returns:
         int: Status code.
@@ -174,8 +174,8 @@ def ERR_manim_parsing_error(scene, msg=[], raw_msg = ""):
         )
 
         # generate voiceover
-        if raw_msg != "":
-            sounds.narrate(raw_msg, scene)
+        if script != "":
+            sounds.narrate(script, scene)
 
         scene.play(
             m.Write(msg_group),

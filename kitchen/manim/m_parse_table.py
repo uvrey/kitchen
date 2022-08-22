@@ -184,7 +184,7 @@ class MParseTable(m.Scene):
                             code = self.vis_add_to_parsetable(key, f, prod)
                         
                         # narrates events
-                        mg.display_msg(self, ["Following " + prod + "adds #", " to First(" + mg.to_tex(key) + ")"], raw_msg = "If we follow "+key+"'s production, we find an epsilon. So, we add this production to the parse table.")
+                        mg.display_msg(self, ["Following " + prod + "adds #", " to First(" + mg.to_tex(key) + ")"], script = "If we follow "+key+"'s production, we find an epsilon. So, we add this production to the parse table.")
                         self.wait()
 
                         if code == ERROR:
@@ -194,7 +194,7 @@ class MParseTable(m.Scene):
                     # adds item to the parse table
                     prod = self.cfg.firstset_index[key][j]
                     mg.display_msg(self, ["Following " + prod + " adds " +
-                                 self.cfg.first_set[key][j], " to First(" + key + ")"], raw_msg = "If we follow " + key + "'s production, we encounter terminal " + self.cfg.first_set[key][j] + ". So, let's add this production to the parse table at row " + key + " and column " + self.cfg.first_set[key][j])
+                                 self.cfg.first_set[key][j], " to First(" + key + ")"], script = "If we follow " + key + "'s production, we encounter terminal " + self.cfg.first_set[key][j] + ". So, let's add this production to the parse table at row " + key + " and column " + self.cfg.first_set[key][j])
                     
                     code = self.vis_add_to_parsetable(
                          key, item, prod)
@@ -221,7 +221,7 @@ class MParseTable(m.Scene):
         """        
         try:
             if self.pt_dict[nt][t] != "Error":
-                mg.display_msg(self, ["Cannot add entry: There is already a production", "at ParseTable[" + nt +", " + t +"].", "NOTE: This grammar cannot be parsed with LL(1)." ], raw_msg = "There's already an entry, so this grammar is unsuitable for LL(1) parsing.")
+                mg.display_msg(self, ["Cannot add entry: There is already a production", "at ParseTable[" + nt +", " + t +"].", "NOTE: This grammar cannot be parsed with LL(1)." ], script = "There's already an entry, so this grammar is unsuitable for LL(1) parsing.")
                 error.ERR_too_many_productions_ll1(nt, t)
                 return ERROR
             else:
@@ -273,4 +273,4 @@ class MParseTable(m.Scene):
     def tear_down(self):
         """Concludes the scene by clearing the narrations directory.
         """        
-        mg.clear_narrs()
+        sounds.clear_narrs()

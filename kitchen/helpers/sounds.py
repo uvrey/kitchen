@@ -101,7 +101,15 @@ def init_narr_dir() -> None:
     try:
         Path(narration_dir).mkdir(exist_ok=True)
     except OSError:
-        display.fail_secho("There was an issue creating the narration directory.")
+        display.fail_secho("There was an issue creating the narration \
+            directory.")
+
+def clear_narrs():
+    """Clears and reinitialises the narration directory.
+    """    
+    if get_config() == NARR:
+        clear_narr_dir()
+        init_narr_dir()
 
 def clear_narr_dir():
     """Cleans the narration directory after the animation is created.

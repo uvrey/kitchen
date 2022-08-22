@@ -39,7 +39,7 @@ class MFirstSet(m.Scene):
         # success message and sound
         sounds.add_sound_to_scene(self, sounds.YAY)
         mg.display_msg(self, ["Successfully found the first set :)"], 
-        raw_msg= "Woohoo! We got the first set!")
+        script= "Woohoo! We got the first set!")
 
     def tear_down(self):
         """Clear first set structures at the end of the animation.
@@ -49,7 +49,7 @@ class MFirstSet(m.Scene):
         for key in self.cfg.first_set.keys():
             self.cfg.first_set[key] = []
             self.cfg.manim_firstset_contents[key] = m.VGroup()
-        mg.clear_narrs()
+        sounds.clear_narrs()
 
     def vis_first_set(self, keys, guide, start, production, pstack):
         """Generates a visualisation of the first set.
@@ -128,7 +128,8 @@ class MFirstSet(m.Scene):
                                         .next_to(self.manim_firstset_lead[ps], 
                                         m.RIGHT)
 
-                                    # fade in new terminal and corresponding element of the cfg
+                                    # fade in new terminal and corresponding 
+                                    # element of the cfg
                                     cfg_element = self.manim_prod_dict\
                                         [production][i][j]
                                     sounds.add_sound_to_scene(self, 
@@ -147,7 +148,7 @@ class MFirstSet(m.Scene):
                                     ["Note: Since First(" + ps + ") may lead \
                                     to ", "the same production via more than \
                                     one", "production, the CFG is ambiguous."],
-                                     raw_msg = "This CFG is ambiguous, since \
+                                     script = "This CFG is ambiguous, since \
                                         more than one production leads to the \
                                         same terminal.")
                             break
@@ -167,7 +168,7 @@ class MFirstSet(m.Scene):
                             mg.display_msg(self, [production + " leads to " + 
                                 current_item + ",", "so First("+production +
                                 ") \\subseteq First("+current_item+")"], 
-                                raw_msg=production + ", leads to another non \
+                                script=production + ", leads to another non \
                                     terminal" + current_item + ", so their \
                                     first sets will overlap.")
 
@@ -238,7 +239,7 @@ class MFirstSet(m.Scene):
                             mg.display_msg(self, ["Note: Since First("+ps+") \
                                 may lead to ", "the same production via more \
                                 than one", "production, the CFG is \
-                                ambiguous."], raw_msg = "This CFG is \
+                                ambiguous."], script = "This CFG is \
                                 ambiguous, since more than one production \
                                 leads to the same terminal.")
 
@@ -249,16 +250,17 @@ class MFirstSet(m.Scene):
                                     " is also", "added to First(" + ps +
                                     "),", "since " + ps + " leads to " +
                                     production]
-                            raw_msg = ps + " leads to " + production + \
+                            script = ps + " leads to " + production + \
                             ", so we add " + first_terminal[0] + " to both. "
                         else:
                             msg = ["Terminal " + terminal_to_write +
                                     " is ", "added to First(" + ps + ")"]
-                            raw_msg = "Let's add terminal " + \
+                            script = "Let's add terminal " + \
                             first_terminal[0] + "!"
-                        mg.display_msg(self, msg, raw_msg)
+                        mg.display_msg(self, msg, script)
 
-                        # fade in new terminal and corresponding element of the cfg
+                        # fade in new terminal and corresponding element of 
+                        # the cfg
                         cfg_element = self.manim_prod_dict[production][i][0]
 
                         # adds sound as the new element is added
@@ -277,7 +279,7 @@ class MFirstSet(m.Scene):
                             mg.display_msg(self, ["\\varepsilon found at \
                                 production " + production + ",", "so " + 
                                 production + " may disappear :)"], 
-                                raw_msg = "The production may disappear \
+                                script = "The production may disappear \
                                     since it can lead to epsilon.")
 
                         # reset other colours to white

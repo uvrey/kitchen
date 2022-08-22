@@ -38,7 +38,7 @@ class MFollowSet(m.Scene):
         """        
         for key in self.cfg.follow_set.keys():
             self.cfg.follow_set[key] = []
-        mg.clear_narrs()
+        sounds.clear_narrs()
 
     def vis_follow_set(self, is_start_symbol):
         """Visualises the follow set calculation.
@@ -75,7 +75,7 @@ class MFollowSet(m.Scene):
                 self._add_to_follow_vis(
                     production, "$", keys, [production + " is the start \
                         symbol,", "so we append $", "to Follow(" +
-                    production + ")"], raw_msg = production + ", is the \
+                    production + ")"], script = production + ", is the \
                         start symbol, so we append $ to its follow set.")
                 is_start_symbol = False
 
@@ -107,7 +107,7 @@ class MFollowSet(m.Scene):
                                 anims.append(t) 
 
                             mg.display_msg(self, ["Follow(" + mg.to_tex(item) +
-                            ") may not exist"], raw_msg = "A standalone \
+                            ") may not exist"], script = "A standalone \
                             non epsilon terminal won't have a follow set.")
 
                         else:
@@ -143,12 +143,12 @@ class MFollowSet(m.Scene):
                             self._add_to_follow_vis(
                                 item, production, keys, ["Follow(" + 
                                 production + ") \\subseteq Follow(" +
-                                item + ")"], raw_msg = "The follow set of " +
+                                item + ")"], script = "The follow set of " +
                                 production + " is a subset of that of " + 
                                 item + " ")
                         else:
                             mg.display_msg(self, [next_item + ", is already \
-                                in Follow(" + item + ")"], raw_msg=item +
+                                in Follow(" + item + ")"], script=item +
                                 "is already in the follow set.")                                   
                     
                     elif index < len(pps) - 1:
@@ -163,7 +163,7 @@ class MFollowSet(m.Scene):
                             else:
                                 mg.display_msg(self, [next_item +", is \
                                     already in Follow(" + item + ")"], 
-                                    raw_msg=item + "is already in the follow \
+                                    script=item + "is already in the follow \
                                     set.")   
                         else:
                             # we add the first of the non-terminal at this 
@@ -192,7 +192,7 @@ class MFollowSet(m.Scene):
                             
                             mg.display_msg(self, [r'\{First (' +next_item +
                                 r') - #\}', r'\subseteq Follow (' + item + 
-                                r')'], raw_msg = "The first set of " + 
+                                r')'], script = "The first set of " + 
                                 next_item + " without epsilon is a subset \
                                     of " + item + "'s follow set.")
 
@@ -222,7 +222,7 @@ class MFollowSet(m.Scene):
                                             r' From this, Follow(' + item +
                                              r') \subseteq Follow(' + 
                                              production + r')'], 
-                                             raw_msg = "Epsilon is in the \
+                                             script = "Epsilon is in the \
                                              first set of " + item + " so the \
                                              non terminal "+ next_item + 
                                              " might not actually appear \
@@ -234,7 +234,7 @@ class MFollowSet(m.Scene):
                                             [r'\varepsilon \subseteq First('+
                                             next_item+r'),', r'so '+next_item+
                                             r'may not', r'actually appear after '
-                                            +item], raw_msg = "Epsilon is in \
+                                            +item], script = "Epsilon is in \
                                             the first set of " + item + " so \
                                             the non-terminal "+next_item + 
                                             " might not actually appear after " 
@@ -281,7 +281,7 @@ class MFollowSet(m.Scene):
         sounds.narrate("We found the follow set!", self)
                             
 
-    def _add_to_follow_vis(self, production, item, keys, msg=[], raw_msg = ""):
+    def _add_to_follow_vis(self, production, item, keys, msg=[], script = ""):
         """Visualises the addition of an element to a follow set.
 
         Args:
@@ -290,7 +290,7 @@ class MFollowSet(m.Scene):
             keys (VGroup): CFG Mobject group.
             msg (list, optional): Set of messages which will be displayed
             as the item is added to the set. Defaults to [].
-            raw_msg (str, optional): Narration script for the action. 
+            script (str, optional): Narration script for the action. 
             Defaults to "".
         """        
         new_element = None
@@ -321,7 +321,7 @@ class MFollowSet(m.Scene):
 
         # Play the addition of the item to the followset and message, if given
             if msg != []:
-                mg.display_msg(self, msg, raw_msg = raw_msg)
+                mg.display_msg(self, msg, script = script)
                 sounds.add_sound_to_scene(self, sounds.CLANG)
                 self.play(
                     m.FadeIn(new_element)

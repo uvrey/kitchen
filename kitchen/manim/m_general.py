@@ -18,20 +18,56 @@ from kitchen.helpers import (
 from kitchen.backend import *
 
 def get_title_mobject(title):
+    """Obtains a title Mobject.
+
+    Args:
+        title (str): Contents of title.
+
+    Returns:
+        Tex: Tex Mobject.
+    """    
     return m.Tex(title, tex_template=m.TexFontTemplates.french_cursive)
 
 def to_tex(item):
-    tex_item = item.replace(r'$', r'\$').replace(r'\varepsilon', r'$\varepsilon$')
-    tex_item = tex_item.replace(r'#', r'\varepsilon').replace(r'\subseteq', r'$\subseteq$').replace(r'->', r'$\to$')
-    display.fail_secho("AFTER TEX: " + tex_item)
+    """Converts a string to its Tex-compatible representation.
+
+    Args:
+        item (str): String to be converted.
+
+    Returns:
+        str: Tex-compatible string.
+    """    
+    tex_item = item.replace(r'$', r'\$').replace(r'\varepsilon', 
+    r'$\varepsilon$')
+    tex_item = tex_item.replace(r'#', r'\varepsilon').replace(r'\subseteq',
+     r'$\subseteq$').replace(r'->', r'$\to$')
     return tex_item
 
 def to_math_tex(item):
-    #.replace("(", "$($").replace(")", "$)$")
-    tex_item = item.replace(r'$', r'\$').replace(r'#', r'\varepsilon').replace(r'->', r'\to')
+    """Converts a string to its MathTex-compatible representation.
+
+    Args:
+        item (str): String to be converted.
+
+    Returns:
+        str: MathTex-compatible string.
+    """    
+    tex_item = item.replace(r'$', r'\$').replace(r'#', r'\varepsilon')\
+    .replace(r'->', r'\to')
     return tex_item
 
-def display_msg(self, msg, raw_msg= "", anim=[]):
+def display_msg(self, msg, script = "", anim=[]):
+    """Displays a set of messages in full-screen, alongside optional narration. 
+
+    Args:
+        msg (str): Messages to be displayed.
+        script (str, optional): Narration script. Defaults to "".
+        anim (list, optional): Group of simultaneous animations. 
+        Defaults to [].
+
+    Returns:
+        _type_: _description_
+    """    
     if msg != []:
         msg_group = m.VGroup()
 
@@ -41,15 +77,16 @@ def display_msg(self, msg, raw_msg= "", anim=[]):
         msg_group.arrange(m.DOWN)
         
         # create fading area
-        rect = m.Rectangle(width=20, height=10, color=config.get_theme_col(), fill_opacity=0.9)
+        rect = m.Rectangle(width=20, height=10, color=config.get_theme_col(), 
+        fill_opacity=0.9)
 
         self.play(
             m.FadeIn(rect),
         )
 
         # generate voiceover
-        if raw_msg != "":
-            sounds.narrate(raw_msg, self)
+        if script != "":
+            sounds.narrate(script, self)
 
         self.play(
             m.Write(msg_group),
@@ -80,54 +117,26 @@ def get_tokens_from_input(inp, spec = None) -> list:
         tokens = spec.get_tokens_from_input(inp)
         return tokens
     else:
-        display.info_secho("Note:\tNo language specification has been provided, so the given \n\tinput will be interpreted as tokens directly.")
+        display.info_secho("Note:\tNo language specification has been \
+            provided, so the given \n\tinput will be interpreted as tokens\
+                directly.")
         return list(filter(None, inp.split(" ")))
 
-# Helper function to put a message on the screen
-def notify(self, message, next_to_this):
-    # returns a keys group, which is the cfg representation
-    msg_text = m.Text(message, color=config.config.get_opp_col(), weight=m.BOLD).scale(0.5).next_to(
-        next_to_this, m.RIGHT)
-    self.play(
-        m.Write(msg_text),
-    )
-    self.wait()
-    self.play(
-        m.FadeOut(msg_text)
-    )
-
-def fullscreen_notify(self, message):
-    err_msg = message
-    err_m_msg = m.Tex(err_msg, color=config.config.get_opp_col())
-    rect = m.Rectangle(width=20, height=10, color=config.get_theme_col(), fill_opacity=0.85)
-    err_m_msg.move_to(rect.get_center())
-    self.play(
-        m.FadeIn(rect),
-    )
-    self.play(
-        m.FadeIn(err_m_msg),
-        run_time=0.5
-    )
-    self.wait()
-
-# gets the scaling factor for listing tokens
-def get_list_scalefactor(list):
-    tl = len(list)
-    if tl > 3:
-        return 1 - (tl - 3)*0.25
-    else:
-        return 1
-
-# sets up the ten options for colour coding the tokens
 def set_up_token_colour(self):
-    # set default manim colours
+    """Sets up the ten options for colour coding the tokens
+    """    
     self.token_has_this_colour = []
     # set up colour boolean array
     for i in range(10):
         self.token_has_this_colour.append(False)
 
-# checks if a col has been taken
 def get_token_colour(self):
+    """Obtains an unclaimed token colour.
+
+    Returns:
+        Color: A unique colour if available, otherwise one which contrasts
+        the theme.
+    """    
     for index, col in enumerate(COLOURS, start=0):
         if not self.token_has_this_colour[index]:
             self.token_has_this_colour[index] = True
@@ -141,7 +150,7 @@ def fade_scene(self):
     )
 
 def row(nts, nt):
-    """Quickly get the row and column index of the parse table contents_summary_
+    """Gets the row index of the parse table contents.
 
     Args:
         cfg (ContextFreeGrammar): CFG 
@@ -153,14 +162,14 @@ def row(nts, nt):
     return nts.index(nt) + 1
 
 def col(ts, t):
-    """Quickly get the row and column index of the parse table contents_summary_
+    """Gets the column index of the parse table contents.
 
     Args:
         cfg (ContextFreeGrammar): CFG     
         nt (str): Non-terminal 
 
     Returns:
-        int: Row of non-terminal
+        int: Column of non-terminal
     """    
     return ts.index(t) + 1
 
@@ -220,8 +229,17 @@ def get_manim_cfg_group(self):
     keys.fade_to(color=m.DARK_GRAY, alpha=1)
     return keys
 
-# helper function to obtain the follow and first set interpretation guide
 def get_guide(arr_right = False):
+    """Obtains a guide for the colour coding of terminals and non-terminals.
+
+    Args:
+        arr_right (bool, optional): Whether the guide should be arranged
+        horizontally (i.e. elements are to the right of each other). Defaults 
+        to False.
+
+    Returns:
+        VGroup: Guide Mobject.
+    """    
     guide_group_outer = m.VGroup()
     square_colors = [m.TEAL, m.RED]
     labels = ["Terminal", "Non-terminal"]
@@ -229,7 +247,8 @@ def get_guide(arr_right = False):
         guide_group_inner = m.VGroup()
         guide_group_inner.add(m.Square().set_fill(
             square_colors[i], opacity=1).scale(0.5))
-        guide_group_inner.add(m.Tex(labels[i], color = config.config.get_opp_col()))
+        guide_group_inner.add(m.Tex(labels[i], color = config.config\
+            .get_opp_col()))
         guide_group_inner.arrange_in_grid(rows = 1, buff = 0.8)
         guide_group_outer.add(guide_group_inner)
     
@@ -239,21 +258,8 @@ def get_guide(arr_right = False):
     else:
         guide_group_outer.arrange_in_grid(rows = 1, buff = 0.8) 
         return guide_group_outer
-    
-def ts_m_epsilon(self):
-    ts_m = []
-    for t in self.ts:
-        if t == "#":
-            ts_m.append("#")
-        else:
-            ts_m.append(t)
-    return ts_m
 
-def clear_narrs():
-    # clear and reinitialise the narration diary
-    if sounds.get_config() == sounds.NARR:
-        sounds.clear_narr_dir()
-        sounds.init_narr_dir()
+
 
 
 
