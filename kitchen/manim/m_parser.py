@@ -80,6 +80,7 @@ def reset_g(self, g, root, anim=[]):
         g.animate.change_layout(
             "tree",
             root_vertex=root,
+            layout_config = LCONFIG,
         ),
     )
 
@@ -485,6 +486,7 @@ class MParseTree(m.Scene):
                     if self.parents != []:
                         replaced_parent = self.parents[-1]
                         sounds.add_sound_to_scene(self, sounds.CLICK)
+                        typer.echo("creating vertex " + replaced_parent.id)
                         new_vertex = create_vertex(g, replaced_parent, \
                             mg.to_math_tex(self.parents[-1].id))
                         reset_g(self, g, start_symbol)
@@ -535,9 +537,6 @@ class MParseTree(m.Scene):
                             vertex_id = self.root.id + "_" + p,
                             parent_id = self.root.id,
                             token = None)
-                            # display.info_secho("1. NEW NODE " + new_node.id +
-                            # "has parent: " + new_node.parent_id + " and vid " + 
-                            # new_node.vertex_id)
                         else:
                             # add connecting node if it is a non-terminal
                             new_node = anytree.Node(
@@ -545,21 +544,17 @@ class MParseTree(m.Scene):
                                 vertex_id = replaced_parent.id + "_" + p,
                                 parent_id = replaced_parent.vertex_id,
                                 tmp_parent = replaced_parent, token = None)
-                            # display.info_secho("2. NEW NODE " + new_node.id +
-                            # "has parent: " + new_node.parent_id + " and vid " + 
-                            # new_node.vertex_id)
                                     
-                        # we don't need to match epsilon, and we also only 
-                        # want non-terminals as parent nodes
+                        # apply non-epsilon nodes to the stack
                         if p != "#":
                             stack_to_append.append(p)
                             nodes_to_append.append(new_node)
 
-                    # pop off parents
+                    # pop off current parent
                     if self.parents != []:
                         self.parents.pop()
                     
-                    # add children
+                    # add children to stack and parent stack
                     for n in reversed(nodes_to_append):
                         self.parents.append(n)
                     
@@ -572,91 +567,6 @@ class MParseTree(m.Scene):
                 except KeyError:
                     self._call_ptable_error(top, next)
                     return
-
-                prods = pt_entry.split("->")
-
-                if self.parents != []:
-                    replaced_parent = self.parents[-1]
-                    sounds.add_sound_to_scene(self, sounds.CLICK)
-                    new_vertex = create_vertex(g, replaced_parent, \
-                        mg.to_math_tex(self.parents[-1].id))
-                    reset_g(self, g, start_symbol)
-
-                sounds.add_sound_to_scene(self, sounds.POP)
-                self.s.pop(r'\text{Replacing }' + top + r'...')
-
-                # highlight parse table row
-                self._fade_in_mtable(highlight  = True, 
-                row = mg.row(self.nts, top), col = mg.col(self.ts, next))
-                
-                #  copy the cfg_line rather than manipulate it directly
-                cfg_line = self.manim_production_groups[prods[0].strip(
-                )][:]
-                cfg_line.next_to(self.s.mstack, m.DOWN).shift(
-                    0.8*m.DOWN).scale(0.7)
-
-                self.play(
-                    m.FadeIn(cfg_line)
-                )
-
-                if top != start_symbol:
-                    # append new non-terminal path to the tree
-                    to_be_appended = self.parents[-1]
-                    if to_be_appended.parent == None:
-                        to_be_appended.parent = to_be_appended.tmp_parent
-
-                # add sequence of productions to the stack
-                ps = list(filter(None, re.findall(
-                    RE_PRODUCTION, prods[1])))
-                
-                nodes_to_append = []
-                stack_to_append = []
-
-                mg.display_msg(self, [prods[0].strip() + " is a \
-                    non-terminal,", "so we can replace it with", 
-                    "its sub-productions: ",  prods[1]], 
-                    script="Let's replace " + prods[0].strip() + 
-                    " with its sub productions")
-
-                # this is the direction we push to the stack
-                for p in ps:
-                    # add to the tree
-                    if top == start_symbol:
-                        new_node = anytree.Node(p, parent=self.root, id=p, 
-                        tmp_p = self.root.id, tmp_parent = self.root, 
-                        vertex_id = self.root.id + "_" + p,
-                        parent_id = self.root.id,
-                        token = None)
-                        # display.info_secho("1. NEW NODE " + new_node.id +
-                        # "has parent: " + new_node.parent_id + " and vid " + 
-                        # new_node.vertex_id)
-                    else:
-                        # add connecting node if it is a non-terminal
-                        new_node = anytree.Node(
-                            p, id=p, parent = None, tmp_p=prods[0].strip(),
-                            vertex_id = replaced_parent.id + "_" + p,
-                            parent_id = replaced_parent.vertex_id,
-                            tmp_parent = replaced_parent, token = None)
-                        # display.info_secho("2. NEW NODE " + new_node.id +
-                        # "has parent: " + new_node.parent_id + " and vid " + 
-                        # new_node.vertex_id)
-                                
-                    # we don't need to match epsilon, and we also only 
-                    # want non-terminals as parent nodes
-                    if p != "#":
-                        stack_to_append.append(p)
-                        nodes_to_append.append(new_node)
-
-                # pop off parents
-                if self.parents != []:
-                    self.parents.pop()
-                
-                # add children
-                for n in reversed(nodes_to_append):
-                    self.parents.append(n)
-                
-                for s in reversed(stack_to_append):
-                    self.s.push(s)
 
                 self.play(
                     m.FadeOut(cfg_line)

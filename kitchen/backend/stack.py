@@ -27,14 +27,9 @@ class Stack:
         self.mstack.set_points_as_corners(
             [left_edge + height*m.UP, left_edge, left_edge + m.RIGHT, 
             (left_edge + m.RIGHT) + height*m.UP])
-<<<<<<< HEAD
         self.mstack.set_stroke(width=2)
         self.mstack.fade_to(color=config.get_opp_col(), alpha = 0.6)
-=======
-        self.mstack.set_stroke(width=1)
-        self.mstack.fade_to(color=config.get_opp_col(), 
-            alpha = 0.6)
->>>>>>> 16625422a455fa36bb25a9b7e498d276996008ec
+
 
     def pop(self, msg, vertex=None, anim=[], matching=False):
         # set up stack in backend
@@ -44,6 +39,7 @@ class Stack:
             self.stack.pop()
 
             m_msg = m.MathTex(msg).next_to(self.mstack, m.DOWN)
+            m_msg.scale(0.4)
 
             if self.texts != []:
                 # animate fading out
@@ -102,11 +98,8 @@ class Stack:
         if msg != None:
             m_msg = m.Tex(msg, color = config.get_opp_col())\
                 .next_to(self.mstack, m.DOWN)
-<<<<<<< HEAD
             m_msg.scale(0.4)
-=======
-            m_msg.scale(0.5)
->>>>>>> 16625422a455fa36bb25a9b7e498d276996008ec
+
 
         # add to backend stack
         self.stack.append(a)
