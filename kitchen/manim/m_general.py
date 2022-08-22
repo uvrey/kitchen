@@ -72,7 +72,7 @@ def display_msg(self, msg, script = "", anim=[]):
         msg_group = m.VGroup()
 
         for ms in msg:
-            msg_txt = m.Tex(to_tex(ms), color=config.config.get_opp_col())
+            msg_txt = m.Tex(to_tex(ms), color=config.get_opp_col())
             msg_group.add(msg_txt)
         msg_group.arrange(m.DOWN)
         
@@ -141,7 +141,7 @@ def get_token_colour(self):
         if not self.token_has_this_colour[index]:
             self.token_has_this_colour[index] = True
             return col
-    return config.config.get_opp_col()
+    return config.get_opp_col()
 
 # fades the scene out
 def fade_scene(self):
@@ -247,8 +247,7 @@ def get_guide(arr_right = False):
         guide_group_inner = m.VGroup()
         guide_group_inner.add(m.Square().set_fill(
             square_colors[i], opacity=1).scale(0.5))
-        guide_group_inner.add(m.Tex(labels[i], color = config.config\
-            .get_opp_col()))
+        guide_group_inner.add(m.Tex(labels[i], color = config.get_opp_col()))
         guide_group_inner.arrange_in_grid(rows = 1, buff = 0.8)
         guide_group_outer.add(guide_group_inner)
     

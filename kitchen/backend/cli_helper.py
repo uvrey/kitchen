@@ -339,7 +339,7 @@ def _process_command(inp, cfg, spec) -> None:
             config.OUTPUT_CONFIG["output_file"] = "Parsetable"
             config.configure_output_file_name(config.PARSETABLE)
             with m.tempconfig(config.OUTPUT_CONFIG):
-                animation = m_parse_table.MParseTable()
+                animation = m_parse_table.MParsingTable()
                 animation.setup_manim(cfg)
                 animation.render()
         else:

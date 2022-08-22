@@ -15,7 +15,7 @@ from kitchen.helpers import config, error, sounds
 from kitchen.backend import context_free_grammar as cfg
 from kitchen.manim import m_general as mg
 
-class MParseTable(m.Scene):
+class MParsingTable(m.Scene):
     def setup_manim(self, cfg: cfg.ContextFreeGrammar):
         """Sets up the structures which the animation will make use of.
 
@@ -35,8 +35,8 @@ class MParseTable(m.Scene):
         """Set up parsing table structure.
         """
         for n in self.nts:
+            self.pt_dict[n] = {}
             for t in self.ts:
-                self.pt_dict[n] = {}
                 self.pt_dict[n][t] = "Error"
 
     def _init_row_contents(self):
@@ -106,8 +106,8 @@ class MParseTable(m.Scene):
         cfg_heading.scale(0.6)
 
         # draws establishing table animations
-        row_labels = self.nts
-        col_labels = mg.ts_m_epsilon(self)
+        row_labels = self.nts[:]
+        col_labels = self.ts[:]
 
         # builds up the row values
         row_vals = self._init_row_contents()
@@ -171,7 +171,7 @@ class MParseTable(m.Scene):
             # highlights the CFG line
             cfg_line = self.manim_production_groups[key][:]
             self.play(
-                    m.FadeToColor(cfg_line, color=config.config.get_opp_col())
+                    m.FadeToColor(cfg_line, color=config.get_opp_col())
             )
 
             for j, item in enumerate(self.cfg.first_set[key], start=0):
@@ -239,12 +239,12 @@ class MParseTable(m.Scene):
         """        
         try:
             if self.pt_dict[nt][t] != "Error":
+                sounds.add_sound_to_scene(self, sounds.FAIL)   
                 mg.display_msg(self, ["Cannot add entry: There is already a \
                     production", "at ParseTable[" + nt +", " + t +"].", 
                     "NOTE: This grammar cannot be parsed with LL(1)." ], 
                     script = "There's already an entry, so this grammar \
-                        is unsuitable for LL(1) parsing.")
-                        
+                        is unsuitable for LL(1) parsing.")    
                 error.ERR_too_many_productions_ll1(nt, t)
                 return ERROR
             else:
@@ -270,14 +270,14 @@ class MParseTable(m.Scene):
         t_old = self.mtable.get_entries_without_labels((row, col))
 
         self.play(
-            m.Indicate(t_old, color = config.config.get_opp_col())
+            m.Indicate(t_old, color = config.get_opp_col())
         )
 
         # set up new value with colour
         t_new = m.MathTex(mg.to_math_tex(new_val))
         t_new.scale_to_fit_width(GRID_ITEM_SCALE).scale(0.7)
         t_new.move_to(t_old)
-        t_new.fade_to(config.config.get_opp_col(), alpha=0.2)
+        t_new.fade_to(config.get_opp_col(), alpha=0.2)
 
         # fade out old value and into new value
         sounds.add_sound_to_scene(self, sounds.CLACK)

@@ -349,13 +349,13 @@ class MFollowSet(m.Scene):
             # highlights manim production
             keys.fade_to(color=m.GRAY, alpha=1)
             cfg_line = self.manim_production_groups[production][:]
-            anims.append(m.FadeToColor(cfg_line, config.config.get_opp_col()))
+            anims.append(m.FadeToColor(cfg_line, config.get_opp_col()))
 
             # adds the follow set titles to the canvas
             if self.cfg.manim_followset_lead[production] == None:
                 self.cfg.manim_followset_lead[production] = \
                     m.Tex("Follow(" + production + "):", 
-                    color = config.config.get_opp_col())\
+                    color = config.get_opp_col())\
                     .align_to(cfg_line, m.UP).shift(m.LEFT)
 
                 # prepares content group

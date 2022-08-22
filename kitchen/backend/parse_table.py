@@ -138,17 +138,6 @@ class ParsingTable:
             row_vals.append(row)
         return row_vals
 
-    def ts_m_epsilon(self):
-        """Replaces an epsilon terminal with its LaTeX equivalent.
-
-        Returns:
-            str: Epsilon
-        """        
-        ts_m = []
-        for t in self.ts:
-            ts_m.append(display.to_math_tex(t))
-        return ts_m
-
     def print_parse_table(self):
         """Prints the parse table.
         """        
