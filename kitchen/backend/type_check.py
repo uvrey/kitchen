@@ -92,6 +92,7 @@ update menu :)
 restructure directory :)
 documentation progress :)
 neaten up imports :)
+set up pdoc :)
 """
 
 """

@@ -445,7 +445,8 @@ class ContextFreeGrammar:
         """Calculates the follow set of a given CFG.
 
         Args:
-            is_start_symbol (bool): Whether or not to begin as the start symbol.
+            is_start_symbol (bool): Whether or not to begin as the start 
+            symbol.
         """
         for production in self.cfg_dict.keys():
             # Rule 1
@@ -462,42 +463,54 @@ class ContextFreeGrammar:
                 # examine each production and obtain follow sets
                 for index, item in enumerate(pps, start=0):
 
-                    if index == len(pps) - 1 and item != "#" and item != production:
-                        # temporarily append production to let us then iterate over and replace it
+                    if index == len(pps) - 1 and item != "#" and item != \
+                    production:
+                        # temporarily append production to let us then iterate
+                        # over and replace it
                         if production not in self.follow_set[item]:
                             self.follow_set[item].append(production)
 
                     elif index < len(pps) - 1:
                         next_item = pps[index + 1]
-                        # if an item is directly followed by a terminal, it is appended to its follow set
+                        # if an item is directly followed by a terminal, it is
+                        #  appended to its follow set
                         if re.match(RE_TERMINAL, next_item):
                             if next_item not in self.follow_set[item]:
                                 self.follow_set[item].append(next_item)
                         else:
-                            # we add the first of the non-terminal at this next index
+                            # we add the first of the non-terminal at this
+                            # next index
                             tmp_first= self.first_set[next_item]
                             for t in tmp_first:
                                 if t != "#" and t not in self.follow_set[item]:
                                     self.follow_set[item].append(t)
                                 else:
-                                    # we found an epsilon, so this non-terminal may disappear
-                                    # we add its follow to the follow set of item
-                                    # as long as this item is NOT at the end of the list
+                                    # we found an epsilon, so this non-terminal
+                                    # may disappear:
+                                    # we add its follow to the follow set of 
+                                    # item as long as this item is NOT at the 
+                                    # end of the list
                                     if t == "#":
                                         if index + 1 == len(pps) - 1:
-                                            # if B -> # and A -> aB, then follow(a) = Follow(A) 
-                                            if production not in self.follow_set[item]: self.follow_set[item].append(production)
+                                            # if B -> # and A -> aB, then 
+                                            # follow(a) = Follow(A) 
+                                            if production not in \
+                                                self.follow_set[item]: 
+                                                self.follow_set[item]\
+                                                    .append(production)
                                         else:
-                                            self.follow_set[item].append(next_item)
+                                            self.follow_set[item]\
+                                                .append(next_item)
                           
         # clean the follow set
         start_symbol = list(self.cfg_dict.keys())[0]
-        self.is_cleaned = []
-        self.is_cleaned = self.get_reset_cleaned_set()
-        self.clean_follow_set(start_symbol, [])
+        is_cleaned = []
+        is_cleaned = self.get_reset_cleaned_set()
+        self.clean_follow_set(start_symbol, [], is_cleaned)
 
     def get_reset_cleaned_set(self) -> Dict:
-        """Obtains a dictionary which holds whether or not the follow sets have been cleaned.
+        """Obtains a dictionary which holds whether or not the follow sets 
+        have been cleaned.
 
         Returns:
             dict: Contains {NT: False} for each non-terminal NT.
@@ -507,7 +520,7 @@ class ContextFreeGrammar:
             tmp_c[fc] = False
         return tmp_c
 
-    def clean_follow_set(self, start, pstack) -> None:
+    def clean_follow_set(self, start, pstack, is_cleaned) -> None:
         """Cleans the follow set after the calculation: Replaces non-terminals 
            with their respective follow sets and removes epsilon elements. 
 
@@ -523,28 +536,28 @@ class ContextFreeGrammar:
 
         # loop through the items in a given follow set and replace 
         # non-terminals with their associated follow sets
-        for index, item in enumerate(items, start=0):
+        for item in items:
             # we have an item in the set
             if re.match(RE_NONTERMINAL, item):
                 # temporarily remove the non-terminal from the list to 
                 # prevent recursion
                 items.remove(item)
                 tmp_nts.append(item)
-                self.clean_follow_set(item, pstack)
+                self.clean_follow_set(item, pstack, is_cleaned)
             else:
                 # we append the descended terminals to the upwards stacks
                 for p in pstack:
                     if p != start and item not in self.follow_set[p]:
                         self.follow_set[p].append(item)
 
-        self.is_cleaned[start] = True
+        is_cleaned[start] = True
 
         if len(pstack) == 1:
             pstack = []
             # gets the next not cleaned set
-            for c in self.is_cleaned.keys():
-                if self.is_cleaned[c] == False:
-                    self.clean_follow_set(c, pstack)
+            for c in is_cleaned.keys():
+                if is_cleaned[c] == False:
+                    self.clean_follow_set(c, pstack, is_cleaned)
         else:
             pstack.pop()
     

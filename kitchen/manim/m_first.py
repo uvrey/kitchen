@@ -49,7 +49,6 @@ class MFirstSet(m.Scene):
             self.cfg.manim_firstset_contents[key] = m.VGroup()
         mg.clear_narrs()
 
-
     def vis_first_set(self, keys, guide, start, production, pstack):
         """Generates a visualisation of the first set.
 
@@ -136,12 +135,7 @@ class MFirstSet(m.Scene):
                             cfg_element = self.manim_prod_dict[production][i][j]
                             cfg_element.fade_to(color=m.RED, alpha=1)
                             sounds.add_sound_to_scene( self, sounds.CLICK)
-                            self.play(
-                                m.LaggedStart(
-                                m.Circumscribe(cfg_element, color=m.RED, shape = m.Circle),
-                                m.FadeToColor(cfg_element, color = m.RED),
-                                )
-                            )
+                          
                             if j > 1:
                                 # fade out the previous non-terminal
                                 prev_element = self.manim_prod_dict[production][i][j-1]
@@ -152,6 +146,13 @@ class MFirstSet(m.Scene):
                             # display the message alongside narration
                             mg.display_msg(self, [production + " leads to " + current_item + ",", "so First("+production +
                                             ") \\subseteq First("+current_item+")"], raw_msg=production + ", leads to another non terminal" + current_item + ", so their first sets will overlap.")
+
+                            self.play(
+                                m.LaggedStart(
+                                m.Circumscribe(cfg_element, color=m.RED, shape = m.Circle),
+                                m.FadeToColor(cfg_element, color = m.RED),
+                                )
+                            )
 
                             # ensure we don't add # when unnecessary
                             had_eps = "#" in self.cfg.first_set[current_item]

@@ -22,11 +22,13 @@ def get_title_mobject(title):
 
 def to_tex(item):
     tex_item = item.replace(r'$', r'\$').replace(r'\varepsilon', r'$\varepsilon$')
-    tex_item = tex_item.replace(r'#', r'\varepsilon').replace(r'\\subseteq', r'$\\subseteq$').replace("->", "$\\to$").replace("(", "$($").replace(")", "$)$")
+    tex_item = tex_item.replace(r'#', r'\varepsilon').replace(r'\subseteq', r'$\subseteq$').replace(r'->', r'$\to$')
+    display.fail_secho("AFTER TEX: " + tex_item)
     return tex_item
 
 def to_math_tex(item):
-    tex_item = item.replace(r'$', r'\$').replace(r'#', r'\varepsilon').replace("->", "\\to")
+    #.replace("(", "$($").replace(")", "$)$")
+    tex_item = item.replace(r'$', r'\$').replace(r'#', r'\varepsilon').replace(r'->', r'\to')
     return tex_item
 
 def display_msg(self, msg, raw_msg= "", anim=[]):
