@@ -41,7 +41,8 @@ def get_prods(cfg_contents) -> list:
     """Obtains a list of productions given the contents of a CFG.
 
     Args:
-        cfg_contents (String): Contents of the CFG as obtained at the provided path.
+        cfg_contents (String): Contents of the CFG as obtained at the 
+        provided path.
 
     Returns:
         List: Productions in a given CFG.
@@ -60,7 +61,8 @@ def get_prods(cfg_contents) -> list:
         # check that non-terminal doesn't start productions
         # TODO handle this error properly
         if not re.match(RE_NONTERMINAL, pps[0]):
-            display.fail_secho("CFG Error at line " + str(line) + "-> " + pps[0])
+            display.fail_secho("CFG Error at line " + str(line) + "-> " + 
+            pps[0])
             raise typer.Exit()
             return CFG_ERROR_NT_FORMAT
 
@@ -210,7 +212,8 @@ class ContextFreeGrammar:
             splitp = list(filter(None, re.findall(RE_PRODUCTION, t)))
             tmp.append(splitp)
 
-        # add only terminals to list, as well as create empty follow set for them
+        # add only terminals to list, as well as create empty follow set 
+        # for them
         # append $ to terminals by default
         self.terminals.append("$")
         for t in set(list(chain(*tmp))):
@@ -317,32 +320,39 @@ class ContextFreeGrammar:
                             for j, ps in enumerate(pstack, start=0):
                                 # add First(Y) - #
                                 if current_item not in self.first_set[ps]:
-                                    # add production which led to this to the parse table
+                                    # add production which led to this to the 
+                                    # parse table
                                     self.firstset_index[ps].append(
                                         self.fstack[j])
                                     self.first_set[ps].append(current_item)
                                 else:
                                     self.is_ambiguous = True
 
-                            # reset the fstack and break since we are just interested in the first production
-                            # that does not lead to an epsilon
+                            # reset the fstack and break since we are just 
+                            # interested in the first production that does
+                            # not lead to an epsilon
                             self.fstack.pop()
                             break
                         else:
                             # we should not find the first set of ourselves
                             if current_item != production:
-                                # we should add A without epsilon if we are the top level production
+                                # we should add A without epsilon if we are 
+                                # the top level production
                                 had_eps = "#" in self.first_set[current_item]
                                 self._calculate_first_set(
                                         current_item, pstack)
                                 has_eps = "#" in self.first_set[current_item]
 
                                 # we don't include the last epsilon if we 
-                                # 1) found it in the first set of a non-terminal AND
-                                # 2) we didn't have it in this first set beforehand AND
-                                # 3) we are the top level production (ie. not in the middle of recursion)
+                                # 1) found it in the first set of a non-
+                                # terminal AND
+                                # 2) we didn't have it in this first set 
+                                # beforehand AND
+                                # 3) we are the top level production (ie. not 
+                                # in the middle of recursion)
                                 # 4) we are not the LAST production 
-                                if not had_eps and has_eps and len(pstack) == 1 and index != len(p_nt) - 1:
+                                if not had_eps and has_eps and len(pstack) \
+                                    == 1 and index != len(p_nt) - 1:
                                     self.first_set[production].remove("#")
                             
                                 if not self.vis_has_epsilon:
@@ -355,11 +365,11 @@ class ContextFreeGrammar:
                         filter(None, re.findall(RE_TERMINAL, p)))
 
                     if first_terminal[0] == "#":
-                        # the non-terminal which led to this may disappear in the original production
+                        # the non-terminal which led to this may disappear 
+                        # in the original production
                         self.vis_has_epsilon = True
-                        # appends this terminal to the first set of previous non-terminals
-
-                    # typer.echo("state of fstack: len -> " + str(len(self.fstack)) + " vs pstack " + str(len(pstack)))
+                        # appends this terminal to the first set of previous 
+                        # non-terminals
                     for j, ps in enumerate(pstack, start=0):
                         # add First(P) - # if down the stack
                         if first_terminal[0] not in self.first_set[ps]:
@@ -578,7 +588,8 @@ class ContextFreeGrammar:
         Returns:
             int: Status code.
         """        
-        self.parsetable = pt.ParsingTable(self.terminals, self.nonterminals, self.cfg_dict)
+        self.parsetable = pt.ParsingTable(self.terminals, self.nonterminals, \
+            self.cfg_dict)
         self.parsetable.set_internals(
                 self.first_set, self.follow_set, self.firstset_index)
         return SUCCESS
