@@ -28,8 +28,7 @@ from kitchen.helpers import (
 )
 from kitchen.manim import m_general as mg
 
-VCONFIG = {"radius": 0.25, "color": m.BLUE, "fill_opacity": 1}
-VCONFIG_TEMP = {"radius": 0.25, "color": m.GRAY}
+VCONFIG = {"radius": 0.15, "color": m.BLUE, "fill_opacity": 1}
 LCONFIG = {"vertex_spacing": (0.5, 1)}
 ECONFIG = {"color": config.get_opp_col()}
 ECONFIG_TEMP = {"color": m.GRAY, "fill_opacity": 0.7}
@@ -42,15 +41,22 @@ def create_tokens(tokens):
         token_gp.append(m.MathTex("\\text{"+t+"}"))
     return token_gp
 
+def set_up_label(g, vertex_id, label, color = m.GRAY):
+    # add label above
+    new_vertex = g[vertex_id]
+
+    # fade vertex
+    new_vertex.fade_to(color, alpha = 1)
+
+    # add the new label above
+    rendered_label = m.MathTex(
+        mg.to_math_tex(label), color = config.get_opp_col())\
+            .scale(0.5)
+    rendered_label.move_to(new_vertex.get_center() + 0.5 * m.UP)
+    new_vertex.add(rendered_label)
+    
 def create_vertex(g, node, label, color=m.GRAY,  link=True):
     global m
-    display.fail_secho("creating a vertex " + node.vertex_id + " with parent " 
-    + node.parent_id)
-    
-    if len(label) > 2:
-        V_LABELS[node.vertex_id] = label[0:2]
-    else:
-        V_LABELS[node.vertex_id] = label
 
     pos = g[node.parent_id].get_center() + m.DOWN
     v = g._add_vertex(
@@ -62,20 +68,7 @@ def create_vertex(g, node, label, color=m.GRAY,  link=True):
             [node.parent_id, node.vertex_id], edge_config={"color": \
                 config.get_opp_col()})
     
-    if len(label) > 2:
-        # add label above
-        new_vertex = g[node.vertex_id]
-
-        # fade vertex
-        new_vertex.fade_to(color, alpha = 1)
-
-        # add the new label above
-        rendered_label = m.MathTex(
-            mg.to_math_tex(label), color = config.get_opp_col())\
-                .scale_to_fit_width(new_vertex.width * 2)
-        rendered_label.move_to(new_vertex.get_center() + 0.5*new_vertex.width\
-             * m.UP)
-        new_vertex.add(rendered_label)
+    set_up_label(g, node.vertex_id, label, color)
     return v
 
 def reset_g(self, g, root, anim=[]):
@@ -364,9 +357,10 @@ class MParseTree(m.Scene):
         )
 
         # create our first label
-        V_LABELS[start_symbol] = start_symbol
         g = m.Graph([start_symbol], [], vertex_config=VCONFIG,
-                  labels = V_LABELS, label_fill_color=config.get_opp_col())
+                  labels = False, label_fill_color=config.get_opp_col())
+
+        set_up_label(g, start_symbol, start_symbol, m.BLUE)
 
         g.to_edge(m.UP).shift(m.DOWN)
         self.add(g)

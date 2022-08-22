@@ -131,9 +131,9 @@ def run() -> None:
     spec = lang_spec.get_spec(cfg)
 
     if spec == None:
-        display.info_secho("Note:\tNo language specification has been \
-            provided, so the given \n\tinput will be interpreted as \
-                tokens directly.")
+        display.info_secho("Note:\tNo language specification has been " +
+            "provided, so the given \n\tinput will be interpreted as " +
+                "tokens directly.")
 
     display.success_secho("CFG loaded successfully.")
     while (True):
