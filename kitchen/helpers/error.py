@@ -170,7 +170,7 @@ def ERR_manim_parsing_error(scene, msg=[], script = ""):
         msg_group.arrange(m.DOWN)
         
         # create fading area
-        rect = m.Rectangle(width=20, height=10, color=c.theme_col(), 
+        rect = m.Rectangle(width=20, height=10, color=c.get_theme_col(), 
         fill_opacity=0.9)
 
         scene.play(

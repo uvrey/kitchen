@@ -153,6 +153,8 @@ Code style choices
 gray lines for tables
 
 message formatting going over lines thanks to \
+    -> Loading the CFG file failed with "file does not         exist"
+FadeIn mathtex error alpha / 0
 """ 
 
 """

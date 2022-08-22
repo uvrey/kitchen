@@ -410,7 +410,7 @@ class MParseTree(m.Scene):
                 if top == next:
                     anims = []
                     prev_token = self.tokens[0]
-                    tokens = self.tokens[1:]
+                    self.tokens = self.tokens[1:]
 
                     sounds.narrate("The next token " + next + 
                     " matches the top of the stack!", self)
@@ -484,6 +484,11 @@ class MParseTree(m.Scene):
                 display.fail_secho("finding entry at " + top + ", " + next)
                 self.cfg.parsetable.print_parse_table()
                 pt_entry = self.cfg.parsetable.pt_dict[top][next]
+
+                if pt_entry == "Error":
+                    self._call_ptable_error(top, next)
+                    return
+
                 prods = pt_entry.split("->")
 
                 if self.parents != []:
@@ -501,14 +506,16 @@ class MParseTree(m.Scene):
                 row = mg.row(self.nts, top), col = mg.col(self.ts, next))
                 
                 #  copy the cfg_line rather than manipulate it directly
-                cfg_line = self.manim_production_groups[prods[0].strip(
-                )][:]
-                cfg_line.next_to(self.s.mstack, m.DOWN).shift(
-                    0.8*m.DOWN).scale(0.7)
+                display.fail_secho("finding cfg line of " + prods[0])
+                typer.echo(self.manim_production_groups)
+                # cfg_line = self.manim_production_groups[prods[0].strip(
+                # )][:]
+                # cfg_line.next_to(self.s.mstack, m.DOWN).shift(
+                #     0.8*m.DOWN).scale(0.7)
 
-                self.play(
-                    m.FadeIn(cfg_line)
-                )
+                # self.play(
+                #     m.FadeIn(cfg_line)
+                # )
 
                 if top != start_symbol:
                     # append new non-terminal path to the tree
@@ -569,22 +576,9 @@ class MParseTree(m.Scene):
                 for s in reversed(stack_to_append):
                     self.s.push(s)
 
-                self.play(
-                    m.FadeOut(cfg_line)
-                )
-
-                # except: TODO
-                #     error.ERR_parsing_error(self.root,
-                #             "ParseTable[" + top + ", " + next + "] is empty.")
-                #     sounds.add_sound_to_scene(self, sounds.FAIL)
-                #     mg.display_msg(self, ["No such entry at ParseTable[" + 
-                #     top + ", " + next + "].", "Invalid input: `" + next + "'"],
-                #     script = next + " leads to a parsing error, so this \
-                #         input is not valid." )
-                #     error.ERR_parsing_error(self.root, 
-                #         "No such entry at ParseTable[" + top + ", " + next +
-                #         "].")
-                #     return 
+                # self.play(
+                #     m.FadeOut(cfg_line)
+                # )
 
         # in case parsing finishes but there are still tokens left in the stack
         if len(self.tokens) > 0:
@@ -612,4 +606,18 @@ class MParseTree(m.Scene):
                               "'!\nParse tree:")
         display.print_parsetree(self.root)
         return SUCCESS
+
+
+    def _call_ptable_error(self, top, next):
+        error.ERR_parsing_error(self.root,
+                "ParseTable[" + top + ", " + next + "] is empty.")
+        sounds.add_sound_to_scene(self, sounds.FAIL)
+        mg.display_msg(self, ["No such entry at ParseTable[" + 
+        top + ", " + next + "].", "Invalid input: `" + next + "'"],
+        script = next + " leads to a parsing error, so this \
+            input is not valid." )
+        error.ERR_parsing_error(self.root, 
+            "No such entry at ParseTable[" + top + ", " + next +
+            "].")
+        return 
 
