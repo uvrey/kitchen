@@ -28,8 +28,8 @@ from kitchen.helpers import (
 )
 from kitchen.manim import m_general as mg
 
-VCONFIG = {"radius": 0.15, "color": m.BLUE, "fill_opacity": 1}
-LCONFIG = {"vertex_spacing": (0.5, 1)}
+VCONFIG = {"radius": 0.2, "color": m.BLUE, "fill_opacity": 1}
+LCONFIG = {"vertex_spacing": (2.5, 1)}
 ECONFIG = {"color": config.get_opp_col()}
 ECONFIG_TEMP = {"color": m.GRAY, "fill_opacity": 0.7}
 V_LABELS = {}
@@ -52,7 +52,7 @@ def set_up_label(g, vertex_id, label, color = m.GRAY):
     rendered_label = m.MathTex(
         mg.to_math_tex(label), color = config.get_opp_col())\
             .scale(0.5)
-    rendered_label.move_to(new_vertex.get_center() + 0.5 * m.UP)
+    rendered_label.move_to(new_vertex.get_center())
     new_vertex.add(rendered_label)
     
 def create_vertex(g, node, label, color=m.GRAY,  link=True):
@@ -62,13 +62,14 @@ def create_vertex(g, node, label, color=m.GRAY,  link=True):
     v = g._add_vertex(
         node.vertex_id, vertex_config={"color": color}, position=pos)
     v.fill_colour = color
+     
+    set_up_label(g, node.vertex_id, label, color)
 
     if link:
         g._add_edge(
             [node.parent_id, node.vertex_id], edge_config={"color": \
                 config.get_opp_col()})
-    
-    set_up_label(g, node.vertex_id, label, color)
+   
     return v
 
 def reset_g(self, g, root, anim=[]):
@@ -442,8 +443,6 @@ class MParseTree(m.Scene):
                     matching=True, msg=r'\text{Matched }' +
                             mg.to_tex(self.s.stack[-1]) + r'\text{!}')
 
-                 
-
                     # highlight the token stream line and token that we matched
                     sounds.add_sound_to_scene(sounds.YAY, self)
                     self.play(m.ApplyWave(m_tok_gp))
@@ -473,9 +472,7 @@ class MParseTree(m.Scene):
                             consider the parse table entry at non-terminal " +
                             top + "'s row and terminal " + next.strip() + "'s \
                             column.")
-                # try:
-                display.fail_secho("finding entry at " + top + ", " + next)
-                self.cfg.parsetable.print_parse_table()
+
                 pt_entry = self.cfg.parsetable.pt_dict[top][next]
 
                 if pt_entry == "Error":
@@ -499,16 +496,14 @@ class MParseTree(m.Scene):
                 row = mg.row(self.nts, top), col = mg.col(self.ts, next))
                 
                 #  copy the cfg_line rather than manipulate it directly
-                display.fail_secho("finding cfg line of " + prods[0])
-                typer.echo(self.manim_production_groups)
-                # cfg_line = self.manim_production_groups[prods[0].strip(
-                # )][:]
-                # cfg_line.next_to(self.s.mstack, m.DOWN).shift(
-                #     0.8*m.DOWN).scale(0.7)
+                cfg_line = self.manim_production_groups[prods[0].strip(
+                )][:]
+                cfg_line.next_to(self.s.mstack, m.DOWN).shift(
+                    0.8*m.DOWN).scale(0.7)
 
-                # self.play(
-                #     m.FadeIn(cfg_line)
-                # )
+                self.play(
+                    m.FadeIn(cfg_line)
+                )
 
                 if top != start_symbol:
                     # append new non-terminal path to the tree
@@ -538,9 +533,9 @@ class MParseTree(m.Scene):
                         vertex_id = self.root.id + "_" + p,
                         parent_id = self.root.id,
                         token = None)
-                        display.info_secho("1. NEW NODE " + new_node.id +
-                        "has parent: " + new_node.parent_id + " and vid " + 
-                        new_node.vertex_id)
+                        # display.info_secho("1. NEW NODE " + new_node.id +
+                        # "has parent: " + new_node.parent_id + " and vid " + 
+                        # new_node.vertex_id)
                     else:
                         # add connecting node if it is a non-terminal
                         new_node = anytree.Node(
@@ -548,9 +543,9 @@ class MParseTree(m.Scene):
                             vertex_id = replaced_parent.id + "_" + p,
                             parent_id = replaced_parent.vertex_id,
                             tmp_parent = replaced_parent, token = None)
-                        display.info_secho("2. NEW NODE " + new_node.id +
-                        "has parent: " + new_node.parent_id + " and vid " + 
-                        new_node.vertex_id)
+                        # display.info_secho("2. NEW NODE " + new_node.id +
+                        # "has parent: " + new_node.parent_id + " and vid " + 
+                        # new_node.vertex_id)
                                 
                     # we don't need to match epsilon, and we also only 
                     # want non-terminals as parent nodes
@@ -569,9 +564,9 @@ class MParseTree(m.Scene):
                 for s in reversed(stack_to_append):
                     self.s.push(s)
 
-                # self.play(
-                #     m.FadeOut(cfg_line)
-                # )
+                self.play(
+                    m.FadeOut(cfg_line)
+                )
 
         # in case parsing finishes but there are still tokens left in the stack
         if len(self.tokens) > 0:
