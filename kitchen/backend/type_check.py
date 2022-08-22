@@ -102,6 +102,9 @@ line length :)
 check cleaning of follow set and first/ follow algorithms :)
 first and follow set not using _to_tex properly - DVI issue. :)
 weird token issue :)
+parsing nodes size setting :)
+Fix manim parsing by adding improved algorithm  HIGH :)
+make start symbol root :)
 """
 
 """
@@ -114,11 +117,14 @@ MANIM
 check epsilon bug in LL(1) parsing video MED
 long names look weird in parsing vids - place above node and highlight the 
 colour to opp of bg? MED
-Fix manim parsing by adding improved algorithm  HIGH
+
 Get parsing colours to match LL(1) tokens   LOW
 implement semantic analysis HIGH
 Scaling large grammars - fs, fw, pt, ll1 LOW
-make start symbol root
+
+scaling stack contents
+scaling replacing etc. 
+scaling cfg line size
 
 RuntimeWarning: invalid value encountered in double_scalars
 original tokens not showing at end of ll1 parsing manim
