@@ -27,7 +27,7 @@ from kitchen.manim import (
     m_first, 
     m_follow, 
     m_parse_table, 
-    m_parse_tree
+    m_parser
 )
 
 def init_app(cfg_path: str, spec_path = None) -> int:
@@ -159,7 +159,7 @@ def _init_parsing_ll1_via_cmd(inp, cfg, spec) -> int:
             else:
                 config.configure_output_file_name(config.LL1_PARSING, to_parse)
                 with m.tempconfig(config.OUTPUT_CONFIG):
-                    animation = m_parse_tree.MParseTree()
+                    animation = m_parser.MParseTree()
                     animation.setup_manim(to_parse, cfg, spec)
                     animation.render()       
     else:
@@ -252,7 +252,7 @@ def _init_parsing_vis_shortcut(inp, cfg, spec) -> int:
     else:
         config.configure_output_file_name(config.LL1_PARSING, to_parse)
         with m.tempconfig(config.OUTPUT_CONFIG):
-            animation = m_parse_tree.MParseTree()
+            animation = m_parser.MParseTree()
             animation.setup_manim(to_parse, cfg, spec)
             animation.render()       
     return SUCCESS

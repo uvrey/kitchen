@@ -85,7 +85,8 @@ class ParserLL1:
 
     def parse_ll1(self, start_symbol, inp="", semantic = False, 
         testing = False) -> int:
-        """LL(1) Parser, which generates a parse tree and stores this to self.root
+        """LL(1) Parser, which generates a parse tree and stores this to 
+        self.root
         Args:
             input (str): Input string to be parsed
             tokens (list): Corresponding token stream
@@ -125,7 +126,8 @@ class ParserLL1:
                         error.ERR_parsing_error(self.root, "Expected " + 
                         self.stack[-1])
                 else:
-                    # parsing is successful if the remaining non-terminal may tend to epsilon
+                    # parsing is successful if the remaining non-terminal 
+                    # may tend to epsilon
                     if "#" in self.cfg.first_set[self.stack[-1]] and \
                     len(self.stack) == 1:
                         self._parsing_successful(original_tokens, semantic, 
