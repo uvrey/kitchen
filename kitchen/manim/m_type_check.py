@@ -14,7 +14,7 @@ import typer
 
 from kitchen.helpers import display, sounds, lang_spec, config
 from kitchen.manim import m_general as mg, m_parser as mp, m_parse_table as mpt
-from kitchen import CFG_SCALE_HEIGHT, RE_NONTERMINAL, CFG_SCALE_WIDTH
+from kitchen import CFG_SCALE_HEIGHT, RE_NONTERMINAL, CFG_SCALE_WIDTH, RE_TERMINAL
 
 VCONFIG = {"radius": 0.2, "color": m.BLUE, "fill_opacity": 1}
 LCONFIG = {"vertex_spacing": (2.5, 1)}
@@ -247,6 +247,16 @@ class MSemanticAnalyser(m.Scene):
                         v = create_vertex(g, v_id, p_id, node.id, m.BLUE)
                         sounds.add_sound_to_scene(self, sounds.CLICK)
                         self.play(m.FadeIn(v))
+
+                        if re.match(RE_TERMINAL, node.id):
+                            sounds.add_sound_to_scene(self, sounds.FLASH)
+                            self.play(
+                                m.Flash(v, line_length=0.4,
+                                num_lines=30, color=m.BLUE,
+                                flash_radius=0.3,
+                                time_width=0.3),
+                            )
+
                         reset_g(self, g, start_symbol)
                     except: 
                         pass
@@ -278,6 +288,7 @@ class MSemanticAnalyser(m.Scene):
                     "a token stream.")
                 return
         
+        sounds.add_sound_to_scene(self, sounds.SUCCESS)
         mg.display_msg(self, ["Semantic analysis complete!"], script = 
         "Semantic analysis complete! Here is the final symbol table.")
 

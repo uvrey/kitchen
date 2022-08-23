@@ -147,7 +147,7 @@ Get parsing colours to match LL(1) tokens   LOW
 LL(1) parsing ID language
 
 SEMANTIC ANALYSIS
-- check conflics
+- check conflicts
 - more comments and SFX
 
 PARSING

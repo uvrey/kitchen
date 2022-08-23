@@ -68,11 +68,11 @@ class Stack:
                     self.scene.play(
                         m.Flash(top_text, line_length=0.4,
                               num_lines=30, color=m.BLUE,
-                              flash_radius=0.2,
+                              flash_radius=0.3,
                               time_width=0.3),
                         m.Flash(vertex, line_length=0.4,
                               num_lines=30, color=m.BLUE,
-                              flash_radius=0.2,
+                              flash_radius=0.3,
                               time_width=0.3),
                         m.FadeOut(top_text))
 
