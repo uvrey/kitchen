@@ -282,7 +282,7 @@ class MParseTree(m.Scene):
         mg.display_msg(self, ["We can now check if any productions led ", 
         "to $\\varepsilon$, and so disappeared."], script = "Let's check if " +
         "any productions led to epsilon.")
-        
+
         # look for any epsilons that came before and add.
         for node in self.root.descendants:
             if re.match(RE_NONTERMINAL, node.id):
@@ -291,7 +291,7 @@ class MParseTree(m.Scene):
                     new_node = anytree.Node("#", parent=node, id= "#", 
                     token = None, parent_id = node.vertex_id, vertex_id =
                     node.id + "_#")
-                    create_vertex(g, new_node, r'\varepsilon')
+                    create_vertex(g, new_node, r'\varepsilon', color = m.BLUE)
         return SUCCESS
 
     def _parsing_successful(self, tokens, semantic: bool, testing = False, 
@@ -478,16 +478,16 @@ class MParseTree(m.Scene):
                     error.ERR_parsing_error(self.root, 
                         "Unexpected token [" + top + "]")
                     error.ERR_manim_parsing_error(self, ["Invalid input: '" +
-                     top + "'"], script = top + " leads to a parsing error,\
-                         so this input is not valid." )
+                     top + "'"], script = top + " leads to a parsing error," +
+                        " so this input is not valid." )
                     return
 
             elif re.match(RE_NONTERMINAL, top):
                 mg.display_msg(self, ["We must find the entry at \
-                        ParseTable["+top+"]["+next+"]"], script = "Let's \
-                            consider the parse table entry at non-terminal " +
-                            top + "'s row and terminal " + next.strip() + "'s \
-                            column.")
+                        ParseTable["+top+"]["+next+"]"], script = "Let's " +
+                            "consider the parse table entry at non-terminal " +
+                            top + "'s row and terminal " + next.strip() + "'s"+
+                            " column.")
 
                 try:
                     pt_entry = self.cfg.parsetable.pt_dict[top][next]
@@ -503,7 +503,8 @@ class MParseTree(m.Scene):
                         sounds.add_sound_to_scene(self, sounds.CLICK)
                         typer.echo("creating vertex " + replaced_parent.id)
                         new_vertex = create_vertex(g, replaced_parent, \
-                            mg.to_math_tex(self.parents[-1].id))
+                            mg.to_math_tex(self.parents[-1].id), 
+                            color = m.BLUE)
                         reset_g(self, g, start_symbol)
 
                     sounds.add_sound_to_scene(self, sounds.POP)

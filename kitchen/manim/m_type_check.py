@@ -5,10 +5,11 @@ import anytree
 import pandas as pd
 import manim as m
 
-from kitchen.helpers import display
+from kitchen.helpers import display, sounds, lang_spec
+from kitchen.manim import m_general as mg, m_parser as mp
 
-class SemanticAnalyser:
-    def __init__(self, cfg, root, inp):
+class MSemanticAnalyser(m.Scene):
+    def setup_manim(self, cfg, root, inp):
         """Initialises the SemanticAnalyser.
 
         Args:
@@ -21,12 +22,64 @@ class SemanticAnalyser:
         self.input = inp
         self.symbol = {'Symbol': [], 'Type': []}
 
+    # shows the input stream and its association with the token stream
+    def intro(self):
+        # introducing the input
+        title = m.Tex(r"Input to be parsed:")
+        sounds.narrate("Let's parse this input.", self)
+        inp = m.Text(self.inp, weight=m.BOLD, color=m.BLUE)
+        m.VGroup(title, inp).arrange(m.DOWN)
+        self.play(
+            m.FadeIn(title),
+            m.Write(inp, shift=m.DOWN),
+        )
+        self.wait()
+
+        # transforming to lexing
+        transform_title = m.Tex(
+            "Lexing matched the input to the following tokens:")
+        sounds.narrate("The input stream gives these token types.", self)
+        transform_title.to_edge(m.UP)
+        self.play(
+            m.Transform(title, transform_title),
+            m.FadeOut(inp)
+        )
+        self.wait()
+
+        # show tokens then fade everything out
+        
+        self.play(
+            m.LaggedStart(*(m.FadeIn(t, shift=m.UP)
+                        for t in mp.map_token_lists(self, self.inp_list, 
+                        lang_spec.get_token_format(self.tokens, types=True, 
+                        as_list=True)))),
+        )
+        self.wait()
+
+        # fades the scene out
+        self.play(
+            *[m.FadeOut(mob)for mob in self.mobjects]
+        )
+        
+    def construct(self):
+        # play the intro
+        self.intro()
+
+        # draws follow set title
+        sem_title = mg.get_title_mobject("semantic analysis") 
+
+        # sets the stage
+        self.play(
+            sem_title.animate.to_edge(m.UP),
+        )
+
     def _call_error(self, msg = ""):
         """Display an error in the type-checking process.
 
         Args:
             msg (str, optional): Details. Defaults to "".
         """        
+        mg.display_msg(self, ["Type Error: ", msg], script = msg)
         display.fail_secho("Type Error: "+ msg)
         self.print_symbol_table()
         return 
@@ -74,8 +127,11 @@ class SemanticAnalyser:
         df = pd.DataFrame.from_dict(self.symbol).to_markdown()
         display.structure_secho(df)
 
+    def animate_graph(self):
+        pass
 
-
+    def animate_table(self):
+        pass
 """
 DONE
 investigate fstack weirdness :)

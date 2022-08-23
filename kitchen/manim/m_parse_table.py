@@ -152,7 +152,6 @@ class MParsingTable(m.Scene):
 
         self.play(
            m.Write((self.mtable).get_labels()),
-            run_time=1
         )
         
         # fades in table lines

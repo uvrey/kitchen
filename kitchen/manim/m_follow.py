@@ -195,7 +195,7 @@ class MFollowSet(m.Scene):
                                 r') - #}', r'\subseteq Follow (' + item + 
                                 r')'], script = "The first set of " + 
                                 next_item + " without epsilon is a subset of "+
-                                     item + "'s follow set.")
+                                    "of " + item + "'s follow set.")
 
                             for t in tmp_first:
                                 if t != "#":
