@@ -249,7 +249,7 @@ class ParserLL1:
         """        
         file_name = config.configure_output_file_name(TREE_PNG)
         try:
-            path = os.getcwd() + "\\assets\\" + file_name + ".png"
+            path = os.getcwd() + "\\assets\\tree_pngs\\" + file_name + ".png"
             DotExporter(self.root).to_picture(path)
             display.success_secho("Succesfully exported tree to " + path +"!")
         except:

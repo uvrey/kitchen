@@ -3,6 +3,7 @@
 
 import configparser
 from datetime import datetime
+import os
 import manim as m
 from pathlib import Path
 import typer
@@ -369,3 +370,13 @@ def _show_config() -> None:
     display.pretty_print_config_settings(OUTPUT_CONFIG, sounds.get_config())
     display.show_config_opts()
 
+
+def init_tree_png_dir() -> None:
+    """Initialises the parse tree PNG directory.
+    """    
+    tree_dir = os.getcwd() + r'\assets\tree_pngs'
+    try:
+        Path(tree_dir).mkdir(exist_ok=True)
+    except OSError:
+        display.fail_secho("There was an issue creating the tree PNG " +
+            "directory.")

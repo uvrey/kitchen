@@ -123,6 +123,7 @@ def run() -> None:
     # set configuration options and initialise narration directory
     sounds.set_config(sounds.NARR)
     sounds.init_narr_dir()
+    config.init_tree_png_dir()
     config.init_config()
 
     display.print_welcome()
