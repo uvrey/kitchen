@@ -1,9 +1,14 @@
 """ General parser generator for Kitchen """
 # kitchen/parser.py
 
+import os
 import anytree
 import re
+from kitchen.helpers.config import TREE_PNG
 import typer
+from anytree.exporter import DotExporter
+import graphviz
+from graphviz import Source, render
 
 from kitchen import (
         RE_NONTERMINAL, 
@@ -17,7 +22,8 @@ from kitchen import (
 from kitchen.helpers import (
         display, 
         error, 
-        lang_spec
+        lang_spec,
+        config
         )
 
 def init_input(self, inp) -> int:
@@ -237,6 +243,19 @@ class ParserLL1:
         # display the parse tree
         self._parsing_successful(original_tokens, semantic, testing)               
         return SUCCESS
+
+    def export_tree(self):
+        """Exports parse tree as a PNG image.
+        """        
+        file_name = config.configure_output_file_name(TREE_PNG)
+        try:
+            path = os.getcwd() + "\\assets\\" + file_name + ".png"
+            DotExporter(self.root).to_picture(path)
+            display.success_secho("Succesfully exported tree to " + path +"!")
+        except:
+            display.fail_secho("Could not export tree as PNG.\n(Have you "+
+            "installed 'graphviz'? Check if it is installed by running "+ 
+            "'dot -v'.\nIf not, please check the README for help.)")
 
     def get_node(self, node_id):
         """Obtains the node in a tree given its ID.

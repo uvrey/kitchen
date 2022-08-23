@@ -31,8 +31,9 @@ THEME = DARK
     FIRST_SET,
     PARSETABLE,
     LL1_PARSING,
-    TYPE_CHECK
-) = range(5)
+    TYPE_CHECK,
+    TREE_PNG,
+) = range(6)
 
 CONFIG_DIR_PATH = Path(typer.get_app_dir(__app_name__))
 CONFIG_FILE_PATH = CONFIG_DIR_PATH / "config.ini"
@@ -236,6 +237,9 @@ def configure_output_file_name(file_type: int, inp = "") -> None:
         file_name = "ParseTable_" + get_time()
     elif file_type == TYPE_CHECK:
         file_name = "TypeCheck_" + get_time()
+    elif file_type == TREE_PNG:
+        file_name = "Tree_" + get_time()
+        return file_name
     
     # if clear name given, set new output file name
     if file_name != "":

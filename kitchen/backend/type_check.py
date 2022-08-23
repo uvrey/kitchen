@@ -136,17 +136,19 @@ SEMANTIC ANALYSIS
 - more comments and SFX :)
 """
 
-
 """
 TODO - DEVELOPMENT
 
 TESTING
 get lots of test cases written
 
-LL(1) parsing ID language
+LL(1) parsing ID language - HIGH
 
 PARSING
 - same IDs in parsing ll1 vis
+
+EXPORT PNG
+- how to initialise saving
 
 RuntimeWarning: invalid value encountered in double_scalars
 original tokens not showing at end of ll1 parsing manim

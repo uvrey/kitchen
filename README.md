@@ -46,6 +46,12 @@ Activate this environment.
 
 Then, install the requirements:
 ```python3 -m pip install -r requirements.txt```
+
+
+**2. Exporting parse trees**
+Exporting the parse trees to PNG files requires an additonal package called `graphviz`.
+
+From an elevated command prompt, install `graphviz` via `choco install graphviz`
  
 ## Compiling and Executing
   

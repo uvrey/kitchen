@@ -365,6 +365,23 @@ def _process_command(inp, cfg, spec) -> None:
                     display.fail_secho("Parsing failed with code " + 
                     str(code)+ ".Cannot generate semantic analysis.")
 
+    elif inp[0:5] == "\\tree":
+            stripped = inp.strip()
+            to_sem = stripped[5:]
+            if to_sem == "":
+                display.fail_secho("No input provided.")
+            else:
+                code = _prepare_to_parse(cfg)
+                if code == AMBIGUOUS_ERROR:
+                    error.ERR_ambiguous_grammar()
+                else:
+                    code = _init_parsing_ll1(to_sem, cfg, spec, semantic = True)
+                    if code == SUCCESS:
+                        cfg.parser_ll1.export_tree()
+                    else:
+                        display.fail_secho("Parsing failed with code " + 
+                        str(code)+ ".Cannot export tree as PNG.")
+
     elif inp[0:5] == "\\vsem":
         stripped = inp.strip()
         to_sem = stripped[5:]
