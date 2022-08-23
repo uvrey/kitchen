@@ -334,15 +334,15 @@ class MParseTree(m.Scene):
         # create the input group here
         m_tok = {}
         m_tok_gp = m.VGroup()
-        m_tok_gp.add(m.Tex("Token stream: ")).scale(0.4)
+        m_tok_gp.add(m.Tex("Token stream: ")).scale(0.5)
 
         for t in self.tokens:
             try:
-                tex = m.MathTex("\\text{"+t.value+"}")
+                tex = m.MathTex("\\text{"+t.value+"}").scale(0.5)
                 m_tok_gp.add(tex)
                 m_tok[t.type] = tex
             except:
-                tex = m.MathTex("\\text{"+t+"}")
+                tex = m.MathTex("\\text{"+t+"}").scale(0.5)
                 m_tok_gp.add(tex)
                 m_tok[t] = tex
         m_tok_gp.arrange(m.RIGHT)
@@ -424,8 +424,6 @@ class MParseTree(m.Scene):
                                             mg.to_math_tex(popped.id), 
                                             color = m.BLUE)
                         reset_g(self, g, start_symbol)
-                    else:
-                        display.fail_secho("TODO!")
 
                     # if we have matched our last token
                     if len(self.tokens) == 1:
@@ -499,7 +497,6 @@ class MParseTree(m.Scene):
                     row = mg.row(self.nts, top), col = mg.col(self.ts, next))
                     
                     #  copy the cfg_line rather than manipulate it directly
-                    typer.echo(self.manim_production_groups)
                     cfg_line = self.manim_production_groups[prods[0].strip(
                     )][:]
                     cfg_line.next_to(self.s.mstack, m.DOWN).shift(

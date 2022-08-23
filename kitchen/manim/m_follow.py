@@ -6,7 +6,7 @@ import re
 
 from kitchen import (
         CFG_SCALE_HEIGHT, 
-        CFG_SCALE, 
+        CFG_SCALE_WIDTH, 
         RE_PRODUCTION, 
         RE_TERMINAL, 
         RE_NONTERMINAL,
@@ -49,12 +49,13 @@ class MFollowSet(m.Scene):
 
         # sets up CFG keys
         keys = mg.get_manim_cfg_group(self)
-        keys.scale_to_fit_height(CFG_SCALE_HEIGHT/3)
+        keys.scale_to_fit_width(CFG_SCALE_WIDTH/3)
         keys.fade_to(m.GRAY, 1).to_edge(m.LEFT)
 
         # draws follow set title
         fw_title = mg.get_title_mobject("follow set calculation") 
-        guide = mg.get_guide(arr_right = True).scale(CFG_SCALE)
+        guide = mg.get_guide(arr_right = True).scale_to_fit_width\
+            (CFG_SCALE_WIDTH/2)
 
         # sets the stage
         self.play(
@@ -113,7 +114,7 @@ class MFollowSet(m.Scene):
                         else:
                             # just highlight the terminal
                             self.wait()
-                            sounds.narrate(item + " , is a terminal.")
+                            sounds.narrate(item + " , is a terminal.", self)
                             self.play(
                                 m.Circumscribe(cfg_element, color=m.TEAL, 
                                                 shape = m.Circle),
@@ -190,8 +191,8 @@ class MFollowSet(m.Scene):
                                     color=m.RED),
                                 )
                             
-                            mg.display_msg(self, [r'\{First (' +next_item +
-                                r') - #\}', r'\subseteq Follow (' + item + 
+                            mg.display_msg(self, [r'{First (' +next_item +
+                                r') - #}', r'\subseteq Follow (' + item + 
                                 r')'], script = "The first set of " + 
                                 next_item + " without epsilon is a subset \
                                     of " + item + "'s follow set.")
@@ -303,13 +304,17 @@ class MFollowSet(m.Scene):
             if re.match(RE_NONTERMINAL, item):
                 # non terminal
                 new_element = m.Tex(
-                    r'Follow(', item, ')', color=m.BLUE)
+                    r'Follow(', item, ')', color=m.BLUE)\
+                    .scale_to_fit_height\
+                (self.cfg.manim_followset_lead[production].height)
 
             else:
                 # append it directly as a terminal
                 element = mg.to_tex(item) 
                 new_element = m.Tex(
-                    element, color=m.TEAL)
+                    element, color=m.TEAL)\
+                    .scale_to_fit_height\
+                (self.cfg.manim_followset_lead[production].height)
 
             # add to the content group
             self.cfg.manim_followset_contents[production].add(
@@ -356,7 +361,8 @@ class MFollowSet(m.Scene):
                 self.cfg.manim_followset_lead[production] = \
                     m.Tex("Follow(" + production + "):", 
                     color = config.get_opp_col())\
-                    .align_to(cfg_line, m.UP).shift(m.LEFT)
+                    .align_to(cfg_line, m.UP).shift(m.LEFT)\
+                        .scale_to_fit_height(2*cfg_line.height)
 
                 # prepares content group
                 self.cfg.manim_followset_contents[production].next_to(

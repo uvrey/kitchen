@@ -155,8 +155,6 @@ class ParserLL1:
                         # set up the terminal node
                         popped.parent = popped.tmp_parent
                         popped.token = prev_token
-                    else:
-                        display.fail_secho("TODO!")
 
                     # if we have matched our last token
                     if len(tokens) == 1:

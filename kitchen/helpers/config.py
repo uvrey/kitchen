@@ -211,7 +211,7 @@ def get_time() -> str:
         str: Formatted time.
     """    
     now = datetime.now()
-    return now.strftime("%d-%m_%H-%M-%S")
+    return now.strftime("%H-%M-%S__%d-%m")
 
 def configure_output_file_name(file_type: int, inp = "") -> None:
     """Sets unique file names for generated videos.

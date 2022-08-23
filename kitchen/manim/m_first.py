@@ -4,7 +4,13 @@
 import manim as m
 import re
 
-from kitchen import CFG_SCALE_HEIGHT, RE_PRODUCTION, RE_TERMINAL, TEXT_SCALE
+from kitchen import (
+    CFG_SCALE_HEIGHT, 
+    CFG_SCALE_WIDTH, 
+    RE_PRODUCTION, 
+    RE_TERMINAL, 
+)
+
 from kitchen.helpers import sounds, config, display, error
 from kitchen.manim import m_general as mg
 
@@ -28,11 +34,11 @@ class MFirstSet(m.Scene):
         self.play(fs_title.animate.to_edge(m.UP))
 
         keys = mg.get_manim_cfg_group(self)
-        keys.scale_to_fit_height(CFG_SCALE_HEIGHT/3)
+        keys.scale_to_fit_width(CFG_SCALE_WIDTH/ 3)
 
         # show key for colour coding
-        guide = mg.get_guide(arr_right = True).scale_to_fit_height\
-            (CFG_SCALE_HEIGHT/4)
+        guide = mg.get_guide(arr_right = True).scale_to_fit_width\
+            (CFG_SCALE_WIDTH/2)
 
         self.vis_first_set(keys, guide, self.cfg.start_symbol, 
         self.cfg.start_symbol, [])
@@ -78,20 +84,22 @@ class MFirstSet(m.Scene):
         cfg_line = self.manim_production_groups[production][:]
 
     # add the first set titles to the canvas
-        self.cfg.manim_firstset_lead[production] = m.Tex("First(" + 
-        production + "):", color = config.get_opp_col())\
-            .align_to(cfg_line, m.UP).shift(m.LEFT)
 
         self.play(
-            m.FadeIn(self.cfg.manim_firstset_lead[production]),
             m.FadeToColor(cfg_line, color=config.get_opp_col()),
             guide.animate.to_edge(m.DOWN),
             keys.animate.to_edge(m.LEFT)
         )
 
+        self.cfg.manim_firstset_lead[production] = m.Tex("First(" + 
+        production + "):", color = config.get_opp_col()).scale_to_fit_height\
+                (2*cfg_line.height).next_to\
+            (keys, m.RIGHT).align_to(cfg_line, m.UP)
+
+        self.play(m.FadeIn(self.cfg.manim_firstset_lead[production]))
+
         # if production does not have a first set
         try:
-
             # loop through values which a production leads to
             for i, p in enumerate(self.cfg.cfg_dict[production], start=0):
 
@@ -121,7 +129,8 @@ class MFirstSet(m.Scene):
                                     # each production in the stack
                                     new_element = m.Tex(
                                         mg.to_tex(terminal_to_write), 
-                                        color=m.TEAL).scale(TEXT_SCALE)
+                                        color=m.TEAL)\
+                                            .scale_to_fit_height(2*cfg_line.height)
                                     self.manim_firstset_contents[ps].add(
                                         new_element)
                                     self.manim_firstset_contents[ps]\
@@ -155,7 +164,8 @@ class MFirstSet(m.Scene):
                             break
                         else:
                             # highlight the non-terminal
-                            cfg_element = self.manim_prod_dict[production][i][j]
+                            cfg_element = self.manim_prod_dict[production]\
+                                [i][j]
                           
                             if j > 1:
                                 # fade out the previous non-terminal
@@ -163,7 +173,7 @@ class MFirstSet(m.Scene):
                                     [production][i][j-1]
                                 prev_element.fade_to(
                                     color=m.DARK_GRAY, alpha=1)
-                                prev_element.scale(TEXT_SCALE)
+                                prev_element.scale_to_fit_height(2*cfg_line.height)
 
                             # display the message alongside narration
                             mg.display_msg(self, [production + " leads to " + 
@@ -230,7 +240,7 @@ class MFirstSet(m.Scene):
                             # production in the stack
                             new_element = m.Tex(
                                     terminal_to_write, color=m.TEAL)\
-                                        .scale(TEXT_SCALE)
+                                        .scale_to_fit_height(2*cfg_line.height)
                             self.cfg.manim_firstset_contents[ps].add(
                                 new_element)
                             self.cfg.manim_firstset_contents[ps]\

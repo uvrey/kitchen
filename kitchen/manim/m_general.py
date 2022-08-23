@@ -38,7 +38,7 @@ def to_tex(item):
         str: Tex-compatible string.
     """    
     tex_item = item.replace(r'$', r'\$').replace(r'\varepsilon', 
-    r'$\varepsilon$')
+    r'$\varepsilon$').replace(r'{', r'\[').replace(r'}', r'\]')
     tex_item = tex_item.replace(r'#', r'\varepsilon').replace(r'\subseteq',
      r'$\subseteq$').replace(r'->', r'$\to$')
     return tex_item
@@ -222,7 +222,7 @@ def get_manim_cfg_group(self):
         self.manim_production_groups[key] = production_group
     
     row_no = len(manim_cfg)
-    keys.arrange_in_grid(rows=row_no, buff=0.5)
+    keys.arrange_in_grid(rows=row_no, buff=1.5, aligned_edge = m.LEFT)
     keys.fade_to(color=m.DARK_GRAY, alpha=1)
     return keys
 
