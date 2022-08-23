@@ -170,7 +170,7 @@ class ParserLL1:
 
                 try:
                     pt_entry = self.pt_dict[top][next]
-                    
+
                     if pt_entry == "Error":
                         self._call_ptable_error(top, next)
                         return
@@ -239,6 +239,14 @@ class ParserLL1:
         return SUCCESS
 
     def get_node(self, node_id):
+        """Obtains the node in a tree given its ID.
+
+        Args:
+            node_id (str): Node identifier.
+
+        Returns:
+            Node or None: If a node was found, it is returned.
+        """        
         for node in self.root.children:
             if node_id == self.root:
                 return node

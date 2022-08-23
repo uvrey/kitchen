@@ -39,8 +39,10 @@ def to_tex(item):
     """    
     tex_item = item.replace(r'$', r'\$').replace(r'\varepsilon', 
     r'$\varepsilon$').replace(r'{', r'\[').replace(r'}', r'\]')
-    tex_item = tex_item.replace(r'#', r'\varepsilon').replace(r'\subseteq',
+    tex_item = tex_item.replace(r'#', r'$\varepsilon$').replace(r'\subseteq',
      r'$\subseteq$').replace(r'->', r'$\to$')
+
+    display.fail_secho("NEW TEXT: " + tex_item)
     return tex_item
 
 def to_math_tex(item):

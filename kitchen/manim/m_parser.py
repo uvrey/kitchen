@@ -280,7 +280,7 @@ class MParseTree(m.Scene):
         """        
         # notify user
         mg.display_msg(self, ["We can now check if any productions led ", 
-        "to \\varepsilon, and so disappeared."], script = "Let's check if " +
+        "to $\\varepsilon$, and so disappeared."], script = "Let's check if " +
         "any productions led to epsilon.")
         # look for any epsilons that came before and add.
         for node in self.root.descendants:
