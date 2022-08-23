@@ -134,6 +134,12 @@ tree arranging to the right :)
 SEMANTIC ANALYSIS
 - check conflicts - not yet and already defined :)
 - more comments and SFX :)
+
+TREE PNGs
+generate tree PNG for export :)
+
+EXPORT PNG
+- how to initialise saving :)
 """
 
 """
@@ -146,9 +152,6 @@ LL(1) parsing ID language - HIGH
 
 PARSING
 - same IDs in parsing ll1 vis
-
-EXPORT PNG
-- how to initialise saving
 
 RuntimeWarning: invalid value encountered in double_scalars
 original tokens not showing at end of ll1 parsing manim
@@ -169,13 +172,11 @@ start dsl tool from the typer app HIGH
 """
 TODO - DETAILS LOW
 remove debugging output
-generate tree PNG for export
 
 Neaten up cli_helper parsing code
 Code style choices
 gray lines for tables
 
-FadeIn mathtex error alpha / 0
 """ 
 
 """
@@ -202,6 +203,7 @@ USER TESTING
 """ *********************************************************
 EXTENSIONS
 - lecturer-supplied audio
+- multi-lingual support
 - LALR/ shift reduce/ recursive descent parsing
 - proof of accuracy - algorithm analysis
 - Reload CFGs within the app

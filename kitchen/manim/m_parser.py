@@ -291,7 +291,9 @@ class MParseTree(m.Scene):
                     new_node = anytree.Node("#", parent=node, id= "#", 
                     token = None, parent_id = node.vertex_id, vertex_id =
                     node.id + "_#")
-                    create_vertex(g, new_node, r'\varepsilon', color = m.BLUE_D)
+                    new_vertex = create_vertex(g, new_node, r'\varepsilon', 
+                    color = m.BLUE_D)
+                    self.play(m.FadeIn(new_vertex))
         return SUCCESS
 
     def _parsing_successful(self, tokens, semantic: bool, testing = False, 
@@ -449,6 +451,7 @@ class MParseTree(m.Scene):
                         new_vertex = create_vertex(g, popped,
                                             mg.to_math_tex(popped.id), 
                                             color = m.BLUE_D)
+                        self.play(m.FadeIn(new_vertex))
                         reset_g(self, g, start_symbol)
 
                     # if we have matched our last token
@@ -514,6 +517,7 @@ class MParseTree(m.Scene):
                         new_vertex = create_vertex(g, replaced_parent, \
                             mg.to_math_tex(self.parents[-1].id), 
                             color = m.BLUE_D)
+                        self.play(m.FadeIn(new_vertex))
                         reset_g(self, g, start_symbol)
 
                     sounds.add_sound_to_scene(self, sounds.POP)
@@ -610,13 +614,11 @@ class MParseTree(m.Scene):
         self.s.write_under_stack("\\text{Stack emptied.}")
         reset_g(self, g, start_symbol, anim=[m.FadeOut(self.s.mstack)])
 
-        token_str = lang_spec.get_token_format(original_tokens)
-        display.fail_secho(token_str)
         sounds.add_sound_to_scene(self, sounds.YAY)
-        mg.display_msg(self, ["Successfully parsed `" + token_str + "'!"], 
+        mg.display_msg(self, ["Successfully parsed `" + self.inp + "'!"], 
             script= "Parsing successful! That was a valid input.")
 
-        display.success_secho("Successfully parsed '" + token_str +
+        display.success_secho("Successfully parsed '" + self.inp +
                               "'!\nParse tree:")
         display.print_parsetree(self.root)
         return SUCCESS
