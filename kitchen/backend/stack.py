@@ -66,7 +66,7 @@ class Stack:
 
                     sounds.add_sound_to_scene(self.scene, sounds.TWINKLE)
                     self.scene.play(
-                        m.Flash(top_text, line_length=0.4,
+                        m.Flash(top_text, line_length=0.3,
                               num_lines=30, color=m.BLUE,
                               flash_radius=0.3,
                               time_width=0.3),

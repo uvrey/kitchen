@@ -22,6 +22,14 @@ ECONFIG = {"color": config.get_opp_col()}
 
 
 def set_up_label(g, vertex_id, label, color = m.GRAY):
+    """Creates the label for a given vertex.
+
+    Args:
+        g (Graph): The Manim Graph Mobject.
+        vertex_id (str): Unique vertex identifier.
+        label (_type_): _description_
+        color (_type_, optional): _description_. Defaults to m.GRAY.
+    """    
     # add label above
     new_vertex = g[vertex_id]
 
@@ -68,7 +76,7 @@ def reset_g(self, g, root, anim=[]):
 
 class MSemanticAnalyser(m.Scene):
     def setup_manim(self, cfg, root, inp, spec):
-        """Initialises the SemanticAnalyser.
+        """Initialises the SemanticAnalyser Manim Scene.
 
         Args:
             cfg (ContextFreeGrammar): Loaded CFG.
@@ -81,13 +89,6 @@ class MSemanticAnalyser(m.Scene):
         self.symbol = {'Symbol': [], 'Type': []}
         self.inp_list = lang_spec.clean_inp_stream(inp.split(" "))
         self.tokens = mg.get_tokens_from_input(inp, spec)
-
-        # mg.set_up_token_colour(self)
-        # self.tok_cols = []
-
-        # # associate a colour for each token
-        # for t in self.tokens:
-        #     self.tok_cols.append(mg.get_token_colour(self))
 
     # shows the input stream and its association with the token stream
     def intro(self):
@@ -129,8 +130,14 @@ class MSemanticAnalyser(m.Scene):
         )
 
     def construct(self):
+        """Constructs the semantic analysis scene.
+        """        
         # play the intro
-        # TODO fix self.intro()
+        mg.display_msg(self, ["Semantic Analysis"], script = "Let's " +
+        " begin semantic analysis.")
+        mg.display_msg(self, ["We begin by traversing the tree we got when ",\
+        " parsing the token stream."], script = "Let us traverse" + 
+        " the parse tree.")
 
         # draws follow set title
         sem_title = mg.get_title_mobject("Semantic Analysis") 
@@ -166,7 +173,7 @@ class MSemanticAnalyser(m.Scene):
                 self.m_inp_gp.add(tex)
                 self.m_inp[t] = tex
         self.m_inp_gp.arrange(m.RIGHT)
-        self.m_inp_gp.next_to(self.m_tok_gp, m.DOWN)
+        
 
         # show parsing direction
         arr = m.Arrow(start=3*m.RIGHT, end=3*m.LEFT, color=config.\
@@ -183,6 +190,9 @@ class MSemanticAnalyser(m.Scene):
             m.Write(arr_caption)
         )
 
+        self.m_inp_gp.next_to(self.m_tok_gp, m.DOWN)
+        self.play(m.FadeIn(self.m_inp_gp))
+
         # create the table
         self.table = self._update_symbol_table([[".", "."]])
 
@@ -198,6 +208,14 @@ class MSemanticAnalyser(m.Scene):
         self.init_analysis(start_symbol, g)
 
     def _update_symbol_table(self, contents):
+        """Creates an updated symbol table.
+
+        Args:
+            contents (list): New contents of the symbol table. 
+
+        Returns:
+            Table: Manim Table
+        """        
         table = m.Table(
             contents,
             col_labels=[m.Tex("Symbol", color = m.BLUE), m.Tex("Type", 
@@ -210,12 +228,12 @@ class MSemanticAnalyser(m.Scene):
 
 
     def _call_error(self, msg = ""):
-        """Display an error in the type-checking process.
+        """Displays an error when encountered in the type-checking process.
 
         Args:
             msg (str, optional): Details. Defaults to "".
         """        
-        mg.display_msg(self, ["Type Error: ", msg], script = msg)
+        mg.display_msg(self, ["Type Error: ", msg], script = msg, error = True)
         display.fail_secho("Type Error: "+ msg)
         self.print_symbol_table()
         return 
@@ -226,10 +244,6 @@ class MSemanticAnalyser(m.Scene):
         """        
         lhs = True
         lh_type = None
-   
-        mg.display_msg(self, ["We traverse the parse tree obtained ", \
-        "from parsing the given token stream."], script = "Let us traverse" + 
-        " the parse tree.")
 
         for node in anytree.PreOrderIter(self.root):
             try:
@@ -248,16 +262,19 @@ class MSemanticAnalyser(m.Scene):
                         sounds.add_sound_to_scene(self, sounds.CLICK)
                         self.play(m.FadeIn(v))
 
+                        reset_g(self, g, start_symbol)
+
                         if re.match(RE_TERMINAL, node.id):
-                            sounds.add_sound_to_scene(self, sounds.FLASH)
+                            sounds.add_sound_to_scene(self, sounds.TWINKLE)
                             self.play(
-                                m.Flash(v, line_length=0.4,
+                                m.Flash(v, line_length=0.3,
                                 num_lines=30, color=m.BLUE,
                                 flash_radius=0.3,
                                 time_width=0.3),
                             )
+                            sounds.narrate("We matched a terminal!", self)
+                        self.wait()
 
-                        reset_g(self, g, start_symbol)
                     except: 
                         pass
 
@@ -291,11 +308,16 @@ class MSemanticAnalyser(m.Scene):
         sounds.add_sound_to_scene(self, sounds.SUCCESS)
         mg.display_msg(self, ["Semantic analysis complete!"], script = 
         "Semantic analysis complete! Here is the final symbol table.")
-
-        self.fade_in_table(fade_out = False)
+        self.fade_in_table(fade_out = False, end = True)
         self.print_symbol_table()
 
-    def replace_entry(self):
+    def replace_entry(self, end = False):
+        """Transforms the symbol table as more rows are added to it.
+
+        Args:
+            end (bool, optional): Whether this is the last time the
+            table is shown in the analysis. Defaults to False.
+        """        
         new_contents = []
         for i in range(len(self.symbol["Symbol"])):
             new_contents.append([self.symbol["Symbol"][i], self.symbol["Type"][i]])
@@ -304,24 +326,26 @@ class MSemanticAnalyser(m.Scene):
         old_table = self.table
         self.play(m.Transform(old_table, new_table))
         self.table = new_table
-        self.play(
-            m.Circumscribe(self.table.get_rows()[len(new_contents)], 
-            color = m.BLUE)
-            )
+
+        if not end:
+            self.play(
+                m.Circumscribe(self.table.get_rows()[len(new_contents)], 
+                color = m.BLUE)
+                )
+
         self.play(
             m.FadeOut(old_table)
         )
-
-    def get_str(self, index, new_item):
-        old_string = self.symbol[index]
-        if old_string == []:
-            return new_item
-        else:
-            new_str = "".join(old_string) + "\n" + new_item
-            display.fail_secho(new_str)
-            return new_str
     
-    def fade_in_table(self, fade_out = True):
+    def fade_in_table(self, fade_out = True, end = False):
+        """Fades in the symbol table for display.
+
+        Args:
+            fade_out (bool, optional): Whether the table should
+            fade out again once having been shown. Defaults to True.
+            end (bool, optional): Whether the symbol table is being
+            displayed at the end of the analysis process. Defaults to False.
+        """        
 
         # create fading area
         rect = m.Rectangle(width=20, height=10, color=config.get_theme_col(), 
@@ -334,15 +358,19 @@ class MSemanticAnalyser(m.Scene):
             m.FadeIn(rect),
         )
 
-        sounds.narrate("Let's add terminal " + 
-        self.symbol["Symbol"][-1] + " to the symbol table.", self)
+        if not end:
+            sounds.narrate("Let's add terminal " + self.symbol["Type"][-1] +
+            " with value " + self.symbol["Symbol"][-1] + " to the " +
+            "symbol table.", self)
+
+            self.wait()
 
         self.play(
             m.FadeIn(st_title),
             m.FadeIn(self.table)
         )
         
-        self.replace_entry()
+        self.replace_entry(end)
 
         if fade_out:
             self.play(

@@ -56,7 +56,7 @@ def to_math_tex(item):
     .replace(r'->', r'\to')
     return tex_item
 
-def display_msg(self, msg, script = "", anim=[]):
+def display_msg(self, msg, script = "", anim=[], error = False):
     """Displays a set of messages in full-screen, alongside optional narration. 
 
     Args:
