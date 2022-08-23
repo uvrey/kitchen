@@ -29,7 +29,7 @@ from kitchen.helpers import (
 )
 from kitchen.manim import m_general as mg
 
-VCONFIG = {"radius": 0.2, "color": m.BLUE, "fill_opacity": 1}
+VCONFIG = {"radius": 0.2, "color": m.BLUE_D, "fill_opacity": 1}
 LCONFIG = {"vertex_spacing": (2.5, 1)}
 ECONFIG = {"color": config.get_opp_col()}
 ECONFIG_TEMP = {"color": m.GRAY, "fill_opacity": 0.7}
@@ -144,7 +144,7 @@ class MParseTree(m.Scene):
         # introducing the input
         title = m.Tex(r"Input to be parsed:")
         sounds.narrate("Let's parse this input.", self)
-        inp = m.Text(self.inp, weight=m.BOLD, color=m.BLUE)
+        inp = m.Text(self.inp, weight=m.BOLD, color=m.BLUE_D)
         m.VGroup(title, inp).arrange(m.DOWN)
         self.play(
             m.FadeIn(title),
@@ -259,8 +259,8 @@ class MParseTree(m.Scene):
             tmp_tab = self.mtable
             t =  self.mtable.get_entries_without_labels([row, col])
             self.play(
-                m.Indicate(t, color = m.BLUE),
-                m.Circumscribe(t, color = m.BLUE),
+                m.Indicate(t, color = m.BLUE_D),
+                m.Circumscribe(t, color = m.BLUE_D),
             )
 
         self.play(
@@ -291,7 +291,7 @@ class MParseTree(m.Scene):
                     new_node = anytree.Node("#", parent=node, id= "#", 
                     token = None, parent_id = node.vertex_id, vertex_id =
                     node.id + "_#")
-                    create_vertex(g, new_node, r'\varepsilon', color = m.BLUE)
+                    create_vertex(g, new_node, r'\varepsilon', color = m.BLUE_D)
         return SUCCESS
 
     def _parsing_successful(self, tokens, semantic: bool, testing = False, 
@@ -388,7 +388,7 @@ class MParseTree(m.Scene):
         g = m.Graph([start_symbol], [], vertex_config=VCONFIG,
                   labels = False, label_fill_color=config.get_opp_col())
 
-        set_up_label(g, start_symbol, start_symbol, m.BLUE)
+        set_up_label(g, start_symbol, start_symbol, m.BLUE_D)
 
         g.to_edge(m.UP).shift(m.DOWN)
         self.add(g)
@@ -448,7 +448,7 @@ class MParseTree(m.Scene):
                         sounds.add_sound_to_scene(self, sounds.CLICK)
                         new_vertex = create_vertex(g, popped,
                                             mg.to_math_tex(popped.id), 
-                                            color = m.BLUE)
+                                            color = m.BLUE_D)
                         reset_g(self, g, start_symbol)
 
                     # if we have matched our last token
@@ -513,7 +513,7 @@ class MParseTree(m.Scene):
                         typer.echo("creating vertex " + replaced_parent.id)
                         new_vertex = create_vertex(g, replaced_parent, \
                             mg.to_math_tex(self.parents[-1].id), 
-                            color = m.BLUE)
+                            color = m.BLUE_D)
                         reset_g(self, g, start_symbol)
 
                     sounds.add_sound_to_scene(self, sounds.POP)

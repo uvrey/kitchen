@@ -16,7 +16,7 @@ from kitchen.helpers import display, sounds, lang_spec, config
 from kitchen.manim import m_general as mg, m_parser as mp, m_parse_table as mpt
 from kitchen import CFG_SCALE_HEIGHT, RE_NONTERMINAL, CFG_SCALE_WIDTH, RE_TERMINAL
 
-VCONFIG = {"radius": 0.2, "color": m.BLUE, "fill_opacity": 1}
+VCONFIG = {"radius": 0.2, "color": m.BLUE_D, "fill_opacity": 1}
 LCONFIG = {"vertex_spacing": (2.5, 1)}
 ECONFIG = {"color": config.get_opp_col()}
 
@@ -44,6 +44,20 @@ def set_up_label(g, vertex_id, label, color = m.GRAY):
     new_vertex.add(rendered_label)
     
 def create_vertex(g, vertex_id, parent_id, label, color=m.GRAY,  link=True):
+    """Creates a vertex in a given Manim Graph.
+
+    Args:
+        g (Graph): Graph Mobject.
+        vertex_id (str): Unique vertex identifier.
+        parent_id (str): Parent identifier
+        label (str): Vertex label.
+        color (_type_, optional): Vertex color. Defaults to m.GRAY.
+        link (bool, optional): Whether the parent and child are to 
+        be linked with an edge. Defaults to True.
+
+    Returns:
+        _type_: _description_
+    """    
     global m
     display.info_secho("creating node between " + vertex_id + " and " + 
         parent_id)
@@ -110,11 +124,11 @@ class MSemanticAnalyser(m.Scene):
         # show the token stream
         self.m_tok = {}
         self.m_tok_gp = m.VGroup()
-        self.m_tok_gp.add(m.Tex("Token stream: ")).scale(0.5)
+        self.m_tok_gp.add(m.Tex("Token stream: ", color = m.MAROON_A)).scale(0.5)
 
         for t in self.tokens:
             try:
-                tex = m.MathTex("\\text{"+t.type+"}").scale(0.5)
+                tex = m.MathTex("\\text{"+t.type+"}", color = m.MAROON_A).scale(0.5)
                 self.m_tok_gp.add(tex)
                 self.m_tok[t.type] = tex
             except:
@@ -126,20 +140,19 @@ class MSemanticAnalyser(m.Scene):
         # show the input stream
         self.m_inp = {}
         self.m_inp_gp = m.VGroup()
-        self.m_inp_gp.add(m.Tex("Input stream: ")).scale(0.5)
+        self.m_inp_gp.add(m.Tex("Input stream: ", color = m.PURPLE_A)).scale(0.5)
 
         for t in self.tokens:
             try:
-                tex = m.MathTex("\\text{"+t.value+"}").scale(0.5)
+                tex = m.MathTex("\\text{"+t.value+"}", color = m.PURPLE_A).scale(0.5)
                 self.m_inp_gp.add(tex)
-                self.m_inp[t.type] = tex
+                self.m_inp[t.value] = tex
             except:
                 tex = m.MathTex("\\text{"+t+"}").scale(0.5)
                 self.m_inp_gp.add(tex)
                 self.m_inp[t] = tex
         self.m_inp_gp.arrange(m.RIGHT)
         
-
         # show parsing direction
         arr = m.Arrow(start=3*m.RIGHT, end=3*m.LEFT, color=config.\
             get_opp_col(), buff = 1)
@@ -156,7 +169,6 @@ class MSemanticAnalyser(m.Scene):
             m.Write(arr_caption)
         )
 
-
         # create the table
         self.table = self._update_symbol_table([[".", "."]])
 
@@ -165,7 +177,7 @@ class MSemanticAnalyser(m.Scene):
         g = m.Graph([start_symbol], [], vertex_config=VCONFIG,
             labels = False, label_fill_color=config.get_opp_col())
 
-        set_up_label(g, start_symbol, start_symbol, m.BLUE)
+        set_up_label(g, start_symbol, start_symbol, m.BLUE_D)
         reset_g(self, g, start_symbol)
 
         # start semantic analysis
@@ -182,11 +194,11 @@ class MSemanticAnalyser(m.Scene):
         """        
         table = m.Table(
             contents,
-            col_labels=[m.Tex("Symbol", color = m.BLUE), m.Tex("Type", 
-                color = m.BLUE)],
+            col_labels=[m.Tex("Symbol", color = m.BLUE_D), m.Tex("Type", 
+                color = m.BLUE_D)],
             top_left_entry=m.Star().scale(0.3),
             include_outer_lines=False,
-            line_config={"stroke_width": 1, "color": m.BLUE_A})
+            line_config={"stroke_width": 1, "color": m.BLUE_D_A})
         table.scale_to_fit_width(CFG_SCALE_WIDTH/2)
         return table
 
@@ -208,7 +220,7 @@ class MSemanticAnalyser(m.Scene):
         """        
         lhs = True
         lh_type = None
-
+        terminal_index = 0
         for node in anytree.PreOrderIter(self.root):
             try:
                 # draw manim vertex
@@ -222,7 +234,7 @@ class MSemanticAnalyser(m.Scene):
                             p_id = node.parent.parent.id + "_" + node.parent.id
                         else:
                             p_id = start_symbol 
-                        v = create_vertex(g, v_id, p_id, node.id, m.BLUE)
+                        v = create_vertex(g, v_id, p_id, node.id, m.BLUE_D)
                         sounds.add_sound_to_scene(self, sounds.CLICK)
                         self.play(m.FadeIn(v))
 
@@ -230,12 +242,33 @@ class MSemanticAnalyser(m.Scene):
 
                         if re.match(RE_TERMINAL, node.id):
                             sounds.add_sound_to_scene(self, sounds.TWINKLE)
+
+                            # highlight the terminal, its input and its token
                             self.play(
                                 m.Flash(v, line_length=0.3,
-                                num_lines=30, color=m.BLUE,
+                                num_lines=20, color=m.BLUE_D,
                                 flash_radius=0.3,
                                 time_width=0.3),
+                                m.Flash(self.m_inp[node.token.value], 
+                                line_length=0.15,
+                                num_lines=20, color=m.BLUE_D,
+                                flash_radius=0.1,
+                                time_width=0.3),
+                                m.Flash(self.m_tok[node.token.type], 
+                                line_length=0.15,
+                                num_lines=20, color=m.BLUE_D,
+                                flash_radius=0.1,
+                                time_width=0.3),
                             )
+
+                            # highlight the input and token stream
+                            self.play(
+                                m.FadeToColor(self.m_tok[node.token.type], 
+                                color = m.BLUE_D),
+                                m.FadeToColor(self.m_inp[node.token.value], 
+                                color = m.BLUE_D),
+                            )
+
                             sounds.narrate("We matched a terminal!", self)
                         self.wait()
 
@@ -275,7 +308,7 @@ class MSemanticAnalyser(m.Scene):
         self.fade_in_table(fade_out = False, end = True)
         self.print_symbol_table()
 
-    def replace_entry(self, end = False):
+    def replace_entry(self, end = False, fade_out = True):
         """Transforms the symbol table as more rows are added to it.
 
         Args:
@@ -294,12 +327,13 @@ class MSemanticAnalyser(m.Scene):
         if not end:
             self.play(
                 m.Circumscribe(self.table.get_rows()[len(new_contents)], 
-                color = m.BLUE)
+                color = m.BLUE_D)
                 )
 
-        self.play(
-            m.FadeOut(old_table)
-        )
+        if fade_out:
+            self.play(
+                m.FadeOut(old_table)
+            )
     
     def fade_in_table(self, fade_out = True, end = False):
         """Fades in the symbol table for display.
@@ -334,7 +368,7 @@ class MSemanticAnalyser(m.Scene):
             m.FadeIn(self.table)
         )
         
-        self.replace_entry(end)
+        self.replace_entry(end, fade_out)
 
         if fade_out:
             self.play(

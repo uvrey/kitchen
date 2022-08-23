@@ -48,7 +48,7 @@ class Stack:
                 if not matching:
                     self.scene.play(
                         m.Write(m_msg),
-                        m.Indicate(top_text, color=m.BLUE),
+                        m.Indicate(top_text, color=m.BLUE_D),
                     )
                     for a in anim:
                         self.scene.play(
@@ -60,18 +60,18 @@ class Stack:
                     # match a terminal in the stack
                     self.scene.play(
                         m.FadeIn(m_msg),
-                        m.Indicate(top_text, color=m.BLUE),
-                        m.FadeToColor(top_text, m.BLUE),
+                        m.Indicate(top_text, color=m.BLUE_D),
+                        m.FadeToColor(top_text, m.BLUE_D),
                     )
 
                     sounds.add_sound_to_scene(self.scene, sounds.TWINKLE)
                     self.scene.play(
                         m.Flash(top_text, line_length=0.3,
-                              num_lines=30, color=m.BLUE,
+                              num_lines=30, color=m.BLUE_D,
                               flash_radius=0.3,
                               time_width=0.3),
                         m.Flash(vertex, line_length=0.4,
-                              num_lines=30, color=m.BLUE,
+                              num_lines=30, color=m.BLUE_D,
                               flash_radius=0.3,
                               time_width=0.3),
                         m.FadeOut(top_text))

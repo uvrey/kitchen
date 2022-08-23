@@ -142,8 +142,6 @@ TODO - DEVELOPMENT
 TESTING
 get lots of test cases written
 
-Get parsing colours to match LL(1) tokens   LOW
-
 LL(1) parsing ID language
 
 SEMANTIC ANALYSIS
@@ -214,6 +212,7 @@ EXTENSIONS
 - proof of accuracy - algorithm analysis
 - Reload CFGs within the app
 - extension: detect LR recursion etc
+Get parsing colours to match LL(1) tokens   LOW
 """
 
 """ 

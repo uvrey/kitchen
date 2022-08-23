@@ -72,7 +72,11 @@ def display_msg(self, msg, script = "", anim=[], error = False):
         msg_group = m.VGroup()
 
         for ms in msg:
-            msg_txt = m.Tex(to_tex(ms), color=config.get_opp_col())
+            if error:
+                col = m.RED
+            else:
+                col = config.get_opp_col()
+            msg_txt = m.Tex(to_tex(ms), color=col)
             msg_group.add(msg_txt)
         msg_group.arrange(m.DOWN)
         

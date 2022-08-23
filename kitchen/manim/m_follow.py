@@ -259,11 +259,11 @@ class MFollowSet(m.Scene):
                     if item == "$":
                         has_eos = True
                     else:
-                        new_fs_group.add(m.Tex(mg.to_tex(item), color = m.BLUE))
+                        new_fs_group.add(m.Tex(mg.to_tex(item), color = m.BLUE_D))
 
                 # puts $ at end of list for consistency
                 if has_eos:
-                    new_fs_group.add(m.Tex(mg.to_tex("$"), color = m.BLUE))
+                    new_fs_group.add(m.Tex(mg.to_tex("$"), color = m.BLUE_D))
                 new_fs_group.arrange_in_grid(rows=1, buff=0.5).next_to(
                     self.cfg.manim_followset_lead[key], m.RIGHT)
 
@@ -300,7 +300,7 @@ class MFollowSet(m.Scene):
             if re.match(RE_NONTERMINAL, item):
                 # non terminal
                 new_element = m.Tex(
-                    r'Follow(', item, ')', color=m.BLUE)\
+                    r'Follow(', item, ')', color=m.BLUE_D)\
                     .scale_to_fit_height\
                 (self.cfg.manim_followset_lead[production].height)
 

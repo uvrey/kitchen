@@ -314,6 +314,9 @@ class MFirstSet(m.Scene):
                 pstack.pop()
 
         except KeyError:
+            mg.display_msg(self, [production + " not given in the CFG."],
+            script = "A production led by " + production + " is not " + 
+            "given in the context free grammar.", error = True)
             error.ERR_key_not_given_in_CFG(production)
 
 
