@@ -124,11 +124,11 @@ class MSemanticAnalyser(m.Scene):
         # show the token stream
         self.m_tok = {}
         self.m_tok_gp = m.VGroup()
-        self.m_tok_gp.add(m.Tex("Token stream: ", color = m.MAROON_A)).scale(0.5)
+        self.m_tok_gp.add(m.Tex("Token stream: ")).scale(0.5)
 
         for t in self.tokens:
             try:
-                tex = m.MathTex("\\text{"+t.type+"}", color = m.MAROON_A).scale(0.5)
+                tex = m.MathTex("\\text{"+t.type+"}", color = m.PURPLE_A).scale(0.5)
                 self.m_tok_gp.add(tex)
                 self.m_tok[t.type] = tex
             except:
@@ -140,7 +140,7 @@ class MSemanticAnalyser(m.Scene):
         # show the input stream
         self.m_inp = {}
         self.m_inp_gp = m.VGroup()
-        self.m_inp_gp.add(m.Tex("Input stream: ", color = m.PURPLE_A)).scale(0.5)
+        self.m_inp_gp.add(m.Tex("Input stream: ")).scale(0.5)
 
         for t in self.tokens:
             try:
@@ -198,7 +198,7 @@ class MSemanticAnalyser(m.Scene):
                 color = m.BLUE_D)],
             top_left_entry=m.Star().scale(0.3),
             include_outer_lines=False,
-            line_config={"stroke_width": 1, "color": m.BLUE_D_A})
+            line_config={"stroke_width": 1, "color": m.BLUE_A})
         table.scale_to_fit_width(CFG_SCALE_WIDTH/2)
         return table
 
