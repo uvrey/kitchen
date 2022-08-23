@@ -244,7 +244,7 @@ class MSemanticAnalyser(m.Scene):
 
                 self.symbol['Symbol'].append(node.token.value)
                 self.symbol['Type'].append(node.token.type)
-                self.fade_in_table(node.token.value, node.token.type)
+                self.fade_in_table()
             # except:
             #     self._call_error("Cannot semantically analyse only "+
             #         "a token stream.")
@@ -255,13 +255,18 @@ class MSemanticAnalyser(m.Scene):
         new_contents = []
         for i in range(len(self.symbol["Symbol"])):
             new_contents.append([self.symbol["Symbol"][i], self.symbol["Type"][i]])
-
-        typer.echo("new contents:")
-        typer.echo(new_contents)
         
         new_table = self._update_symbol_table(new_contents)
-        self.play(m.Transform(self.table, new_table), m.FadeOut(self.table))
+        old_table = self.table
+        self.play(m.Transform(old_table, new_table))
         self.table = new_table
+        self.play(
+            m.Circumscribe(self.table.get_rows()[len(new_contents)], 
+            color = m.BLUE)
+            )
+        self.play(
+            m.FadeOut(old_table)
+        )
 
     def get_str(self, index, new_item):
         old_string = self.symbol[index]
@@ -272,7 +277,7 @@ class MSemanticAnalyser(m.Scene):
             display.fail_secho(new_str)
             return new_str
     
-    def fade_in_table(self, value, type):
+    def fade_in_table(self):
 
         # create fading area
         rect = m.Rectangle(width=20, height=10, color=config.get_theme_col(), 
@@ -285,8 +290,7 @@ class MSemanticAnalyser(m.Scene):
             m.FadeIn(rect),
         )
 
-        sounds.narrate("Let's add to the symbol table.", self)
-
+        sounds.narrate("Let's add this terminal to the symbol table.", self)
         self.play(
             m.FadeIn(st_title),
             m.FadeIn(self.table)
@@ -294,10 +298,7 @@ class MSemanticAnalyser(m.Scene):
         
         self.replace_entry()
 
-        self.wait()
-
         self.play(
-            m.FadeOut(self.table),
             m.FadeOut(st_title),
             m.FadeOut(rect),
         )
@@ -308,171 +309,3 @@ class MSemanticAnalyser(m.Scene):
         display.info_secho("Symbol Table:")
         df = pd.DataFrame.from_dict(self.symbol).to_markdown(index = False)
         display.structure_secho(df)
-
-"""
-DONE
-investigate fstack weirdness :)
-get BLA working on current test cases (ll(1) subsets should work) :)
-warn when they are ambiguous :)
-customise the regex terminal definitions :)
-match raw input with regex expressions :)
-get regex spec from app/ with simon's help :)
-add intro scene with token stream :)
-get regex commands :)
-notify about LL(1) grammar ambiguity from parse table stage. :)
-solve CFG_13 parsing table, ll1 bug :)
-pass the funny things :)
-id language :)
-semantic analyser backend :)
-solve parsing bug with bla_complex - it was not LL(1) compatible :)
-first set animation not moving CFG to the left :)
-PT table spacing on large outputs :) 
-update menu :)
-restructure directory :)
-documentation progress :)
-neaten up imports :)
-set up pdoc :)
-verify m follow/ m first set :)
-line length :)
-check cleaning of follow set and first/ follow algorithms :)
-first and follow set not using _to_tex properly - DVI issue. :)
-weird token issue :)
-parsing nodes size setting :)
-Fix manim parsing by adding improved algorithm  HIGH :)
-make start symbol root :)
-Print first and followsets as dataframes :)
-cfg_1 parsing has sound not found error :)
-colour to opp of bg? MED :)
-scaling stack contents :)
-scaling replacing etc. :)
-scaling cfg line size :)
-scaling FS and FW properly :)
-Scaling large grammars - fs, fw, pt, ll1 LOW :)
-visualising with tokens :)
-check epsilons in LL(1) parsing video MED :)
-long names look weird in parsing vids - place nicely :)
-message formatting going over lines thanks to \
-    -> Loading the CFG file failed with "file does not         exist" :)
-"""
-
-"""
-TODO - DEVELOPMENT
-
-TESTING
-get lots of test cases written
-
-Get parsing colours to match LL(1) tokens   LOW
-implement semantic analysis HIGH
-
-RuntimeWarning: invalid value encountered in double_scalars
-original tokens not showing at end of ll1 parsing manim
-
-token colour coding
-
-tree arranging to the right
-
-LATEX
-
-GRAMMARS
-validate grammars and language spec MED
-
-CLI
-- some terminals missing regex error - investigate MED
-- Notes on regex spec - necessary?  MED
-
-""" 
-
-"""
-TODO - INTEGRATION 
-start dsl tool from the typer app HIGH
-""" 
-
-"""
-TODO - DETAILS LOW
-
-remove debugging output
-generate tree PNG for export
-
-Neaten up cli_helper parsing code
-Code style choices
-gray lines for tables
-
-FadeIn mathtex error alpha / 0
-""" 
-
-"""
-TODO - ADMIN LOW
-complete documentation
-- type hints
-- function return types
-
-how to autogenerate documentation
-
-README 
-- better installation guidelines
-clean up code   
-clean git repo
-
-PAPER
-- write and edit draft
-
-USER TESTING
-- ethics approval
-- conduct tests
-""" 
-
-""" *********************************************************
-EXTENSIONS
-- lecturer-supplied audio
-- LALR/ shift reduce/ recursive descent parsing
-- proof of accuracy - algorithm analysis
-- Reload CFGs within the app
-- extension: detect LR recursion etc
-"""
-
-""" 
-NOTES
-Valid LL(1) Grammars
-
-For any production S -> A | B, it must be the case that:
-
-    For no terminal t could A and B derive strings beginning with t
-    At most one of A and B can derive the empty string
-    if B can derive the empty string, then A does not derive any 
-    string beginning with a terminal in Follow(A)
-
-# Find First(α) and for each terminal in First(α), make entry A –> α 
-# in the table.
-# If First(α) contains ε (epsilon) as terminal than, find the Follow(A) 
-# and for each terminal in Follow(A), make entry A –> α in the table.
-# If the First(α) contains ε and Follow(A) contains $ as terminal, then 
-# make entry A –> α in the table for the $. 
-
-"""
-
-"""
-FEATURES
-- unique filenames and timestamps
-- configurable interface
-- 4 algorithms visualised
-- handles more complex grammars
-- handles DSLs
-- sound effects and narration
-~ matching token colours
-~ some semantic analysis 
-"""
-
-""" 
-LIMITATIONS
-Unlike PLY (LALR), Kitchen does not have
-support for empty productions, precedence rules, error recovery, 
-and ambiguous grammars. 
-Single line of input accepted
-Max number of token colours 
-Difficult grammars not handled
-Checking for conflicts
-Sound may get corrupted when animation is cancelled before it is finished 
-- so it can't clear the cache
-Known issues:
-- No sound: clear partial movie directory and restart.
-"""

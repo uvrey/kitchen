@@ -128,7 +128,9 @@ message formatting going over lines thanks to \
     -> Loading the CFG file failed with "file does not         exist" :)
 
 
-base for semantic analysis (cfg.txt)
+base for semantic analysis (cfg.txt) :)
+Transforming table bug :)
+tree arranging to the right :)
 """
 
 """
@@ -142,6 +144,11 @@ Get parsing colours to match LL(1) tokens   LOW
 SEMANTIC ANALYSIS
 - ID language (naming of nodes?)
 - larger inputs - make them underneath each other in the symbol table
+- unique names
+- more comments and SFX
+
+PARSING
+- unique IDs in parsing 
 
 
 RuntimeWarning: invalid value encountered in double_scalars
@@ -149,7 +156,7 @@ original tokens not showing at end of ll1 parsing manim
 
 token colour coding
 
-tree arranging to the right
+
 
 LATEX
 
@@ -255,4 +262,9 @@ Sound may get corrupted when animation is cancelled before it is finished
 - so it can't clear the cache
 Known issues:
 - No sound: clear partial movie directory and restart.
+
+
+ moov atom not found
+[concat @ 0000020ab91ebc40] Impossible to open...
+- clear sound dir and restart
 """
