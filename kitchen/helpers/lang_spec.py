@@ -6,9 +6,11 @@ from pathlib import Path
 import typer
 import re
 
+
+from kitchen import ERROR 
 from kitchen.helpers import (
         display, 
-        config
+        config,
 )
 
 def get_spec_path(config_file: Path) -> Path:
@@ -145,6 +147,7 @@ class Specification:
                 return inp
             if re.match(self.token_spec[key], inp):
                 return key
+        return ERROR
 
     def get_tokens_from_input(self, inp: str) -> list:
         """Obtains tokens from several inputs in one string.
@@ -159,7 +162,12 @@ class Specification:
         inp_stream = inp.strip().split(" ")
         cleaned_stream = clean_inp_stream(inp_stream)
         for c in cleaned_stream:
-            tokens.append(Token(self._match(c), c))
+            matched = self._match(c)
+            if matched != ERROR:
+                tokens.append(Token(matched, c))
+            else:
+                display.fail_secho("\tCould not match [" + c + "] to a token.")
+                return ERROR
         if len(tokens) != len(cleaned_stream):
             display.fail_secho("Could not match all tokens.")
             return None
@@ -221,4 +229,5 @@ class Token:
         """        
         self.type = type
         self.value = value
+        
     

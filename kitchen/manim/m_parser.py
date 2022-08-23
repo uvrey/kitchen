@@ -15,7 +15,8 @@ from kitchen import (
     RE_TERMINAL, 
     RE_NONTERMINAL, 
     RE_PRODUCTION, 
-    SUCCESS
+    SUCCESS,
+    ERROR
 )
 
 from kitchen.backend import stack, parser
@@ -121,16 +122,17 @@ class MParseTree(m.Scene):
         mg.set_up_token_colour(self)
         self.tok_cols = []
 
-        # associate a colour for each token
-        for t in self.tokens:
-            self.tok_cols.append(mg.get_token_colour(self))
+        if self.tokens != ERROR:
+            # associate a colour for each token
+            for t in self.tokens:
+                self.tok_cols.append(mg.get_token_colour(self))
 
         self.cfg = cfg
         self.nts = sorted(cfg.nonterminals)
         self.ts = sorted(cfg.terminals)
 
     def construct(self):
-        self.vis_parse_ll1(self.inp, self.tokens)
+        self.vis_parse_ll1()
     
     def tear_down(self):
         self.mtable = None
@@ -267,13 +269,26 @@ class MParseTree(m.Scene):
             m.FadeOut(rect),
         )
 
-    def check_for_epsilons(self):
+    def check_for_epsilons(self, g):
+        """Checks if any non-terminals led to epsilon.
+
+        Args:
+            g (_type_): _description_
+
+        Returns:
+            _type_: _description_
+        """        
+        # notify user
+        mg.display_msg(self, ["We can now check if any productions led ", 
+        "to \\varepsilon, and so disappeared."], script = "Let's check if " +
+        "any productions led to epsilon.")
         # look for any epsilons that came before and add.
         for node in self.root.descendants:
             if re.match(RE_NONTERMINAL, node.id):
                 if len(node.children) == 0 and "#" in \
                 self.cfg.first_set[node.id]:
                     anytree.Node("#", parent=node, id= "#", token = None)
+                    create_vertex(g, node, node.id)
         return SUCCESS
 
     def _parsing_successful(self, tokens, semantic: bool, testing = False, 
@@ -295,15 +310,14 @@ class MParseTree(m.Scene):
                 display.print_parsetree(self.root)
         
     # Parse LL(1) in the CLI
-    def vis_parse_ll1(self, tokens, input = ""):
+    def vis_parse_ll1(self):
         global V_LABELS
         global VCONFIG
         global m
-
-        # TODO check works with tokens 
-        if None in self.tokens:
-            display.fail_secho("Not all tokens from the input stream were \
-                matched :(\nParsing failed.")
+        
+        if self.tokens == ERROR:
+            display.fail_secho("Not all tokens from the input stream were " +
+                "matched :(\nParsing failed.")
             return
 
         # set up the stack and the parsing table
@@ -319,7 +333,7 @@ class MParseTree(m.Scene):
                          manim=m.MathTex(start_symbol))
 
         # copy the tokens
-        original_tokens = tokens[:]
+        original_tokens = self.tokens[:]
 
         # initialise a way to track the parent nodes
         self.parents = []
@@ -427,7 +441,7 @@ class MParseTree(m.Scene):
 
                     # if we have matched our last token
                     if len(self.tokens) == 1:
-                        self.check_for_epsilons()
+                        self.check_for_epsilons(g)
 
                     # pop off the stack and 'flash'
                     self.play(
@@ -500,7 +514,7 @@ class MParseTree(m.Scene):
                     cfg_line = self.manim_production_groups[prods[0].strip(
                     )][:]
                     cfg_line.next_to(self.s.mstack, m.DOWN).shift(
-                        0.8*m.DOWN).scale(0.4)
+                        0.8*m.DOWN).scale_to_fit_width(3*self.s.mstack.width)
 
                     self.play(
                         m.FadeIn(cfg_line)
@@ -519,8 +533,8 @@ class MParseTree(m.Scene):
                     nodes_to_append = []
                     stack_to_append = []
 
-                    mg.display_msg(self, [prods[0].strip() + " is a \
-                        non-terminal,", "so we can replace it with", 
+                    mg.display_msg(self, [prods[0].strip() + " is a "+
+                        "non-terminal,", "so we can replace it with", 
                         "its sub-productions: ",  prods[1]], 
                         script="Let's replace " + prods[0].strip() + 
                         " with its sub productions")
@@ -574,8 +588,8 @@ class MParseTree(m.Scene):
             sounds.add_sound_to_scene(self, sounds.FAIL)
             error.ERR_parsing_error(self.root)
             error.ERR_manim_parsing_error(self, ["The stack is not emptied,", 
-            "but parsing has concluded."], script = "Since the stack is not \
-                emptied, parsing is unsuccessful.")
+            "but parsing has concluded."], script = "Since the stack is not"+
+                " emptied, parsing is unsuccessful.")
             return
 
         # fade out the stack and transform the parse tree
@@ -583,13 +597,13 @@ class MParseTree(m.Scene):
         self.s.write_under_stack("\\text{Stack emptied.}")
         reset_g(self, g, start_symbol, anim=[m.FadeOut(self.s.mstack)])
 
+        token_str = lang_spec.get_token_format(original_tokens)
+        display.fail_secho(token_str)
         sounds.add_sound_to_scene(self, sounds.YAY)
-        mg.display_msg(self, ["Successfully parsed `" + lang_spec\
-            .get_token_format(original_tokens) + "'!"], 
+        mg.display_msg(self, ["Successfully parsed `" + token_str + "'!"], 
             script= "Parsing successful! That was a valid input.")
 
-        display.success_secho("Successfully parsed '" + 
-        lang_spec.get_token_format(original_tokens) +
+        display.success_secho("Successfully parsed '" + token_str +
                               "'!\nParse tree:")
         display.print_parsetree(self.root)
         return SUCCESS
@@ -601,8 +615,8 @@ class MParseTree(m.Scene):
         sounds.add_sound_to_scene(self, sounds.FAIL)
         mg.display_msg(self, ["No such entry at ParseTable[" + 
         top + ", " + next + "].", "Invalid input: `" + next + "'"],
-        script = next + " leads to a parsing error, so this \
-            input is not valid." )
+        script = next + " leads to a parsing error, so this "+
+            "input is not valid." )
         error.ERR_parsing_error(self.root, 
             "No such entry at ParseTable[" + top + ", " + next +
             "].")

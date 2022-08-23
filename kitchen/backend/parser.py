@@ -170,8 +170,13 @@ class ParserLL1:
 
                 try:
                     pt_entry = self.pt_dict[top][next]
+                    
+                    if pt_entry == "Error":
+                        self._call_ptable_error(top, next)
+                        return
+
                     prods = pt_entry.split("->")
-                  
+                    
                     self.stack.pop()
 
                     if top != start_symbol:
@@ -183,7 +188,7 @@ class ParserLL1:
                     # add sequence of productions to the stack
                     ps = list(filter(None, re.findall(
                         RE_PRODUCTION, prods[1])))
-                   
+                    
                     nodes_to_append = []
                     stack_to_append = []
 
@@ -238,4 +243,8 @@ class ParserLL1:
             if node_id == self.root:
                 return node
         return None
+
+    def _call_ptable_error(self, top, next):
+        error.ERR_parsing_error(self.root,
+                "ParseTable[" + top + ", " + next + "] is empty.")
 

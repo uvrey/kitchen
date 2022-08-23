@@ -108,6 +108,12 @@ make start symbol root :)
 Print first and followsets as dataframes :)
 cfg_1 parsing has sound not found error :)
 colour to opp of bg? MED :)
+scaling stack contents :)
+scaling replacing etc. :)
+scaling cfg line size :)
+scaling FS and FW properly :)
+Scaling large grammars - fs, fw, pt, ll1 LOW :)
+visualising with tokens :)
 """
 
 """
@@ -117,20 +123,16 @@ TESTING
 get lots of test cases written
 
 MANIM
-check epsilon bug in LL(1) parsing video MED
+check epsilons in LL(1) parsing video MED
 long names look weird in parsing vids - place above node and highlight the 
 
 Get parsing colours to match LL(1) tokens   LOW
 implement semantic analysis HIGH
-Scaling large grammars - fs, fw, pt, ll1 LOW
-
-scaling stack contents
-scaling replacing etc. 
-scaling cfg line size
 
 RuntimeWarning: invalid value encountered in double_scalars
 original tokens not showing at end of ll1 parsing manim
-visualising with tokens
+
+token colour coding
 
 LATEX
 
@@ -150,7 +152,7 @@ start dsl tool from the typer app HIGH
 
 """
 TODO - DETAILS LOW
-scaling FS and FW properly
+
 remove debugging output
 generate tree PNG for export
 

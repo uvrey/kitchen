@@ -94,8 +94,12 @@ def show_tokens(tokens):
         tokens (list): Token list to be shown.
     """    
     for t in tokens:
-        structure_secho("Token < Type: " + t.type + ", Value: " + t.value + 
-        " >")
+        if t != None:
+            structure_secho("Token < Type: " + t.type + ", Value: " + t.value + 
+            " >")
+        else:
+            structure_secho("None")
+
 
 def pretty_print_dict(dict):
     """Prints a nicely-formatted dictionary.

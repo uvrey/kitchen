@@ -74,10 +74,10 @@ class MFollowSet(m.Scene):
             if is_start_symbol:
                 self.cfg.follow_set[production].append("$")
                 self._add_to_follow_vis(
-                    production, "$", keys, [production + " is the start \
-                        symbol,", "so we append $", "to Follow(" +
-                    production + ")"], script = production + ", is the \
-                        start symbol, so we append $ to its follow set.")
+                    production, "$", keys, [production + " is the start " +
+                        "symbol,", "so we append $", "to Follow(" +
+                    production + ")"], script = production + ", is the " +
+                        "start symbol, so we append $ to its follow set.")
                 is_start_symbol = False
 
             # inspect each element in the production
@@ -108,8 +108,8 @@ class MFollowSet(m.Scene):
                                 anims.append(t) 
 
                             mg.display_msg(self, ["Follow(" + mg.to_tex(item) +
-                            ") may not exist"], script = "A standalone \
-                            non epsilon terminal won't have a follow set.")
+                            ") may not exist"], script = "A standalone " +
+                            "non epsilon terminal won't have a follow set.")
 
                         else:
                             # just highlight the terminal
@@ -123,8 +123,8 @@ class MFollowSet(m.Scene):
 
                     else:
                         self.wait()
-                        sounds.narrate("Let's now look at " +item +", which\
-                            is a non terminal.", self)
+                        sounds.narrate("Let's now look at " +item +", which " +
+                            "is a non terminal.", self)
 
                         self.play(
                             m.Circumscribe(cfg_element, color=m.RED, 
@@ -148,8 +148,8 @@ class MFollowSet(m.Scene):
                                 production + " is a subset of that of " + 
                                 item + " ")
                         else:
-                            mg.display_msg(self, [next_item + ", is already \
-                                in Follow(" + item + ")"], script=item +
+                            mg.display_msg(self, [next_item + ", is already " +
+                                "in Follow(" + item + ")"], script=item +
                                 "is already in the follow set.")                                   
                     
                     elif index < len(pps) - 1:
@@ -162,10 +162,10 @@ class MFollowSet(m.Scene):
                                 self._add_to_follow_vis(
                                     item, next_item, keys)
                             else:
-                                mg.display_msg(self, [next_item +", is \
-                                    already in Follow(" + item + ")"], 
-                                    script=item + "is already in the follow \
-                                    set.")   
+                                mg.display_msg(self, [next_item +", is "+
+                                    "already in Follow(" + item + ")"], 
+                                    script=item + "is already in the follow " +
+                                    "set.")   
                         else:
                             # we add the first of the non-terminal at this 
                             # next index
@@ -194,8 +194,8 @@ class MFollowSet(m.Scene):
                             mg.display_msg(self, [r'{First (' +next_item +
                                 r') - #}', r'\subseteq Follow (' + item + 
                                 r')'], script = "The first set of " + 
-                                next_item + " without epsilon is a subset \
-                                    of " + item + "'s follow set.")
+                                next_item + " without epsilon is a subset of "+
+                                     item + "'s follow set.")
 
                             for t in tmp_first:
                                 if t != "#":
