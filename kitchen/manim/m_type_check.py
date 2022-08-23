@@ -61,9 +61,13 @@ def create_vertex(g, vertex_id, parent_id, label, color=m.GRAY,  link=True):
 
     return v
 
-def reset_g(self, g, root, anim=[]):
-    for a in anim:
-        self.play(a)
+def reset_g(self, g, root):
+    """Resets the graph layout.
+
+    Args:
+        g (Graph): Graph Mobject.
+        root (str): Identifier of the root vertex.
+    """    
 
     self.play(
         g.animate.change_layout(
@@ -89,45 +93,6 @@ class MSemanticAnalyser(m.Scene):
         self.symbol = {'Symbol': [], 'Type': []}
         self.inp_list = lang_spec.clean_inp_stream(inp.split(" "))
         self.tokens = mg.get_tokens_from_input(inp, spec)
-
-    # shows the input stream and its association with the token stream
-    def intro(self):
-        # introducing the input
-        title = m.Tex(r"Input to be parsed:")
-        sounds.narrate("Let's parse this input.", self)
-        inp = m.Text(self.input, weight=m.BOLD, color=m.BLUE)
-        m.VGroup(title, inp).arrange(m.DOWN)
-        self.play(
-            m.FadeIn(title),
-            m.Write(inp, shift=m.DOWN),
-        )
-        self.wait()
-
-        # transforming to lexing
-        transform_title = m.Tex(
-            "Lexing matched the input to the following tokens:")
-        sounds.narrate("The input stream gives these token types.", self)
-        transform_title.to_edge(m.UP)
-        self.play(
-            m.Transform(title, transform_title),
-            m.FadeOut(inp)
-        )
-        self.wait()
-
-        # show tokens then fade everything out
-        
-        self.play(
-            m.LaggedStart(*(m.FadeIn(t, shift=m.UP)
-                        for t in mp.map_token_lists(self, self.inp_list, 
-                        lang_spec.get_token_format(self.tokens, types=True, 
-                        as_list=True)))),
-        )
-        self.wait()
-
-        # fades the scene out
-        self.play(
-            *[m.FadeOut(mob)for mob in self.mobjects]
-        )
 
     def construct(self):
         """Constructs the semantic analysis scene.
@@ -185,13 +150,12 @@ class MSemanticAnalyser(m.Scene):
         # sets the stage
         self.play(
             sem_title.animate.to_edge(m.UP),
-            self.m_tok_gp.animate.to_edge(m.RIGHT).shift(m.UL),
+            self.m_tok_gp.animate.to_edge(m.RIGHT).shift(m.UL+m.UP),
+            self.m_inp_gp.animate.to_edge(m.LEFT).shift(m.UR+ m.UP),
             m.Create(arr),
             m.Write(arr_caption)
         )
 
-        self.m_inp_gp.next_to(self.m_tok_gp, m.DOWN)
-        self.play(m.FadeIn(self.m_inp_gp))
 
         # create the table
         self.table = self._update_symbol_table([[".", "."]])
