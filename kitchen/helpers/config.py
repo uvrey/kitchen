@@ -31,7 +31,8 @@ THEME = DARK
     FIRST_SET,
     PARSETABLE,
     LL1_PARSING,
-) = range(4)
+    TYPE_CHECK
+) = range(5)
 
 CONFIG_DIR_PATH = Path(typer.get_app_dir(__app_name__))
 CONFIG_FILE_PATH = CONFIG_DIR_PATH / "config.ini"
@@ -211,7 +212,7 @@ def get_time() -> str:
         str: Formatted time.
     """    
     now = datetime.now()
-    return now.strftime("%H-%M-%S__%d-%m")
+    return now.strftime("%H-%M-%S_%d-%m")
 
 def configure_output_file_name(file_type: int, inp = "") -> None:
     """Sets unique file names for generated videos.
@@ -233,6 +234,8 @@ def configure_output_file_name(file_type: int, inp = "") -> None:
         file_name = "FirstSet_" + get_time()
     elif file_type == PARSETABLE:
         file_name = "ParseTable_" + get_time()
+    elif file_type == TYPE_CHECK:
+        file_name = "TypeCheck_" + get_time()
     
     # if clear name given, set new output file name
     if file_name != "":

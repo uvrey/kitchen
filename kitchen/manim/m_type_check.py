@@ -2,18 +2,19 @@
 # kitchen/backend/type_check.py
 
 import re
+from symtable import Symbol
 from tracemalloc import start
 import anytree
 from anytree.exporter import DictExporter
 from collections import OrderedDict
 import pandas as pd
-from kitchen import RE_NONTERMINAL
 import manim as m
 import networkx as nx
 import typer
 
 from kitchen.helpers import display, sounds, lang_spec, config
 from kitchen.manim import m_general as mg, m_parser as mp, m_parse_table as mpt
+from kitchen import CFG_SCALE_HEIGHT, RE_NONTERMINAL, CFG_SCALE_WIDTH
 
 VCONFIG = {"radius": 0.2, "color": m.BLUE, "fill_opacity": 1}
 LCONFIG = {"vertex_spacing": (2.5, 1)}
@@ -87,8 +88,6 @@ class MSemanticAnalyser(m.Scene):
         # # associate a colour for each token
         # for t in self.tokens:
         #     self.tok_cols.append(mg.get_token_colour(self))
-       
-
 
     # shows the input stream and its association with the token stream
     def intro(self):
@@ -134,7 +133,7 @@ class MSemanticAnalyser(m.Scene):
         # TODO fix self.intro()
 
         # draws follow set title
-        sem_title = mg.get_title_mobject("semantic analysis") 
+        sem_title = mg.get_title_mobject("Semantic Analysis") 
 
         # show the token stream
         self.m_tok = {}
@@ -143,7 +142,7 @@ class MSemanticAnalyser(m.Scene):
 
         for t in self.tokens:
             try:
-                tex = m.MathTex("\\text{"+t.value+"}").scale(0.5)
+                tex = m.MathTex("\\text{"+t.type+"}").scale(0.5)
                 self.m_tok_gp.add(tex)
                 self.m_tok[t.type] = tex
             except:
@@ -152,13 +151,37 @@ class MSemanticAnalyser(m.Scene):
                 self.m_tok[t] = tex
         self.m_tok_gp.arrange(m.RIGHT)
 
+        # show the input stream
+        self.m_inp = {}
+        self.m_inp_gp = m.VGroup()
+        self.m_inp_gp.add(m.Tex("Input stream: ")).scale(0.5)
+
+        for t in self.tokens:
+            try:
+                tex = m.MathTex("\\text{"+t.value+"}").scale(0.5)
+                self.m_inp_gp.add(tex)
+                self.m_inp[t.type] = tex
+            except:
+                tex = m.MathTex("\\text{"+t+"}").scale(0.5)
+                self.m_inp_gp.add(tex)
+                self.m_inp[t] = tex
+        self.m_inp_gp.arrange(m.RIGHT)
+        self.m_inp_gp.next_to(self.m_tok_gp, m.DOWN)
+
+        # show parsing direction
+        arr = m.Arrow(start=3*m.RIGHT, end=3*m.LEFT, color=config.\
+            get_opp_col(), buff = 1)
+        arr.to_edge(m.DOWN)
+        arr_caption = m.Tex("Parsing direction").scale(0.7)
+        arr_caption.next_to(arr, m.UP)
+
         # sets the stage
         self.play(
             sem_title.animate.to_edge(m.UP),
-            self.m_tok_gp.animate.to_edge(m.RIGHT).shift(m.UL)
+            self.m_tok_gp.animate.to_edge(m.RIGHT).shift(m.UL),
+            m.Create(arr),
+            m.Write(arr_caption)
         )
-
-        sounds.narrate("Parsing gave this parse tree.", self)
 
         # create the table
         self.table = self._update_symbol_table([[".", "."]])
@@ -174,14 +197,15 @@ class MSemanticAnalyser(m.Scene):
         # start semantic analysis
         self.init_analysis(start_symbol, g)
 
-
     def _update_symbol_table(self, contents):
         table = m.Table(
             contents,
-            col_labels=[m.Tex("Symbol", color = m.BLUE), m.Tex("Type", color = m.BLUE)],
+            col_labels=[m.Tex("Symbol", color = m.BLUE), m.Tex("Type", 
+                color = m.BLUE)],
             top_left_entry=m.Star().scale(0.3),
             include_outer_lines=False,
             line_config={"stroke_width": 1, "color": m.BLUE_A})
+        table.scale_to_fit_width(CFG_SCALE_WIDTH/2)
         return table
 
 
@@ -203,52 +227,61 @@ class MSemanticAnalyser(m.Scene):
         lhs = True
         lh_type = None
    
+        mg.display_msg(self, ["We traverse the parse tree obtained ", \
+        "from parsing the given token stream."], script = "Let us traverse" + 
+        " the parse tree.")
+
         for node in anytree.PreOrderIter(self.root):
-           # try: TODO
-            # draw manim vertex
-            if node.id != start_symbol:
-                try: 
-                    if re.match(RE_NONTERMINAL, node.id):
-                        v_id = node.parent.id + "_" + node.id
-                    else:
-                        v_id = node.parent.id + "_" + node.token.value
-                    if node.parent.id != start_symbol:
-                        p_id = node.parent.parent.id + "_" + node.parent.id
-                    else:
-                        p_id = start_symbol 
-                    v = create_vertex(g, v_id, p_id, node.id, m.BLUE)
-                    sounds.add_sound_to_scene(self, sounds.CLICK)
-                    self.play(m.FadeIn(v))
-                    reset_g(self, g, start_symbol)
-                except: 
-                    pass
-
-            if node.token != None:
-                if not lhs:
-                    if node.token.value not in self.symbol['Symbol'] \
-                        and lh_type == node.token.type:
-                        self._call_error(node.token.value + 
-                        " has not yet been defined.")
-                        return
-                    lhs = True
-                else:
-                    if node.token.value != "=":
-                        if node.token.value in self.symbol['Symbol']:
-                            self._call_error(node.token.value + 
-                            " has already been defined.")
-                            return
+            try:
+                # draw manim vertex
+                if node.id != start_symbol:
+                    try: 
+                        if re.match(RE_NONTERMINAL, node.id):
+                            v_id = node.parent.id + "_" + node.id
                         else:
-                            lh_type = node.token.type
-                    else:
-                        lhs = False
+                            v_id = node.parent.id + "_" + node.token.value
+                        if node.parent.id != start_symbol:
+                            p_id = node.parent.parent.id + "_" + node.parent.id
+                        else:
+                            p_id = start_symbol 
+                        v = create_vertex(g, v_id, p_id, node.id, m.BLUE)
+                        sounds.add_sound_to_scene(self, sounds.CLICK)
+                        self.play(m.FadeIn(v))
+                        reset_g(self, g, start_symbol)
+                    except: 
+                        pass
 
-                self.symbol['Symbol'].append(node.token.value)
-                self.symbol['Type'].append(node.token.type)
-                self.fade_in_table()
-            # except:
-            #     self._call_error("Cannot semantically analyse only "+
-            #         "a token stream.")
-            #     return
+                if node.token != None:
+                    if not lhs:
+                        if node.token.value not in self.symbol['Symbol'] \
+                            and lh_type == node.token.type:
+                            self._call_error(node.token.value + 
+                            " has not yet been defined.")
+                            return
+                        lhs = True
+                    else:
+                        if node.token.value != "=":
+                            if node.token.value in self.symbol['Symbol']:
+                                self._call_error(node.token.value + 
+                                " has already been defined.")
+                                return
+                            else:
+                                lh_type = node.token.type
+                        else:
+                            lhs = False
+
+                    self.symbol['Symbol'].append(node.token.value)
+                    self.symbol['Type'].append(node.token.type)
+                    self.fade_in_table()
+            except:
+                self._call_error("Cannot semantically analyse only "+
+                    "a token stream.")
+                return
+        
+        mg.display_msg(self, ["Semantic analysis complete!"], script = 
+        "Semantic analysis complete! Here is the final symbol table.")
+
+        self.fade_in_table(fade_out = False)
         self.print_symbol_table()
 
     def replace_entry(self):
@@ -277,20 +310,22 @@ class MSemanticAnalyser(m.Scene):
             display.fail_secho(new_str)
             return new_str
     
-    def fade_in_table(self):
+    def fade_in_table(self, fade_out = True):
 
         # create fading area
         rect = m.Rectangle(width=20, height=10, color=config.get_theme_col(), 
         fill_opacity=0.95)
 
         st_title = mg.get_title_mobject("Symbol table")
-        st_title.next_to(self.table, m.UP)
+        st_title.to_edge(m.UP)
 
         self.play(
             m.FadeIn(rect),
         )
 
-        sounds.narrate("Let's add this terminal to the symbol table.", self)
+        sounds.narrate("Let's add terminal " + 
+        self.symbol["Symbol"][-1] + " to the symbol table.", self)
+
         self.play(
             m.FadeIn(st_title),
             m.FadeIn(self.table)
@@ -298,10 +333,11 @@ class MSemanticAnalyser(m.Scene):
         
         self.replace_entry()
 
-        self.play(
-            m.FadeOut(st_title),
-            m.FadeOut(rect),
-        )
+        if fade_out:
+            self.play(
+                m.FadeOut(st_title),
+                m.FadeOut(rect),
+            )
 
     def print_symbol_table(self):
         """Displays the symbol table.

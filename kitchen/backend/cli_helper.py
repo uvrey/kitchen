@@ -377,10 +377,13 @@ def _process_command(inp, cfg, spec) -> None:
             else:
                 code = _init_parsing_ll1(to_sem, cfg, spec, semantic = True)
                 if code == SUCCESS:
-                    sem_analyser = m_type_check.MSemanticAnalyser()
-                    sem_analyser.setup_manim(cfg, 
-                    cfg.parser_ll1.root, to_sem, spec)
-                    sem_analyser.render()
+                    config.OUTPUT_CONFIG["output_file"] = "TypeCheck"
+                    config.configure_output_file_name(config.TYPE_CHECK)
+                    with m.tempconfig(config.OUTPUT_CONFIG):
+                        sem_analyser = m_type_check.MSemanticAnalyser()
+                        sem_analyser.setup_manim(cfg, 
+                        cfg.parser_ll1.root, to_sem, spec)
+                        sem_analyser.render()
                 else:
                     display.fail_secho("Parsing failed with code " + 
                     str(code)+ ".Cannot generate semantic analysis.")

@@ -131,6 +131,9 @@ message formatting going over lines thanks to \
 base for semantic analysis (cfg.txt) :)
 Transforming table bug :)
 tree arranging to the right :)
+- larger inputs - make them underneath each other in the symbol table :)
+- unique file names :)
+- ID language sem an :)
 """
 
 """
@@ -141,22 +144,19 @@ get lots of test cases written
 
 Get parsing colours to match LL(1) tokens   LOW
 
+LL(1) parsing ID language
+
 SEMANTIC ANALYSIS
-- ID language (naming of nodes?)
-- larger inputs - make them underneath each other in the symbol table
-- unique names
+- check conflics
 - more comments and SFX
 
 PARSING
 - unique IDs in parsing 
 
-
 RuntimeWarning: invalid value encountered in double_scalars
 original tokens not showing at end of ll1 parsing manim
 
 token colour coding
-
-
 
 LATEX
 
@@ -176,7 +176,6 @@ start dsl tool from the typer app HIGH
 
 """
 TODO - DETAILS LOW
-
 remove debugging output
 generate tree PNG for export
 
