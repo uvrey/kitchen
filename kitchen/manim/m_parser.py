@@ -513,7 +513,6 @@ class MParseTree(m.Scene):
                     if self.parents != []:
                         replaced_parent = self.parents[-1]
                         sounds.add_sound_to_scene(self, sounds.CLICK)
-                        typer.echo("creating vertex " + replaced_parent.id)
                         new_vertex = create_vertex(g, replaced_parent, \
                             mg.to_math_tex(self.parents[-1].id), 
                             color = m.BLUE_D)
