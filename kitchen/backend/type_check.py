@@ -122,7 +122,7 @@ visualising with tokens :)
 check epsilons in LL(1) parsing video MED :)
 long names look weird in parsing vids - place nicely :)
 message formatting going over lines thanks to \
-    -> Loading the CFG file failed with "file does not         exist" :)
+    -> Loading the CFG file failed with "file does not exist" :)
 
 base for semantic analysis (cfg.txt) :)
 Transforming table bug :)
@@ -140,6 +140,7 @@ generate tree PNG for export :)
 
 EXPORT PNG
 - how to initialise saving :)
+original tokens not showing at end of ll1 parsing manim :)
 """
 
 """
@@ -149,14 +150,9 @@ TESTING
 get lots of test cases written
 
 LL(1) parsing ID language - HIGH
-
-PARSING
-- same IDs in parsing ll1 vis
+same IDs in parsing ll1 vis
 
 RuntimeWarning: invalid value encountered in double_scalars
-original tokens not showing at end of ll1 parsing manim
-
-LATEX
 
 GRAMMARS
 validate grammars and language spec MED
