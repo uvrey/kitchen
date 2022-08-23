@@ -282,13 +282,16 @@ class MParseTree(m.Scene):
         mg.display_msg(self, ["We can now check if any productions led ", 
         "to $\\varepsilon$, and so disappeared."], script = "Let's check if " +
         "any productions led to epsilon.")
+        
         # look for any epsilons that came before and add.
         for node in self.root.descendants:
             if re.match(RE_NONTERMINAL, node.id):
                 if len(node.children) == 0 and "#" in \
                 self.cfg.first_set[node.id]:
-                    anytree.Node("#", parent=node, id= "#", token = None)
-                    create_vertex(g, node, node.id)
+                    new_node = anytree.Node("#", parent=node, id= "#", 
+                    token = None, parent_id = node.vertex_id, vertex_id =
+                    node.id + "_#")
+                    create_vertex(g, new_node, r'\varepsilon')
         return SUCCESS
 
     def _parsing_successful(self, tokens, semantic: bool, testing = False, 
