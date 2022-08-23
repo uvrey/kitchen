@@ -367,12 +367,21 @@ class MParseTree(m.Scene):
         # show the parsing table
         self._fade_in_mtable(first_time=True)
 
+        # show parsing direction
+        arr = m.Arrow(start=3*m.RIGHT, end=3*m.LEFT, color=config.\
+            get_opp_col(), buff = 1)
+        arr.to_edge(m.DOWN)
+        arr_caption = m.Tex("Parsing direction").scale(0.7)
+        arr_caption.next_to(arr, m.UP)
+
         # set the stage
         self.play(
             ll1_title.animate.to_edge(m.UP),
             m_tok_gp.animate.to_edge(m.UR).shift(m.DOWN + m.LEFT),
             self.s.mstack.animate.to_edge(m.LEFT).shift(
                 m.DOWN+m.RIGHT).align_to(self.mtable.get_center),
+            m.Create(arr),
+            m.Write(arr_caption)
         )
 
         # create our first label

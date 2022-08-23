@@ -15,6 +15,72 @@ from kitchen.helpers import config, error, sounds
 from kitchen.backend import context_free_grammar as cfg
 from kitchen.manim import m_general as mg
 
+
+def init_m_table(row_vals: list, row_labels: list, col_labels: list):
+    """Initialises the Manim MathTable structure.
+
+    Args:
+        row_vals (list): Row values.
+        row_labels (list): Row labels.
+        col_labels (list): Column labels.
+
+    Returns:
+        MathTable: Initialised Manim MathTable structure.
+    """        
+    row_labels = row_labels
+    col_labels = col_labels
+
+    table = m.MathTable(
+        row_vals,
+        row_labels=[m.MathTex(mg.to_math_tex(rl)) for rl in row_labels],
+        col_labels=[m.MathTex(mg.to_math_tex(cl)) for cl in col_labels],
+        include_outer_lines=True)
+
+    lab = table.get_labels()
+    lab.set_color(m.LIGHT_GRAY)
+    table.get_horizontal_lines()[2].set_stroke(width=3, color=m.LIGHT_GRAY)
+    table.get_vertical_lines()[2].set_stroke(width=3, color=m.LIGHT_GRAY)
+    return table
+
+
+def swap(scene, row: int, col: int, new_val: str) -> m.MathTable:
+    """Swaps two elements in a parse table visualisation.
+
+    Args:
+        row (int): Row of element to be swapped.
+        col (int): Column of element to be swapped.
+        new_val (String): Value to be swapped into the table. 
+    """        
+    global GRID_ITEM_SCALE
+    GRID_ITEM_SCALE = scene.mtable.width / len(scene.mtable.col_labels)
+
+    t_old = scene.mtable.get_entries_without_labels((row, col))
+
+    scene.play(
+        m.Indicate(t_old, color = config.get_opp_col())
+    )
+
+    # set up new value with colour
+    t_new = m.MathTex(mg.to_math_tex(new_val))
+    t_new.scale_to_fit_width(GRID_ITEM_SCALE).scale(0.7)
+    t_new.move_to(t_old)
+    t_new.fade_to(config.get_opp_col(), alpha=0.2)
+
+    # fade out old value and into new value
+    sounds.add_sound_to_scene(scene, sounds.CLACK)
+    scene.play(
+        m.FadeIn(t_new),
+        m.FadeOut(t_old),
+    )
+
+    scene.play(
+        m.ApplyWave(t_new),
+    )
+
+    # pause before concluding
+    scene.wait()
+
+
 class MParsingTable(m.Scene):
     def setup_manim(self, cfg: cfg.ContextFreeGrammar):
         """Sets up the structures which the animation will make use of.
@@ -54,31 +120,6 @@ class MParsingTable(m.Scene):
             row_vals.append(row)
         return row_vals
 
-    def _init_m_table(self, row_vals: list, row_labels: list, col_labels: list):
-        """Initialises the Manim MathTable structure.
-
-        Args:
-            row_vals (list): Row values.
-            row_labels (list): Row labels.
-            col_labels (list): Column labels.
-
-        Returns:
-            MathTable: Initialised Manim MathTable structure.
-        """        
-        row_labels = row_labels
-        col_labels = col_labels
-
-        table = m.MathTable(
-            row_vals,
-            row_labels=[m.MathTex(mg.to_math_tex(rl)) for rl in row_labels],
-            col_labels=[m.MathTex(mg.to_math_tex(cl)) for cl in col_labels],
-            include_outer_lines=True)
-
-        lab = table.get_labels()
-        lab.set_color(m.LIGHT_GRAY)
-        table.get_horizontal_lines()[2].set_stroke(width=3, color=m.LIGHT_GRAY)
-        table.get_vertical_lines()[2].set_stroke(width=3, color=m.LIGHT_GRAY)
-        return table
 
     def _vis_populate_table(self):
         """Visualises the algorithm that constructs the parsing table.
@@ -113,8 +154,7 @@ class MParsingTable(m.Scene):
         row_vals = self._init_row_contents()
 
         # adds the table to the element group
-        self.mtable = self._init_m_table(
-            row_vals, row_labels, col_labels)
+        self.mtable = init_m_table(row_vals, row_labels, col_labels)
         self.mtable.get_row_labels().fade_to(color=m.RED, alpha=1)
         self.mtable.get_col_labels().fade_to(color=m.TEAL, alpha=1)
         self.mtable.scale_to_fit_height(CFG_SCALE_HEIGHT)
@@ -125,7 +165,7 @@ class MParsingTable(m.Scene):
         guide.scale(0.6)
         
         # arranges all items
-        all_elements.arrange_in_grid(rows = 1, buff = 1.2)
+        all_elements.arrange_in_grid(rows = 1, buff = 2)
         all_elements.center()
 
         # scales everything nicely
@@ -248,49 +288,12 @@ class MParsingTable(m.Scene):
                 return ERROR
             else:
                 self.pt_dict[nt][t] = prod
-                self.swap(mg.row(self.nts, nt), mg.col(self.ts, t), prod)
+                swap(self, mg.row(self.nts, nt), mg.col(self.ts, t), prod)
 
         except KeyError:
             self.pt_dict[nt][t] = prod
-            self.swap(mg.row(self.nts, nt), mg.col(self.ts, t), prod)
+            swap(self, mg.row(self.nts, nt), mg.col(self.ts, t), prod)
         return SUCCESS
-
-    def swap(self, row: int, col: int, new_val: str) -> m.MathTable:
-        """Swaps two elements in a parse table visualisation.
-
-        Args:
-            row (int): Row of element to be swapped.
-            col (int): Column of element to be swapped.
-            new_val (String): Value to be swapped into the table. 
-        """        
-        global GRID_ITEM_SCALE
-        GRID_ITEM_SCALE = self.mtable.width / len(self.cfg.terminals)
-
-        t_old = self.mtable.get_entries_without_labels((row, col))
-
-        self.play(
-            m.Indicate(t_old, color = config.get_opp_col())
-        )
-
-        # set up new value with colour
-        t_new = m.MathTex(mg.to_math_tex(new_val))
-        t_new.scale_to_fit_width(GRID_ITEM_SCALE).scale(0.7)
-        t_new.move_to(t_old)
-        t_new.fade_to(config.get_opp_col(), alpha=0.2)
-
-        # fade out old value and into new value
-        sounds.add_sound_to_scene(self, sounds.CLACK)
-        self.play(
-            m.FadeIn(t_new),
-            m.FadeOut(t_old),
-        )
-
-        self.play(
-            m.ApplyWave(t_new),
-        )
-
-        # pause before concluding
-        self.wait()
 
     def tear_down(self):
         """Concludes the scene by clearing the narrations directory.

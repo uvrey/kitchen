@@ -4,6 +4,9 @@
 import anytree
 import pandas as pd
 import manim as m
+from anytree.exporter import DictExporter
+from collections import OrderedDict
+import networkx as nx
 
 from kitchen.helpers import display
 
@@ -62,8 +65,8 @@ class SemanticAnalyser:
                     self.symbol['Type'].append(node.token.type)
 
                 except:
-                    self._call_error("Cannot semantically analyse only \
-                        a token stream.")
+                    self._call_error("Cannot semantically analyse only "+
+                        "a token stream.")
                     return
         self.print_symbol_table()
 
@@ -73,6 +76,9 @@ class SemanticAnalyser:
         display.info_secho("Symbol Table:")
         df = pd.DataFrame.from_dict(self.symbol).to_markdown()
         display.structure_secho(df)
+
+
+ 
 
 
 
@@ -120,6 +126,9 @@ check epsilons in LL(1) parsing video MED :)
 long names look weird in parsing vids - place nicely :)
 message formatting going over lines thanks to \
     -> Loading the CFG file failed with "file does not         exist" :)
+
+
+base for semantic analysis (cfg.txt)
 """
 
 """
@@ -129,7 +138,11 @@ TESTING
 get lots of test cases written
 
 Get parsing colours to match LL(1) tokens   LOW
-implement semantic analysis HIGH
+
+SEMANTIC ANALYSIS
+- ID language (naming of nodes?)
+- larger inputs - make them underneath each other in the symbol table
+
 
 RuntimeWarning: invalid value encountered in double_scalars
 original tokens not showing at end of ll1 parsing manim
