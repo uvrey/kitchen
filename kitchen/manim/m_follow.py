@@ -259,15 +259,11 @@ class MFollowSet(m.Scene):
                     if item == "$":
                         has_eos = True
                     else:
-                        new_fs_group.add(
-                            m.Tex(mg.to_tex(item), color = m.BLUE)\
-                                .scale(TEXT_SCALE))
+                        new_fs_group.add(m.Tex(mg.to_tex(item), color = m.BLUE))
 
                 # puts $ at end of list for consistency
                 if has_eos:
-                    new_fs_group.add(
-                        m.Tex(mg.to_tex("$"), color = m.BLUE)\
-                            .scale(TEXT_SCALE))
+                    new_fs_group.add(m.Tex(mg.to_tex("$"), color = m.BLUE))
                 new_fs_group.arrange_in_grid(rows=1, buff=0.5).next_to(
                     self.cfg.manim_followset_lead[key], m.RIGHT)
 
@@ -360,9 +356,9 @@ class MFollowSet(m.Scene):
             if self.cfg.manim_followset_lead[production] == None:
                 self.cfg.manim_followset_lead[production] = \
                     m.Tex("Follow(" + production + "):", 
-                    color = config.get_opp_col())\
-                    .align_to(cfg_line, m.UP).shift(m.LEFT)\
-                        .scale_to_fit_height(2*cfg_line.height)
+                    color = config.get_opp_col()).scale_to_fit_height\
+                        (2*cfg_line.height).next_to\
+                        (keys, m.RIGHT).align_to(cfg_line, m.UP)
 
                 # prepares content group
                 self.cfg.manim_followset_contents[production].next_to(

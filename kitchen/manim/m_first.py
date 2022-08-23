@@ -130,7 +130,7 @@ class MFirstSet(m.Scene):
                                     new_element = m.Tex(
                                         mg.to_tex(terminal_to_write), 
                                         color=m.TEAL)\
-                                            .scale_to_fit_height(2*cfg_line.height)
+                                            .scale_to_fit_height(1.5*cfg_line.height)
                                     self.manim_firstset_contents[ps].add(
                                         new_element)
                                     self.manim_firstset_contents[ps]\
@@ -173,7 +173,7 @@ class MFirstSet(m.Scene):
                                     [production][i][j-1]
                                 prev_element.fade_to(
                                     color=m.DARK_GRAY, alpha=1)
-                                prev_element.scale_to_fit_height(2*cfg_line.height)
+                                prev_element.scale_to_fit_height(1.5*cfg_line.height)
 
                             # display the message alongside narration
                             mg.display_msg(self, [production + " leads to " + 
@@ -240,7 +240,7 @@ class MFirstSet(m.Scene):
                             # production in the stack
                             new_element = m.Tex(
                                     terminal_to_write, color=m.TEAL)\
-                                        .scale_to_fit_height(2*cfg_line.height)
+                                        .scale_to_fit_height(1.5*cfg_line.height)
                             self.cfg.manim_firstset_contents[ps].add(
                                 new_element)
                             self.cfg.manim_firstset_contents[ps]\

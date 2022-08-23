@@ -38,7 +38,7 @@ class Stack:
             self.stack.pop()
 
             m_msg = m.MathTex(msg).next_to(self.mstack, m.DOWN)
-            m_msg.scale(0.5)
+            m_msg.scale_to_fit_width(1.5*self.mstack.width)
 
             if self.texts != []:
                 # animate fading out
@@ -81,7 +81,8 @@ class Stack:
 
     def write_under_stack(self, msg, fade_out=True):
         # set up message
-        m_msg = m.MathTex(msg).next_to(self.mstack, m.DOWN).scale(0.5)
+        m_msg = m.MathTex(msg).next_to(self.mstack, m.DOWN)\
+            .scale_to_fit_width(1.5*self.mstack.width)
         self.scene.play(
             m.Write(m_msg),
         )
@@ -96,7 +97,7 @@ class Stack:
         if msg != None:
             m_msg = m.Tex(msg, color = config.get_opp_col())\
                 .next_to(self.mstack, m.DOWN)
-            m_msg.scale(0.5)
+            m_msg.scale_to_fit_width(1.5*self.mstack.width)
 
 
         # add to backend stack
@@ -113,7 +114,7 @@ class Stack:
             t = m.MathTex(a).shift(self.le).fade_to(color=m.RED, alpha=1)
             if re.match(RE_TERMINAL, a):
                 t.fade_to(color=m.TEAL, alpha=1)
-            t.scale(0.5)
+            t.scale_to_fit_width(1.5*self.mstack.width)
             t.move_to(self.texts[-1].get_top()).shift(m.UP*0.5)
             self.texts.append(t)
 
