@@ -78,9 +78,6 @@ class SemanticAnalyser:
         display.structure_secho(df)
 
 
- 
-
-
 
 """
 DONE
@@ -127,7 +124,6 @@ long names look weird in parsing vids - place nicely :)
 message formatting going over lines thanks to \
     -> Loading the CFG file failed with "file does not         exist" :)
 
-
 base for semantic analysis (cfg.txt) :)
 Transforming table bug :)
 tree arranging to the right :)
@@ -135,8 +131,8 @@ tree arranging to the right :)
 - unique file names :)
 - ID language sem an :)
 
-SEM ANAL
-- check conflicts :)
+SEMANTIC ANALYSIS
+- check conflicts - not yet and already defined :)
 - more comments and SFX :)
 """
 
@@ -149,10 +145,8 @@ get lots of test cases written
 
 LL(1) parsing ID language
 
-SEMANTIC ANALYSIS
-
 PARSING
-- unique IDs in parsing 
+- same IDs in parsing ll1 vis
 
 RuntimeWarning: invalid value encountered in double_scalars
 original tokens not showing at end of ll1 parsing manim
