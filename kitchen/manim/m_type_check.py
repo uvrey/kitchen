@@ -12,9 +12,25 @@ import manim as m
 import networkx as nx
 import typer
 
-from kitchen.helpers import display, sounds, lang_spec, config
-from kitchen.manim import m_general as mg, m_parser as mp, m_parse_table as mpt
-from kitchen import CFG_SCALE_HEIGHT, RE_NONTERMINAL, CFG_SCALE_WIDTH, RE_TERMINAL
+from kitchen.helpers import (
+    display, 
+    sounds, 
+    lang_spec, 
+    config
+)
+
+from kitchen.manim import (
+    m_general as mg, 
+    m_parser as mp,
+    m_parse_table as mpt
+)
+
+from kitchen import (
+        CFG_SCALE_HEIGHT, 
+        RE_NONTERMINAL, 
+        CFG_SCALE_WIDTH, 
+        RE_TERMINAL
+)
 
 VCONFIG = {"radius": 0.2, "color": m.BLUE_D, "fill_opacity": 1}
 LCONFIG = {"vertex_spacing": (2.5, 1)}
@@ -59,8 +75,6 @@ def create_vertex(g, vertex_id, parent_id, label, color=m.GRAY,  link=True):
         _type_: _description_
     """    
     global m
-    display.info_secho("creating node between " + vertex_id + " and " + 
-        parent_id)
     pos = g[parent_id].get_center() + m.DOWN
     v = g._add_vertex(
         vertex_id, vertex_config={"color": color}, position=pos)
@@ -122,36 +136,40 @@ class MSemanticAnalyser(m.Scene):
         sem_title = mg.get_title_mobject("Semantic Analysis") 
 
         # show the token stream
-        self.m_tok = {}
+        self.m_tok = []
         self.m_tok_gp = m.VGroup()
         self.m_tok_gp.add(m.Tex("Token stream: ")).scale(0.5)
 
         for t in self.tokens:
             try:
-                tex = m.MathTex("\\text{"+t.type+"}", color = m.PURPLE_A).scale(0.5)
+                tex = m.MathTex("\\text{"+t.type+"}", color = m.PURPLE_A)\
+                    .scale(0.5)
                 self.m_tok_gp.add(tex)
-                self.m_tok[t.type] = tex
+                self.m_tok.append(tex)
             except:
                 tex = m.MathTex("\\text{"+t+"}").scale(0.5)
                 self.m_tok_gp.add(tex)
-                self.m_tok[t] = tex
-        self.m_tok_gp.arrange(m.RIGHT)
+                self.m_tok.append(tex)
+        self.m_tok_gp.arrange_in_grid(rows = 1, buff = 0.5)
+        self.m_tok_gp.scale_to_fit_width(CFG_SCALE_WIDTH/2)
 
         # show the input stream
-        self.m_inp = {}
+        self.m_inp = []
         self.m_inp_gp = m.VGroup()
         self.m_inp_gp.add(m.Tex("Input stream: ")).scale(0.5)
 
         for t in self.tokens:
             try:
-                tex = m.MathTex("\\text{"+t.value+"}", color = m.PURPLE_A).scale(0.5)
+                tex = m.MathTex("\\text{"+t.value+"}", color = m.PURPLE_A)\
+                    .scale(0.5)
                 self.m_inp_gp.add(tex)
-                self.m_inp[t.value] = tex
+                self.m_inp.append(tex)
             except:
                 tex = m.MathTex("\\text{"+t+"}").scale(0.5)
                 self.m_inp_gp.add(tex)
-                self.m_inp[t] = tex
-        self.m_inp_gp.arrange(m.RIGHT)
+                self.m_inp.append(tex)
+        self.m_inp_gp.arrange_in_grid(rows = 1, buff = 0.5)
+        self.m_inp_gp.scale_to_fit_width(CFG_SCALE_WIDTH/2)
         
         # show parsing direction
         arr = m.Arrow(start=3*m.RIGHT, end=3*m.LEFT, color=config.\
@@ -209,7 +227,8 @@ class MSemanticAnalyser(m.Scene):
         Args:
             msg (str, optional): Details. Defaults to "".
         """        
-        mg.display_msg(self, ["Type Error: ", msg], script = msg, error = True)
+        mg.display_msg(self, ["Type Error: ", msg], script = "We have a "
+        + " semantic error. " + msg, error = True)
         display.fail_secho("Type Error: "+ msg)
         self.print_symbol_table()
         return 
@@ -249,12 +268,12 @@ class MSemanticAnalyser(m.Scene):
                                 num_lines=20, color=m.BLUE_D,
                                 flash_radius=0.3,
                                 time_width=0.3),
-                                m.Flash(self.m_inp[node.token.value], 
+                                m.Flash(self.m_inp[terminal_index], 
                                 line_length=0.15,
                                 num_lines=20, color=m.BLUE_D,
                                 flash_radius=0.1,
                                 time_width=0.3),
-                                m.Flash(self.m_tok[node.token.type], 
+                                m.Flash(self.m_tok[terminal_index], 
                                 line_length=0.15,
                                 num_lines=20, color=m.BLUE_D,
                                 flash_radius=0.1,
@@ -263,13 +282,14 @@ class MSemanticAnalyser(m.Scene):
 
                             # highlight the input and token stream
                             self.play(
-                                m.FadeToColor(self.m_tok[node.token.type], 
+                                m.FadeToColor(self.m_tok[terminal_index], 
                                 color = m.BLUE_D),
-                                m.FadeToColor(self.m_inp[node.token.value], 
+                                m.FadeToColor(self.m_inp[terminal_index], 
                                 color = m.BLUE_D),
                             )
-
                             sounds.narrate("We matched a terminal!", self)
+                            terminal_index = terminal_index + 1
+
                         self.wait()
 
                     except: 
@@ -286,8 +306,9 @@ class MSemanticAnalyser(m.Scene):
                     else:
                         if node.token.value != "=":
                             if node.token.value in self.symbol['Symbol']:
-                                self._call_error(node.token.value + 
-                                " has already been defined.")
+                                self._call_error("The symbol " + 
+                                node.token.value + " has already been " + 
+                                "defined.")
                                 return
                             else:
                                 lh_type = node.token.type

@@ -134,7 +134,12 @@ tree arranging to the right :)
 - larger inputs - make them underneath each other in the symbol table :)
 - unique file names :)
 - ID language sem an :)
+
+SEM ANAL
+- check conflicts :)
+- more comments and SFX :)
 """
+
 
 """
 TODO - DEVELOPMENT
@@ -145,8 +150,6 @@ get lots of test cases written
 LL(1) parsing ID language
 
 SEMANTIC ANALYSIS
-- check conflicts
-- more comments and SFX
 
 PARSING
 - unique IDs in parsing 
@@ -154,16 +157,11 @@ PARSING
 RuntimeWarning: invalid value encountered in double_scalars
 original tokens not showing at end of ll1 parsing manim
 
-token colour coding
-
 LATEX
 
 GRAMMARS
 validate grammars and language spec MED
-
-CLI
-- some terminals missing regex error - investigate MED
-- Notes on regex spec - necessary?  MED
+validity checks on inputs
 
 """ 
 
@@ -212,7 +210,8 @@ EXTENSIONS
 - proof of accuracy - algorithm analysis
 - Reload CFGs within the app
 - extension: detect LR recursion etc
-Get parsing colours to match LL(1) tokens   LOW
+Get parsing colours to match LL(1) tokens  
+token colour coding
 """
 
 """ 
