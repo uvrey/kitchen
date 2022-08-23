@@ -150,8 +150,8 @@ class MSemanticAnalyser(m.Scene):
                 tex = m.MathTex("\\text{"+t+"}").scale(0.5)
                 self.m_tok_gp.add(tex)
                 self.m_tok.append(tex)
-        self.m_tok_gp.arrange_in_grid(rows = 1, buff = 0.5)
-        self.m_tok_gp.scale_to_fit_width(CFG_SCALE_WIDTH/2)
+        self.m_tok_gp.arrange(m.RIGHT)
+        self.m_tok_gp.scale_to_fit_width(CFG_SCALE_WIDTH/3)
 
         # show the input stream
         self.m_inp = []
@@ -168,8 +168,8 @@ class MSemanticAnalyser(m.Scene):
                 tex = m.MathTex("\\text{"+t+"}").scale(0.5)
                 self.m_inp_gp.add(tex)
                 self.m_inp.append(tex)
-        self.m_inp_gp.arrange_in_grid(rows = 1, buff = 0.5)
-        self.m_inp_gp.scale_to_fit_width(CFG_SCALE_WIDTH/2)
+        self.m_inp_gp.arrange(m.RIGHT)
+        self.m_inp_gp.scale_to_fit_width(CFG_SCALE_WIDTH/3)
         
         # show parsing direction
         arr = m.Arrow(start=3*m.RIGHT, end=3*m.LEFT, color=config.\
