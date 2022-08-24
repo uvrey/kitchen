@@ -72,8 +72,7 @@ def create_vertex(g, node, label, color=m.GRAY,  link=True, vertex_ids = None):
     
         return v
     except:
-        display.fail_secho("Couldn't create vertex " + node.vertex_id + " with parent " + 
-        node.parent_id)
+        pass
 
 def reset_g(self, g, root, anim=[]):
     for a in anim:
