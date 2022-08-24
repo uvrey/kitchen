@@ -2,9 +2,6 @@
 """ Generates a visualisation of the parse tree calculation. """
 # kitchen/manim/m_parser.py
 
-from dataclasses import replace
-from distutils.log import info
-from tracemalloc import start
 import manim as m
 import re
 import typer
@@ -19,7 +16,7 @@ from kitchen import (
     ERROR
 )
 
-from kitchen.backend import stack, parser
+from kitchen.backend import stack
 from kitchen.helpers import (
     lang_spec, 
     config, 
@@ -30,7 +27,7 @@ from kitchen.helpers import (
 from kitchen.manim import m_general as mg
 
 VCONFIG = {"radius": 0.2, "color": m.BLUE_D, "fill_opacity": 1}
-LCONFIG = {"vertex_spacing": (2.5, 1)}
+LCONFIG = {"vertex_spacing": (2, 1)}
 ECONFIG = {"color": config.get_opp_col()}
 ECONFIG_TEMP = {"color": m.GRAY, "fill_opacity": 0.7}
 V_LABELS = {}
@@ -56,7 +53,7 @@ def set_up_label(g, vertex_id, label, color = m.GRAY):
     rendered_label.move_to(new_vertex.get_center())
     new_vertex.add(rendered_label)
     
-def create_vertex(g, node, label, color=m.GRAY,  link=True):
+def create_vertex(g, node, label, color=m.GRAY,  link=True, vertex_ids = None):
     global m
 
     pos = g[node.parent_id].get_center() + m.DOWN
@@ -253,7 +250,7 @@ class MParseTree(m.Scene):
             m.FadeIn(self.mtable)
         )
         self.wait()
-        self.wait()
+        self.wait() 
 
         if highlight:
             tmp_tab = self.mtable
@@ -273,27 +270,29 @@ class MParseTree(m.Scene):
         """Checks if any non-terminals led to epsilon.
 
         Args:
-            g (_type_): _description_
+            g (Graph): Graph MObjects.
 
         Returns:
-            _type_: _description_
+            int: Status code.
         """        
         # notify user
         mg.display_msg(self, ["We can now check if any productions led ", 
         "to $\\varepsilon$, and so disappeared."], script = "Let's check if " +
         "any productions led to epsilon.")
 
+        # TODO 
+
         # look for any epsilons that came before and add.
-        for node in self.root.descendants:
-            if re.match(RE_NONTERMINAL, node.id):
-                if len(node.children) == 0 and "#" in \
-                self.cfg.first_set[node.id]:
-                    new_node = anytree.Node("#", parent=node, id= "#", 
-                    token = None, parent_id = node.vertex_id, vertex_id =
-                    node.id + "_#")
-                    new_vertex = create_vertex(g, new_node, r'\varepsilon', 
-                    color = m.BLUE_D)
-                    self.play(m.FadeIn(new_vertex))
+        # for node in self.root.descendants:
+        #     if re.match(RE_NONTERMINAL, node.id):
+        #         if len(node.children) == 0 and "#" in \
+        #         self.cfg.first_set[node.id]:
+        #             new_node = anytree.Node("#", parent=node, id= "#", 
+        #             token = None, parent_id = node.vertex_id, vertex_id =
+        #             node.id + "_#")
+        #             new_vertex = create_vertex(g, new_node, r'\varepsilon', 
+        #             color = m.BLUE_D)
+        #             self.play(m.FadeIn(new_vertex))
         return SUCCESS
 
     def _parsing_successful(self, tokens, semantic: bool, testing = False, 
@@ -319,6 +318,7 @@ class MParseTree(m.Scene):
         global V_LABELS
         global VCONFIG
         global m
+        id_count = 0
         
         if self.tokens == ERROR:
             display.fail_secho("Not all tokens from the input stream were " +
@@ -342,6 +342,9 @@ class MParseTree(m.Scene):
 
         # initialise a way to track the parent nodes
         self.parents = []
+
+        # set up directory of vertex names
+        self.vertex_ids = []
         self.intro()
 
         # draw LL(1) representation title
@@ -398,9 +401,9 @@ class MParseTree(m.Scene):
          
         # begin parsing
         while self.s.stack != []:
-            # in case we run out of input before the stack is empty
+            # check if the stack is empty before the parsing is complete
             if self.tokens == []:
-                if re.match(RE_TERMINAL, self.stack[-1]):
+                if re.match(RE_TERMINAL, self.s.stack[-1]):
                     error.ERR_parsing_error(self.root, "Expected " + 
                     self.s.stack[-1]+".")
                     error.ERR_manim_parsing_error(self,  ["Expected `" 
@@ -410,9 +413,9 @@ class MParseTree(m.Scene):
                 else:
                     # parsing is successful if the remaining non-terminal may 
                     # tend to epsilon
-                    if "#" in self.cfg.first_set[self.stack[-1]] and \
-                    len(self.stack) == 1:
-                        self._parsing_successful(original_tokens)
+                    if "#" in self.cfg.first_set[self.s.stack[-1]] and \
+                    len(self.s.stack) == 1:
+                        self._parsing_successful(original_tokens, False)
                         return SUCCESS
                     # otherwise calls an error
                     error.ERR_parsing_error(self.root)
@@ -450,7 +453,7 @@ class MParseTree(m.Scene):
                         sounds.add_sound_to_scene(self, sounds.CLICK)
                         new_vertex = create_vertex(g, popped,
                                             mg.to_math_tex(popped.id), 
-                                            color = m.BLUE_D)
+                                            color = m.BLUE_D, vertex_ids=self.vertex_ids)
                         self.play(m.FadeIn(new_vertex))
                         reset_g(self, g, start_symbol)
 
@@ -514,8 +517,8 @@ class MParseTree(m.Scene):
                         replaced_parent = self.parents[-1]
                         sounds.add_sound_to_scene(self, sounds.CLICK)
                         new_vertex = create_vertex(g, replaced_parent, \
-                            mg.to_math_tex(self.parents[-1].id), 
-                            color = m.BLUE_D)
+                            mg.to_math_tex(self.parents[-1].id), \
+                            vertex_ids=self.vertex_ids, color = m.BLUE_D)
                         self.play(m.FadeIn(new_vertex))
                         reset_g(self, g, start_symbol)
 
@@ -559,18 +562,31 @@ class MParseTree(m.Scene):
                     for p in ps:
                         # add to the tree
                         if top == start_symbol:
+                            v_id = self.root.id + "_" + p
+                            if v_id in self.vertex_ids:
+                                v_id = v_id + "_" + str(id_count)
+                                id_count = id_count + 1
+
                             new_node = anytree.Node(p, parent=self.root, id=p, 
                             tmp_p = self.root.id, tmp_parent = self.root, 
-                            vertex_id = self.root.id + "_" + p,
+                            vertex_id = v_id,
                             parent_id = self.root.id,
                             token = None)
+                            self.vertex_ids.append(v_id)
                         else:
                             # add connecting node if it is a non-terminal
+                            v_id = replaced_parent.id + "_" + p
+
+                            if v_id in self.vertex_ids:
+                                v_id = v_id + "_" + str(id_count)
+                                id_count = id_count + 1
+
                             new_node = anytree.Node(
                                 p, id=p, parent = None, tmp_p=prods[0].strip(),
-                                vertex_id = replaced_parent.id + "_" + p,
+                                vertex_id = v_id,
                                 parent_id = replaced_parent.vertex_id,
                                 tmp_parent = replaced_parent, token = None)
+                            self.vertex_ids.append(v_id)
                                     
                         # apply non-epsilon nodes to the stack
                         if p != "#":

@@ -157,7 +157,6 @@ RuntimeWarning: invalid value encountered in double_scalars
 GRAMMARS
 validate grammars and language spec MED
 validity checks on inputs
-
 """ 
 
 """
@@ -204,8 +203,10 @@ EXTENSIONS
 - proof of accuracy - algorithm analysis
 - Reload CFGs within the app
 - extension: detect LR recursion etc
+- compressing videos
 Get parsing colours to match LL(1) tokens  
 token colour coding
+- AST vs Parse tree
 """
 
 """ 

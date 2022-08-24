@@ -141,10 +141,10 @@ def run() -> None:
         input = typer.prompt("Input")
         cli_helper.handle_input(input, cfg, spec)
 
-# TODO
+# TODO python3 -m kitchen dsl-tool
 @app.command(name="dsl-tool")
 def init_dsl() -> None:
-    # dsl_tool.main(
+    # dsl.dsl_tool.main()
     pass
 
 @app.command(name="show-cfg")

@@ -31,6 +31,10 @@ from kitchen.manim import (
     m_type_check
 )
 
+# from kitchen.dsl import (
+#     // dsltool as dsl
+# )
+
 def init_app(cfg_path: str, spec_path = None) -> int:
     """Initialises the application by creating its configuration file and
        CFG path.
@@ -277,7 +281,7 @@ def _process_command(inp, cfg, spec) -> None:
         raise typer.Exit()
 
     elif inp == "\\dsl":
-      #  dsl_tool.main()
+       #dsl.dsl_tool.main()
         pass
 
     elif inp == "\\show first" or inp == "\\fs":
