@@ -57,19 +57,23 @@ def set_up_label(g, vertex_id, label, color = m.GRAY):
 def create_vertex(g, node, label, color=m.GRAY,  link=True, vertex_ids = None):
     global m
 
-    pos = g[node.parent_id].get_center() + m.DOWN
-    v = g._add_vertex(
-        node.vertex_id, vertex_config={"color": color}, position=pos)
-    v.fill_colour = color
-     
-    set_up_label(g, node.vertex_id, label, color)
+    try:
+        pos = g[node.parent_id].get_center() + m.DOWN
+        v = g._add_vertex(
+            node.vertex_id, vertex_config={"color": color}, position=pos)
+        v.fill_colour = color
+        
+        set_up_label(g, node.vertex_id, label, color)
 
-    if link:
-        g._add_edge(
-            [node.parent_id, node.vertex_id], edge_config={"color": \
-                config.get_opp_col()})
-   
-    return v
+        if link:
+            g._add_edge(
+                [node.parent_id, node.vertex_id], edge_config={"color": \
+                    config.get_opp_col()})
+    
+        return v
+    except:
+        display.fail_secho("Couldn't create vertex " + node.vertex_id + " with parent " + 
+        node.parent_id)
 
 def reset_g(self, g, root, anim=[]):
     for a in anim:
@@ -273,7 +277,8 @@ class MParseTree(m.Scene):
         )
 
     def check_for_epsilons(self, g):
-        """Checks if any non-terminals led to epsilon.
+        """Checks if any non-terminals lead to epsilon and add this connection,
+        only if the node is on the graph. 
 
         Args:
             g (Graph): Graph MObjects.
@@ -286,16 +291,18 @@ class MParseTree(m.Scene):
         "to $\\varepsilon$, and so disappeared."], script = "Let's check if " +
         "any productions led to epsilon.")
 
-        # TODO 
-
         # look for any epsilons that came before and add.
         for node in self.root.descendants:
             if re.match(RE_NONTERMINAL, node.id):
                 if len(node.children) == 0 and "#" in \
                 self.cfg.first_set[node.id]:
+               
                     v_id = node.id + "_#"
                     if v_id in self.vertex_ids:
                         v_id = node.id + "_#_" + self.id_count
+
+                    display.info_secho("Making epsilon node "+ v_id +
+                    "with parent " + node.vertex_id)
                     new_node = anytree.Node("#", parent=node, id= "#", 
                     token = None, parent_id = node.vertex_id, vertex_id =
                     v_id)
@@ -463,7 +470,8 @@ class MParseTree(m.Scene):
                         sounds.add_sound_to_scene(self, sounds.CLICK)
                         new_vertex = create_vertex(g, popped,
                                             mg.to_math_tex(popped.id), 
-                                            color = m.BLUE_D, vertex_ids=self.vertex_ids)
+                                            color = m.BLUE_D, 
+                                            vertex_ids=self.vertex_ids)
                         self.play(m.FadeIn(new_vertex))
                         reset_g(self, g, start_symbol)
 
@@ -576,7 +584,7 @@ class MParseTree(m.Scene):
                             if v_id in self.vertex_ids:
                                 v_id = v_id + "_" + str(self.id_count)
                                 self.id_count = self.id_count + 1
-
+           
                             new_node = anytree.Node(p, parent=self.root, id=p, 
                             tmp_p = self.root.id, tmp_parent = self.root, 
                             vertex_id = v_id,
@@ -590,7 +598,7 @@ class MParseTree(m.Scene):
                             if v_id in self.vertex_ids:
                                 v_id = v_id + "_" + str(self.id_count)
                                 self.id_count = self.id_count + 1
-
+                          
                             new_node = anytree.Node(
                                 p, id=p, parent = None, tmp_p=prods[0].strip(),
                                 vertex_id = v_id,
