@@ -4,7 +4,6 @@
 
 import manim as m
 import re
-import typer
 import anytree
 
 from kitchen import ( 
@@ -17,6 +16,7 @@ from kitchen import (
 )
 
 from kitchen.backend import stack
+
 from kitchen.helpers import (
     lang_spec, 
     config, 
@@ -24,10 +24,11 @@ from kitchen.helpers import (
     error, 
     display
 )
+
 from kitchen.manim import m_general as mg
 
 VCONFIG = {"radius": 0.2, "color": m.BLUE_D, "fill_opacity": 1}
-LCONFIG = {"vertex_spacing": (2, 1)}
+LCONFIG = {"vertex_spacing": (1.5, 1)}
 ECONFIG = {"color": config.get_opp_col()}
 ECONFIG_TEMP = {"color": m.GRAY, "fill_opacity": 0.7}
 V_LABELS = {}
@@ -81,6 +82,8 @@ def reset_g(self, g, root, anim=[]):
             layout_config = LCONFIG,
         ),
     )
+
+    g.shift(m.RIGHT)
 
 # general function for mapping elements in some list to another list
 def map_token_lists(self, lhs, rhs):
@@ -236,7 +239,7 @@ class MParseTree(m.Scene):
         fill_opacity=0.9)
 
         pt_title = mg.get_title_mobject("Parse table")
-        pt_title.next_to(self.mtable, m.UP)
+        pt_title.to_edge(m.UP)
 
         self.play(
             m.FadeIn(rect),
@@ -244,6 +247,9 @@ class MParseTree(m.Scene):
 
         if first_time:
             sounds.narrate("Here is the parse table for this grammar", self)
+
+        if self.mtable.width > CFG_SCALE_WIDTH:
+            self.mtable.scale_to_fit_width(CFG_SCALE_WIDTH)
 
         self.play(
             m.FadeIn(pt_title),
@@ -283,20 +289,24 @@ class MParseTree(m.Scene):
         # TODO 
 
         # look for any epsilons that came before and add.
-        # for node in self.root.descendants:
-        #     if re.match(RE_NONTERMINAL, node.id):
-        #         if len(node.children) == 0 and "#" in \
-        #         self.cfg.first_set[node.id]:
-        #             new_node = anytree.Node("#", parent=node, id= "#", 
-        #             token = None, parent_id = node.vertex_id, vertex_id =
-        #             node.id + "_#")
-        #             new_vertex = create_vertex(g, new_node, r'\varepsilon', 
-        #             color = m.BLUE_D)
-        #             self.play(m.FadeIn(new_vertex))
+        for node in self.root.descendants:
+            if re.match(RE_NONTERMINAL, node.id):
+                if len(node.children) == 0 and "#" in \
+                self.cfg.first_set[node.id]:
+                    v_id = node.id + "_#"
+                    if v_id in self.vertex_ids:
+                        v_id = node.id + "_#_" + self.id_count
+                    new_node = anytree.Node("#", parent=node, id= "#", 
+                    token = None, parent_id = node.vertex_id, vertex_id =
+                    v_id)
+                    new_vertex = create_vertex(g, new_node, r'\varepsilon', 
+                    color = m.BLUE_D)
+                    self.play(m.FadeIn(new_vertex))
         return SUCCESS
 
     def _parsing_successful(self, tokens, semantic: bool, testing = False, 
         verbose = True):
+        # TODO display message to screen
         types = lang_spec.get_token_format(tokens, types=True)
         values = lang_spec.get_token_format(tokens, values=True)
         
@@ -318,7 +328,7 @@ class MParseTree(m.Scene):
         global V_LABELS
         global VCONFIG
         global m
-        id_count = 0
+        self.id_count = 0
         
         if self.tokens == ERROR:
             display.fail_secho("Not all tokens from the input stream were " +
@@ -564,8 +574,8 @@ class MParseTree(m.Scene):
                         if top == start_symbol:
                             v_id = self.root.id + "_" + p
                             if v_id in self.vertex_ids:
-                                v_id = v_id + "_" + str(id_count)
-                                id_count = id_count + 1
+                                v_id = v_id + "_" + str(self.id_count)
+                                self.id_count = self.id_count + 1
 
                             new_node = anytree.Node(p, parent=self.root, id=p, 
                             tmp_p = self.root.id, tmp_parent = self.root, 
@@ -578,8 +588,8 @@ class MParseTree(m.Scene):
                             v_id = replaced_parent.id + "_" + p
 
                             if v_id in self.vertex_ids:
-                                v_id = v_id + "_" + str(id_count)
-                                id_count = id_count + 1
+                                v_id = v_id + "_" + str(self.id_count)
+                                self.id_count = self.id_count + 1
 
                             new_node = anytree.Node(
                                 p, id=p, parent = None, tmp_p=prods[0].strip(),

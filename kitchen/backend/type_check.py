@@ -141,16 +141,18 @@ generate tree PNG for export :)
 EXPORT PNG
 - how to initialise saving :)
 original tokens not showing at end of ll1 parsing manim :)
+
+LL(1) parsing ID language - HIGH :)
+same IDs in parsing ll1 vis :)
 """
 
 """
 TODO - DEVELOPMENT
-
 TESTING
 get lots of test cases written
 
-LL(1) parsing ID language - HIGH
-same IDs in parsing ll1 vis
+- show stack with larger parsing trees
+- epsilon with larger trees
 
 RuntimeWarning: invalid value encountered in double_scalars
 
