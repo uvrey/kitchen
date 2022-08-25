@@ -242,9 +242,8 @@ class MSemanticAnalyser(m.Scene):
             include_outer_lines=False,
             line_config={"stroke_width": 1, "color": m.BLUE_A})
 
-        entries = table.get_entries_without_labels()
-        for e in entries:
-            e.set_colour(config.get_opp_col())
+        table.fade_to(config.get_opp_col(), alpha = 1)
+        table.get_col_labels().fade_to(color=m.BLUE_D, alpha=1)
 
         table.scale_to_fit_width(CFG_SCALE_WIDTH/2)
         if table.height > CFG_SCALE_HEIGHT:
@@ -324,6 +323,7 @@ class MSemanticAnalyser(m.Scene):
                             if node.token.type != node.token.value:
                                 sounds.narrate("We matched a terminal that"+
                                 " may an operator.", self)
+                                self.wait()
                             else:
                                 sounds.narrate("We matched a terminal!", self)
                             t_index = t_index + 1

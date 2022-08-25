@@ -207,10 +207,6 @@ class MParseTree(m.Scene):
             col_labels=[m.MathTex(mg.to_math_tex(cl)) for cl in col_labels],
             include_outer_lines=True)
 
-        entries = table.get_entries_without_labels()
-        for e in entries:
-            e.set_colour(config.get_opp_col())
-
         # Table
         lab = table.get_labels()
         lab.set_color(m.LIGHT_GRAY)
