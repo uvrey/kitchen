@@ -9,6 +9,7 @@ from kitchen import (
      __version__, 
      SUCCESS, 
      ERROR,
+     ERRORS
 )
 
 from kitchen.backend import (
@@ -74,12 +75,9 @@ def _check_cfg(cfg) -> None:
     Raises:
         typer.Abort: Aborts when CFG is invalid.
     """  
-    pass
-    #typer.echo(cfg.prods)  
-    # TODO fix
-    # if cfg.prods in ERRORS:
-    #     display.fail_secho('"CFG file invalid with "{ERRORS[cfg.prods]}"')
-    #     raise typer.Abort()
+    if cfg.prods in ERRORS:
+        display.fail_secho('"CFG file invalid with "{ERRORS[cfg.prods]}"')
+        raise typer.Abort()
 
 @app.command()
 def init(
@@ -127,8 +125,6 @@ def run() -> None:
     config.init_tree_png_dir()
     config.init_config()
 
-    display.print_welcome()
-
     cfg = get_cfg()
     spec = lang_spec.get_spec(cfg)
 
@@ -137,7 +133,9 @@ def run() -> None:
             "provided, so the given \n\tinput will be interpreted as " +
                 "tokens directly.")
 
-    display.success_secho("CFG loaded successfully.")
+    display.success_secho("CFG loaded successfully.\n")
+
+    display.print_welcome()
     while (True):
         input = typer.prompt("Input")
         cli_helper.handle_input(input, cfg, spec)

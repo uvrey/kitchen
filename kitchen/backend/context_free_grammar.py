@@ -58,13 +58,11 @@ def get_prods(cfg_contents) -> list:
         tmp_prod = []
         pps = list(filter(None, production.split("->")))
 
-        # check that non-terminal doesn't start productions
-        # TODO handle this error properly
+        # check that an invalid element doesn't start productions
         if not re.match(RE_NONTERMINAL, pps[0]):
-            display.fail_secho("CFG Error at line " + str(line) + "-> " + 
-            pps[0])
+            display.fail_secho("CFG Error at line " + str(line) + ". " +
+            " Unexpected non-terminal format" + pps[0])
             raise typer.Exit()
-            return CFG_ERROR_NT_FORMAT
 
         tmp_prod.append(re.sub(r'[\s+]', '', pps[0]))
 

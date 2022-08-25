@@ -58,9 +58,30 @@ class Specification:
         self.token_spec = {}
         self.cfg = cfg
         self.reserved_words = []
+        self.has_definition = {}
+
+        for t in self.cfg.terminals:
+            self.has_definition[t] = False
+            if t == "$":
+                self.has_definition[t] = True
 
         # associate spec regex with token types
-        self.read_to_spec()
+        issues = self.read_to_spec()
+        if issues != []:
+            display.structure_secho("Warning: [" + ", ".join(issues) + "] defined " +
+            "in the language specificiation\nwithout appearing in the CFG.")
+
+        # report for errors
+        failed = False
+        for key in self.has_definition.keys():
+            if self.has_definition[key] == False:
+                display.fail_secho("Error: " + key + " is not defined in the " +
+                "specficiation, but is used in the CFG.")
+                failed = True
+
+        if failed:
+            display.fail_secho("Please fix your language specification.")
+            raise typer.Exit()
 
     def read_to_spec(self) -> None:
         """Reads the contents of the language specification file to the 
@@ -70,6 +91,7 @@ class Specification:
         line_count = 0
         read_toks = False
         reserved = False
+        issues = []
         for line in contents:
             if len(line) > 0 and line.strip()[0] != "#":
                 if line == "Reserved words:":
@@ -82,17 +104,16 @@ class Specification:
                             if line.strip() == "---":
                                 break
                             else:
-                                self._process_regex_spec(line)
+                                no_appear = self._process_regex_spec(line)
+                                if no_appear != "":
+                                    issues.append(no_appear)
                                 line_count = line_count + 1
                         if reserved:
                             if line.strip() == "---":
                                 reserved = False
                             else:
                                 self._process_reserved_words(line.strip())
-
-        # if line_count != len(self.cfg.terminals): TODO
-        #     display.fail_secho("Note: Some terminals in the CFG are 
-        # missing regex definitions :(")
+        return issues
     
     def _process_reserved_words(self, line: str) -> None:
         """Processes reserved words in the specification.
@@ -107,7 +128,7 @@ class Specification:
         except:
             display.fail_secho("Some error with reserved words occurred.")
 
-    def _process_regex_spec(self, line: str) -> None:
+    def _process_regex_spec(self, line: str) -> str:
         """Processes the regex specifications inside the file.
 
         Args:
@@ -121,12 +142,12 @@ class Specification:
             # add regex for each terminal
             if t_found in self.cfg.terminals:
                 self.token_spec[t_found] = regex
-            # else: TODO
-            #     display.info_secho("Note: " + t_found + " is defined 
-            # in specificiation but does not appear in CFG.")
+                self.has_definition[t_found] = True
+            else: 
+                return t_found
         except:
             display.fail_secho("Some error with regex processing occurred.")
-            return
+        return ""
 
     def show_contents(self) -> None:
         """Displays the contents of the specification file.

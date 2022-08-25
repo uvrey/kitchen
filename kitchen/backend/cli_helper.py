@@ -1,6 +1,7 @@
 """ Driver functions for the CLI application. """
 # kitchen/backend/cli_helper.py
 
+from pathlib import Path
 import typer
 import manim as m
 
@@ -15,12 +16,14 @@ from kitchen.helpers import (
     display,
     error, 
     config,
+    lang_spec
 )
 
 from kitchen.backend import (
     parse_table as pt,
     parser as p,
-    type_check as tc
+    type_check as tc,
+    context_free_grammar as cofg
 )
 
 from kitchen.manim import (
@@ -80,6 +83,10 @@ def load_app(cfg_path, spec_path = None, testing = False) -> None:
         raise typer.Exit(1)
     else:
         if not testing:
+            # does preliminary checks on the loaded grammars.
+            cfg = cofg.ContextFreeGrammar(Path(cfg_path))
+            spec = lang_spec.get_spec(cfg)
+
             typer.secho(f"Initialisation successful!\n\t The cfg path is " + 
             cfg_path, fg=typer.colors.GREEN)
             if spec_path != None:

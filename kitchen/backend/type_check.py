@@ -160,6 +160,8 @@ class SemanticAnalyser:
 # token colours - type checking :)
 # light and dark mode - type and ll1
 
+# remove debugging output :)
+
 
 # TODO - DEVELOPMENT
 # TESTING
@@ -174,8 +176,6 @@ class SemanticAnalyser:
 # start dsl tool from the typer app HIGH
 
 # TODO - DETAILS LOW
-# remove debugging output
-
 # Neaten up cli_helper parsing code
 # Code style choices
 # gray lines for tables
@@ -250,10 +250,7 @@ class SemanticAnalyser:
 # - so it can't clear the cache
 # Known issues:
 # - No sound: clear partial movie directory and restart.
-
-
 # Currently, there is a lot of interplay between a scene and its renderer. This is a flaw in Manim’s current architecture, and we are working on reducing this interdependency to achieve a less convoluted code flow.
-
 
 #  moov atom not found
 # [concat @ 0000020ab91ebc40] Impossible to open...
