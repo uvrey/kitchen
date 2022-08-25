@@ -27,7 +27,8 @@ def get_title_mobject(title):
     Returns:
         Tex: Tex Mobject.
     """    
-    return m.Tex(title, tex_template=m.TexFontTemplates.french_cursive)
+    return m.Tex(title, tex_template=m.TexFontTemplates.french_cursive, 
+    color = config.get_opp_col())
 
 def to_tex(item):
     """Converts a string to its Tex-compatible representation.

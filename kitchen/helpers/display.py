@@ -84,7 +84,8 @@ def show_config_opts():
     """Shows the configuration options.
     """    
     opts_str = ("Options:\n\tQuality: -q <high | med | low>\n\t" +
-                "Preview: -p <y | n>\n\tNarration: -n <y / n>")
+                "Preview: -p <y | n>\n\tAnimation Theme: -t <dark | light>\n\t" +
+                "Narration: -n <y / n>")
     info_secho(opts_str)
 
 def show_tokens(tokens):

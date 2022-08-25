@@ -178,7 +178,7 @@ def get_theme_name() -> str:
     if THEME == LIGHT:
         return "light"
     else:
-        return "dark " 
+        return "dark" 
 
 def _get_theme_code()  -> int:
     """Retrieves the current theme code.

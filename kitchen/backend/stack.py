@@ -39,7 +39,7 @@ class Stack:
         else:
             self.stack.pop()
 
-            m_msg = m.MathTex(msg).next_to(self.mstack, m.DOWN)
+            m_msg = m.MathTex(msg, color = config.get_opp_col()).next_to(self.mstack, m.DOWN)
             m_msg.scale_to_fit_width(3*self.mstack.width)
 
             if self.texts != []:
@@ -88,7 +88,7 @@ class Stack:
 
     def write_under_stack(self, msg, fade_out=True):
         # set up message
-        m_msg = m.MathTex(msg).next_to(self.mstack, m.DOWN)\
+        m_msg = m.MathTex(msg, color = config.get_opp_col()).next_to(self.mstack, m.DOWN)\
             .scale_to_fit_width(3*self.mstack.width)
         self.scene.play(
             m.Write(m_msg),
@@ -112,8 +112,9 @@ class Stack:
 
         # create base of the stack
         if self.texts == []:
-            t = m.MathTex(a).move_to(self.mstack.get_center()
-                                   ).shift((3*self.mstack_height/2)/4 * m.DOWN)
+            t = m.MathTex(a, color = config.get_opp_col())\
+                .move_to(self.mstack.get_center())\
+                    .shift((3*self.mstack_height/2)/4 * m.DOWN)
             t.scale(0.6)
             self.texts.append(t)
 

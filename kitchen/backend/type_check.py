@@ -149,12 +149,20 @@ class SemanticAnalyser:
 # - show stack with larger parsing trees :)
 # - epsilon with larger trees :)
 
+
+# Animation 215: FadeIn(MathTex('value')), etc.:   0%|  | 0/
+#   alpha = t / animation.run_time
+# C:\Users\josie\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.9_qbz5n2kfra8p0\LocalCache\local-packages\Python39\site-packages\manim\scene\scene.py:1427: RuntimeWarning: divide by zero encountered in double_scalars
+#   alpha = t / animation.run_time :)
+# RuntimeWarning: invalid value encountered in double_scalars :)
+# Token colours (LL(1)) :)
+# pt test cases :)
+
+
 # TODO - DEVELOPMENT
 # TESTING
-# get lots of test cases written
+# fs, fw, ll1 test cases written
 # generate demo showcase videos in 1080p
-
-# RuntimeWarning: invalid value encountered in double_scalars
 
 # GRAMMARS
 # validate grammars and language spec MED
@@ -169,7 +177,6 @@ class SemanticAnalyser:
 # Neaten up cli_helper parsing code
 # Code style choices
 # gray lines for tables
-
 
 # TODO - ADMIN LOW
 # complete documentation
@@ -199,8 +206,6 @@ class SemanticAnalyser:
 # - Reload CFGs within the app
 # - extension: detect LR recursion etc
 # - compressing videos
-# Get parsing colours to match LL(1) tokens  
-# token colour coding
 # - AST vs Parse tree
 
 # NOTES
@@ -243,11 +248,6 @@ class SemanticAnalyser:
 # - so it can't clear the cache
 # Known issues:
 # - No sound: clear partial movie directory and restart.
-
-# Animation 215: FadeIn(MathTex('value')), etc.:   0%|  | 0/
-#   alpha = t / animation.run_time
-# C:\Users\josie\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.9_qbz5n2kfra8p0\LocalCache\local-packages\Python39\site-packages\manim\scene\scene.py:1427: RuntimeWarning: divide by zero encountered in double_scalars
-#   alpha = t / animation.run_time
 
 
 # Currently, there is a lot of interplay between a scene and its renderer. This is a flaw in Manim’s current architecture, and we are working on reducing this interdependency to achieve a less convoluted code flow.

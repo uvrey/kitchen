@@ -38,7 +38,7 @@ def create_tokens(tokens):
     # Write equations
     token_gp = []
     for t in tokens:
-        token_gp.append(m.MathTex("\\text{"+t+"}"))
+        token_gp.append(m.MathTex("\\text{"+t+"}", color = config.get_opp_col()))
     return token_gp
 
 def set_up_label(g, vertex_id, label, color = m.GRAY):
@@ -52,7 +52,7 @@ def set_up_label(g, vertex_id, label, color = m.GRAY):
     if re.match(RE_TERMINAL, label):
         label_col = config.get_theme_col()
     else:
-        label_col = config.get_opp_col()
+        label_col = m.WHITE
 
     # add the new label above
     rendered_label = m.MathTex(
@@ -93,8 +93,6 @@ def reset_g(self, g, root, anim=[]):
         ),
     )
 
-
-
 # general function for mapping elements in some list to another list
 def map_token_lists(self, lhs, rhs):
     # create token group
@@ -103,10 +101,11 @@ def map_token_lists(self, lhs, rhs):
     # map the tokens
     for index, il in enumerate(lhs, start=0):
         small_group = m.VGroup()
-        lh = m.Text(il, slant=m.ITALIC, weight=m.BOLD)
+        lh = m.Tex(il, color = config.get_opp_col())
         arrow = m.Arrow(start=m.LEFT, end=m.RIGHT, buff=0)\
             .next_to(lh, m.RIGHT)
-        rh = m.Text(rhs[index], weight=m.BOLD, 
+        arrow.fade_to(config.get_opp_col(), alpha = 1)
+        rh = m.Tex(rhs[index], 
         color=self.tok_cols[index]).next_to(
             arrow, m.RIGHT)
         small_group.add(lh, arrow, rh)
@@ -152,7 +151,7 @@ class MParseTree(m.Scene):
     # shows the input stream and its association with the token stream
     def intro(self):
         # introducing the input
-        title = m.Tex(r"Input to be parsed:")
+        title = m.Tex(r"Input to be parsed:", color = config.get_opp_col())
         sounds.narrate("Let's parse this input.", self)
         inp = m.Text(self.inp, weight=m.BOLD, color=m.BLUE_D)
         m.VGroup(title, inp).arrange(m.DOWN)
@@ -164,7 +163,8 @@ class MParseTree(m.Scene):
 
         # transforming to lexing
         transform_title = m.Tex(
-            "Lexing matched the input to the following tokens:")
+            "Lexing matched the input to the following tokens:", color = \
+                config.get_opp_col())
         sounds.narrate("The input stream gives these token types.", self)
         transform_title.to_edge(m.UP)
         self.play(
@@ -198,6 +198,10 @@ class MParseTree(m.Scene):
             col_labels=[m.MathTex(mg.to_math_tex(cl)) for cl in col_labels],
             include_outer_lines=True)
 
+        entries = table.get_entries_without_labels()
+        for e in entries:
+            e.set_colour(config.get_opp_col())
+
         # Table
         lab = table.get_labels()
         lab.set_color(m.LIGHT_GRAY)
@@ -217,6 +221,7 @@ class MParseTree(m.Scene):
 
         self.mtable = self.init_m_table(
             row_vals, row_labels, col_labels)
+        self.mtable.fade_to(config.get_opp_col(), alpha = 1)
 
         self.mtable.get_row_labels().fade_to(color=m.RED, alpha=1)
         self.mtable.get_col_labels().fade_to(color=m.TEAL, alpha=1)
@@ -384,14 +389,17 @@ class MParseTree(m.Scene):
         # create the input group here
         m_tok = []
         m_tok_gp = m.VGroup()
-        m_tok_gp.add(m.Tex("Token stream: ")).scale(0.5)
+        m_tok_gp.add(m.Tex("Token stream: ", color = config.get_opp_col())\
+            .scale(0.5))
 
         for t in self.tokens:
             try:
-                tex = m.MathTex("\\text{"+t.value+"}").scale(0.5)
+                tex = m.MathTex("\\text{"+t.value+"}", color = config.\
+                    get_opp_col()).scale(0.5)
                 m_tok_gp.add(tex)
             except:
-                tex = m.MathTex("\\text{"+t+"}").scale(0.5)
+                tex = m.MathTex("\\text{"+t+"}", color = config.\
+                    get_opp_col()).scale(0.5)
                 m_tok_gp.add(tex)
             m_tok.append(tex)
         m_tok_gp.arrange(m.RIGHT)
@@ -403,7 +411,8 @@ class MParseTree(m.Scene):
         arr = m.Arrow(start=3*m.RIGHT, end=3*m.LEFT, color=config.\
             get_opp_col(), buff = 1)
         arr.to_edge(m.DOWN)
-        arr_caption = m.Tex("Parsing direction").scale(0.7)
+        arr_caption = m.Tex("Parsing direction", color = config.\
+            get_opp_col()).scale(0.7)
         arr_caption.next_to(arr, m.UP)
 
         # set the stage

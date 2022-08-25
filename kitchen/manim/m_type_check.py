@@ -107,7 +107,7 @@ def reset_g(self, g, root):
 
 
 class MSemanticAnalyser(m.Scene):
-    def setup_manim(self, cfg, root, inp, spec):
+    def setup_manim(self, cfg, root, inp, spec, tok_cols):
         """Initialises the SemanticAnalyser Manim Scene.
 
         Args:
@@ -121,6 +121,7 @@ class MSemanticAnalyser(m.Scene):
         self.symbol = {'Symbol': [], 'Type': []}
         self.inp_list = lang_spec.clean_inp_stream(inp.split(" "))
         self.tokens = mg.get_tokens_from_input(inp, spec)
+        self.tok_cols = tok_cols
 
     def construct(self):
         """Constructs the semantic analysis scene.
@@ -241,7 +242,7 @@ class MSemanticAnalyser(m.Scene):
         """        
         lhs = True
         lh_type = None
-        terminal_index = 0
+        t_index = 0
         for node in anytree.PreOrderIter(self.root):
             try:
                 # draw manim vertex
@@ -267,30 +268,30 @@ class MSemanticAnalyser(m.Scene):
                             # highlight the terminal, its input and its token
                             self.play(
                                 m.Flash(v, line_length=0.3,
-                                num_lines=20, color=m.BLUE_D,
+                                num_lines=20, color=self.tok_cols[t_index],
                                 flash_radius=0.3,
                                 time_width=0.3),
-                                m.Flash(self.m_inp[terminal_index], 
+                                m.Flash(self.m_inp[t_index], 
                                 line_length=0.15,
-                                num_lines=20, color=m.BLUE_D,
+                                num_lines=20, color=self.tok_cols[t_index],
                                 flash_radius=0.1,
                                 time_width=0.3),
-                                m.Flash(self.m_tok[terminal_index], 
+                                m.Flash(self.m_tok[t_index], 
                                 line_length=0.15,
-                                num_lines=20, color=m.BLUE_D,
+                                num_lines=20, color=self.tok_cols[t_index],
                                 flash_radius=0.1,
                                 time_width=0.3),
                             )
 
                             # highlight the input and token stream
                             self.play(
-                                m.FadeToColor(self.m_tok[terminal_index], 
-                                color = m.BLUE_D),
-                                m.FadeToColor(self.m_inp[terminal_index], 
-                                color = m.BLUE_D),
+                                m.FadeToColor(self.m_tok[t_index], 
+                                color = self.tok_cols[t_index]),
+                                m.FadeToColor(self.m_inp[t_index], 
+                                color = self.tok_cols[t_index]),
                             )
                             sounds.narrate("We matched a terminal!", self)
-                            terminal_index = terminal_index + 1
+                            t_index = t_index + 1
 
                         self.wait()
 
