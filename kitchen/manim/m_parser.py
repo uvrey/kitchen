@@ -58,6 +58,15 @@ def set_up_label(g, vertex_id, label, color = m.GRAY):
     rendered_label = m.MathTex(
         mg.to_math_tex(label), color = label_col)\
             .scale(0.5)
+
+    # add background of label for longer non-terminals
+    if len(label) > 1:
+        bg = m.Rectangle(width=rendered_label.width, 
+        height=rendered_label.height, color = color)
+        bg.set_fill(color, opacity=1.0)
+        bg.move_to(new_vertex.get_center())
+        new_vertex.add(bg)
+
     rendered_label.move_to(new_vertex.get_center())
     new_vertex.add(rendered_label)
     
@@ -312,8 +321,6 @@ class MParseTree(m.Scene):
                     if v_id in self.vertex_ids:
                         v_id = node.id + "_#_" + self.id_count
 
-                    display.info_secho("Making epsilon node "+ v_id +
-                    "with parent " + node.vertex_id)
                     new_node = anytree.Node("#", parent=node, id= "#", 
                     token = None, parent_id = node.vertex_id, vertex_id =
                     v_id)

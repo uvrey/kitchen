@@ -29,7 +29,8 @@ from kitchen import (
         CFG_SCALE_HEIGHT, 
         RE_NONTERMINAL, 
         CFG_SCALE_WIDTH, 
-        RE_TERMINAL
+        RE_TERMINAL,
+        ERROR
 )
 
 VCONFIG = {"radius": 0.2, "color": m.BLUE_D, "fill_opacity": 1}
@@ -52,10 +53,24 @@ def set_up_label(g, vertex_id, label, color = m.GRAY):
     # fade vertex
     new_vertex.fade_to(color, alpha = 1)
 
+  # set label color
+    if re.match(RE_TERMINAL, label):
+        label_col = config.get_theme_col()
+    else:
+        label_col = m.WHITE
+
     # add the new label above
     rendered_label = m.MathTex(
-        mg.to_math_tex(label), color = config.get_opp_col())\
-            .scale(0.5)
+        mg.to_math_tex(label), color = label_col).scale(0.5)
+
+    # add background of label for longer non-terminals
+    if len(label) > 1:
+        bg = m.Rectangle(width=rendered_label.width, 
+        height=rendered_label.height, color = color)
+        bg.set_fill(color, opacity=1.0)
+        bg.move_to(new_vertex.get_center())
+        new_vertex.add(bg)
+
     rendered_label.move_to(new_vertex.get_center())
     new_vertex.add(rendered_label)
     
@@ -107,7 +122,7 @@ def reset_g(self, g, root):
 
 
 class MSemanticAnalyser(m.Scene):
-    def setup_manim(self, cfg, root, inp, spec, tok_cols):
+    def setup_manim(self, cfg, root, inp, spec):
         """Initialises the SemanticAnalyser Manim Scene.
 
         Args:
@@ -121,7 +136,12 @@ class MSemanticAnalyser(m.Scene):
         self.symbol = {'Symbol': [], 'Type': []}
         self.inp_list = lang_spec.clean_inp_stream(inp.split(" "))
         self.tokens = mg.get_tokens_from_input(inp, spec)
-        self.tok_cols = tok_cols
+        mg.set_up_token_colour(self)
+        self.tok_cols = []
+        if self.tokens != ERROR:
+                # associate a colour for each token
+                for t in self.tokens:
+                    self.tok_cols.append(mg.get_token_colour(self))
 
     def construct(self):
         """Constructs the semantic analysis scene.
@@ -139,12 +159,13 @@ class MSemanticAnalyser(m.Scene):
         # show the token stream
         self.m_tok = []
         self.m_tok_gp = m.VGroup()
-        self.m_tok_gp.add(m.Tex("Token stream: ")).scale(0.5)
+        self.m_tok_gp.add(m.Tex("Token stream: ", color = config.\
+            get_opp_col()).scale(0.5))
 
         for t in self.tokens:
             try:
-                tex = m.MathTex("\\text{"+t.type+"}", color = m.PURPLE_A)\
-                    .scale(0.5)
+                tex = m.MathTex("\\text{"+t.type+"}", color = config.\
+                    get_opp_col()).scale(0.5)
                 self.m_tok_gp.add(tex)
                 self.m_tok.append(tex)
             except:
@@ -157,12 +178,13 @@ class MSemanticAnalyser(m.Scene):
         # show the input stream
         self.m_inp = []
         self.m_inp_gp = m.VGroup()
-        self.m_inp_gp.add(m.Tex("Input stream: ")).scale(0.5)
+        self.m_inp_gp.add(m.Tex("Input stream: ", color = config.\
+            get_opp_col())).scale(0.5)
 
         for t in self.tokens:
             try:
-                tex = m.MathTex("\\text{"+t.value+"}", color = m.PURPLE_A)\
-                    .scale(0.5)
+                tex = m.MathTex("\\text{"+t.value+"}", color = config.\
+                    get_opp_col()).scale(0.5)
                 self.m_inp_gp.add(tex)
                 self.m_inp.append(tex)
             except:
@@ -176,7 +198,8 @@ class MSemanticAnalyser(m.Scene):
         arr = m.Arrow(start=3*m.RIGHT, end=3*m.LEFT, color=config.\
             get_opp_col(), buff = 1)
         arr.to_edge(m.DOWN)
-        arr_caption = m.Tex("Parsing direction").scale(0.7)
+        arr_caption = m.Tex("Parsing direction", color = config.\
+            get_opp_col()).scale(0.7)
         arr_caption.next_to(arr, m.UP)
 
         # sets the stage
@@ -218,6 +241,11 @@ class MSemanticAnalyser(m.Scene):
             top_left_entry=m.Star().scale(0.3),
             include_outer_lines=False,
             line_config={"stroke_width": 1, "color": m.BLUE_A})
+
+        entries = table.get_entries_without_labels()
+        for e in entries:
+            e.set_colour(config.get_opp_col())
+
         table.scale_to_fit_width(CFG_SCALE_WIDTH/2)
         if table.height > CFG_SCALE_HEIGHT:
             table.scale_to_fit_width(CFG_SCALE_HEIGHT)
@@ -250,13 +278,15 @@ class MSemanticAnalyser(m.Scene):
                     try: 
                         if re.match(RE_NONTERMINAL, node.id):
                             v_id = node.parent.id + "_" + node.id
+                            tok_col = m.GRAY
                         else:
                             v_id = node.parent.id + "_" + node.token.value
+                            tok_col = self.tok_cols[t_index]
                         if node.parent.id != start_symbol:
                             p_id = node.parent.parent.id + "_" + node.parent.id
                         else:
                             p_id = start_symbol 
-                        v = create_vertex(g, v_id, p_id, node.id, m.BLUE_D)
+                        v = create_vertex(g, v_id, p_id, node.id, tok_col)
                         sounds.add_sound_to_scene(self, sounds.CLICK)
                         self.play(m.FadeIn(v))
 
@@ -290,7 +320,12 @@ class MSemanticAnalyser(m.Scene):
                                 m.FadeToColor(self.m_inp[t_index], 
                                 color = self.tok_cols[t_index]),
                             )
-                            sounds.narrate("We matched a terminal!", self)
+                            
+                            if node.token.type != node.token.value:
+                                sounds.narrate("We matched a terminal that"+
+                                " may an operator.", self)
+                            else:
+                                sounds.narrate("We matched a terminal!", self)
                             t_index = t_index + 1
 
                         self.wait()
@@ -317,10 +352,11 @@ class MSemanticAnalyser(m.Scene):
                                 lh_type = node.token.type
                         else:
                             lhs = False
-
-                    self.symbol['Symbol'].append(node.token.value)
-                    self.symbol['Type'].append(node.token.type)
-                    self.fade_in_table()
+                    
+                    if node.token.value != node.token.type:
+                        self.symbol['Symbol'].append(node.token.value)
+                        self.symbol['Type'].append(node.token.type)
+                        self.fade_in_table()
             except:
                 self._call_error("Cannot semantically analyse only "+
                     "a token stream.")
@@ -328,7 +364,8 @@ class MSemanticAnalyser(m.Scene):
         
         sounds.add_sound_to_scene(self, sounds.SUCCESS)
         mg.display_msg(self, ["Semantic analysis complete!"], script = 
-        "Semantic analysis complete! Here is the final symbol table.")
+        "Semantic analysis complete! That was a valid input. Here is " +
+        "the final symbol table.")
         self.fade_in_table(fade_out = False, end = True)
         self.print_symbol_table()
 

@@ -403,8 +403,7 @@ def _process_command(inp, cfg, spec) -> None:
                     with m.tempconfig(config.OUTPUT_CONFIG):
                         sem_analyser = m_type_check.MSemanticAnalyser()
                         sem_analyser.setup_manim(cfg, 
-                        cfg.parser_ll1.root, to_sem, spec, 
-                        cfg.parser_ll1.tok_cols)
+                        cfg.parser_ll1.root, to_sem, spec)
                         sem_analyser.render()
                 else:
                     display.fail_secho("Parsing failed with code " + 
