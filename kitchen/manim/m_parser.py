@@ -48,8 +48,8 @@ def set_up_label(g, vertex_id, label, color = m.GRAY):
     new_vertex.fade_to(color, alpha = 1)
 
     # add the new label above
-    rendered_label = m.MathTex(
-        mg.to_math_tex(label), color = config.get_opp_col())\
+    rendered_label = m.Tex(
+        mg.to_tex(label), color = config.get_opp_col())\
             .scale(0.5)
     rendered_label.move_to(new_vertex.get_center())
     new_vertex.add(rendered_label)

@@ -248,6 +248,10 @@ class SemanticAnalyser:
 # C:\Users\josie\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.9_qbz5n2kfra8p0\LocalCache\local-packages\Python39\site-packages\manim\scene\scene.py:1427: RuntimeWarning: divide by zero encountered in double_scalars
 #   alpha = t / animation.run_time
 
+
+# Currently, there is a lot of interplay between a scene and its renderer. This is a flaw in Manim’s current architecture, and we are working on reducing this interdependency to achieve a less convoluted code flow.
+
+
 #  moov atom not found
 # [concat @ 0000020ab91ebc40] Impossible to open...
 # - clear sound dir and restart

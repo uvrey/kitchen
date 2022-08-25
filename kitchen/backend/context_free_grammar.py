@@ -600,6 +600,6 @@ class ContextFreeGrammar:
         Returns:
             int: Status code.
         """        
-        self.parsetable.populate_table()
+        code = self.parsetable.populate_table()
         self.parsetable_calculated = True
-        return SUCCESS
+        return code

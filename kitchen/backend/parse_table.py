@@ -8,6 +8,8 @@ import typer
 
 from kitchen import (
     RE_TERMINAL,
+    ERROR,
+    SUCCESS
 )
 
 from kitchen.helpers import (
@@ -89,15 +91,18 @@ class ParsingTable:
                         prod = key + " -> " + item
                         if f == "$":
                             # make A->a in column of "$"
-                            self.add_to_parsetable(key, "$", prod)
+                            code = self.add_to_parsetable(key, "$", prod)
                         else:
-                            self.add_to_parsetable(key, f, prod)
+                            code = self.add_to_parsetable(key, f, prod)
+                        if code == ERROR: return ERROR
                 else:
                     # add item to the parse table
                     prod = self.firstset_index[key][j]
-                    self.add_to_parsetable(key, item, prod)
+                    code = self.add_to_parsetable(key, item, prod)
+                    if code == ERROR: return ERROR
+        return SUCCESS
 
-    def add_to_parsetable(self, nt, t, production):
+    def add_to_parsetable(self, nt, t, production, testing = False):
         """Adds a production to the parsetable at a given index. 
 
         Args:
@@ -108,10 +113,12 @@ class ParsingTable:
         try:
             if self.pt_dict[nt][t] != "Error":
                 error.ERR_too_many_productions_ll1(nt, t)
+                return ERROR
             else:
                 self.pt_dict[nt][t] = production
         except KeyError:
             self.pt_dict[nt][t] = production
+        return SUCCESS
 
     def get_row_contents(self):
         """Gets the rows as a list of lists. 

@@ -20,7 +20,8 @@ from kitchen.helpers import (
     display,
     sounds,
     lang_spec,
-    config
+    config,
+    error
 )
 
 app = typer.Typer()
@@ -175,13 +176,15 @@ def find_pt() -> None:
     _check_cfg(cfg)
     cfg.reset_first_set()
     cfg.reset_follow_set()
-
-    # initialise parsetable
-    cfg.setup_parsetable()
-
-    # calculate parsetable
-    code = cfg.calculate_parsetable()
-    cfg.parsetable.print_parse_table_testing()
+    if not cfg.is_ambiguous:
+        # initialise parsetable
+        code = cfg.setup_parsetable()
+        # calculate parsetable
+        code = cfg.calculate_parsetable()
+        if code != ERROR:
+            cfg.parsetable.print_parse_table_testing()
+    else:
+        error.ERR_ambiguous_grammar(testing = True)
 
 # TODO ADD more tests here
 @app.command(name = "test-ll1")

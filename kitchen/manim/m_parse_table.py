@@ -279,11 +279,11 @@ class MParsingTable(m.Scene):
         try:
             if self.pt_dict[nt][t] != "Error":
                 sounds.add_sound_to_scene(self, sounds.FAIL)   
-                mg.display_msg(self, ["Cannot add entry: There is already a \
-                    production", "at ParseTable[" + nt +", " + t +"].", 
+                mg.display_msg(self, ["Cannot add entry: There is already a" +
+                    " production", "at ParseTable[" + nt +", " + t +"].", 
                     "NOTE: This grammar cannot be parsed with LL(1)." ], 
-                    script = "There's already an entry, so this grammar \
-                        is unsuitable for LL(1) parsing.")    
+                    script = "There's already an entry, so this grammar " +
+                        "is unsuitable for LL(1) parsing.")    
                 error.ERR_too_many_productions_ll1(nt, t)
                 return ERROR
             else:

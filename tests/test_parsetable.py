@@ -17,20 +17,23 @@ def sample_path():
 def pt_out_path():
     return ".\\samples\\expected_pt\\"
 
-
 """ Test calculation of first sets on existing CFG files """
 @pytest.mark.parametrize("sample_cfg", [
     ("cfg.txt"),
-    # ("cfg_1.txt"), # need memo
-    # ("cfg_2.txt"), # issue here with follow(B) and done
-    # ("cfg_3.txt"),
-    # ("cfg_4.txt"),
-    # ("cfg_5.txt"),
-    # ("cfg_6.txt"),
-    # ("cfg_7.txt"), 
-    # ("cfg_8.txt"),
-    # ("cfg_9.txt"), 
-    # ("cfg_10.txt"), # issue here
+    ("cfg_1.txt"), 
+    ("cfg_2.txt"), 
+    ("cfg_3.txt"),
+    ("cfg_4.txt"),
+    ("cfg_5.txt"),
+    ("cfg_6.txt"),
+    ("cfg_7.txt"), 
+    ("cfg_8.txt"),
+    ("cfg_9.txt"), 
+    ("cfg_10.txt"),
+    ("cfg_11.txt"), 
+    ("cfg_12.txt"),
+    ("cfg_bla_simple_2.txt"),
+    ("cfg_id_language.txt"),
 ])
 
 def test_pt(sample_path, pt_out_path, sample_cfg):

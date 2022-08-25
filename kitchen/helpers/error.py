@@ -109,8 +109,8 @@ def ERR_too_many_productions_ll1(nt, t):
     """    
     err = typer.style("Error:", fg=typer.colors.WHITE, bg=typer.colors.RED)
     typer.echo(err + " When building the parsing table, [" + nt + ", " + t +
-               "] contains more than one production - this CFG is not \
-                feasible to parse with LL(1).")
+               "] contains more than one production - this CFG is not " +
+                "feasible to parse with LL(1).")
 
 def ERR_parsing_error(root = None, detail=""):
     """Displays a parsing error.
@@ -137,9 +137,13 @@ def ERR_no_input_given():
     err = typer.style("Error:", fg=typer.colors.WHITE, bg=typer.colors.RED)
     typer.echo(err + " No input provided.")
 
-def ERR_ambiguous_grammar():
+def ERR_ambiguous_grammar(testing = False):
     """Displays an error when the grammar is ambiguous.
     """    
+    if testing:
+        typer.echo("Error: Ambiguous grammar detected.")
+        return
+        
     err = typer.style("Error:", fg=typer.colors.WHITE, bg=typer.colors.RED)
     msg_str = (err + "\t The provided grammar contains ambiguity." +
                "\n\t This means that for some production S -> A | B," +
