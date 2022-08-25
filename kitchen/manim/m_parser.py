@@ -312,7 +312,6 @@ class MParseTree(m.Scene):
 
     def _parsing_successful(self, tokens, semantic: bool, testing = False, 
         verbose = True):
-        # TODO display message to screen
         types = lang_spec.get_token_format(tokens, types=True)
         values = lang_spec.get_token_format(tokens, values=True)
         
@@ -324,6 +323,9 @@ class MParseTree(m.Scene):
                 return
 
             if verbose:
+                mg.display_msg(self, ["Parsing successful!", values + 
+                " is a valid input."], script = "Parsing successful. " +
+                "That was a valid input.")
                 display.success_secho("\nSuccessfully parsed token stream '" + 
                 types + "'\nfrom input stream '" + values + 
                 "'.\n\nParse tree:")
@@ -431,6 +433,7 @@ class MParseTree(m.Scene):
                     # tend to epsilon
                     if "#" in self.cfg.first_set[self.s.stack[-1]] and \
                     len(self.s.stack) == 1:
+                        self.s.pop(msg = self.s.stack[-1] + r'\to \varepsilon')
                         self._parsing_successful(original_tokens, False)
                         return SUCCESS
                     # otherwise calls an error
