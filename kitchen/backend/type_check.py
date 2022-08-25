@@ -157,6 +157,8 @@ class SemanticAnalyser:
 # RuntimeWarning: invalid value encountered in double_scalars :)
 # Token colours (LL(1)) :)
 # pt test cases :)
+# token colours - type checking :)
+# light and dark mode - type and ll1
 
 
 # TODO - DEVELOPMENT
