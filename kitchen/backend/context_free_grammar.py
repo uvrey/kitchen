@@ -263,7 +263,7 @@ class ContextFreeGrammar:
         """        
         self._calculate_first_set(self.start_symbol, [])
         self._clean_first_set()
-        typer.echo(self.first_set) 
+        display.general_secho(self.first_set) 
 
     def reset_first_set(self, calculate_again = True) -> None:
         """Resets the first sets in preparation for another calculation.

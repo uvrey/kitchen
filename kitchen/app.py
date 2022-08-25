@@ -36,7 +36,7 @@ def _version_callback(value: bool) -> None:
         typer.Exit: Exits the app once version has been displayed.
     """    
     if value:
-        typer.echo(f"{__app_name__} v{__version__}")
+        display.general_secho(f"{__app_name__} v{__version__}")
         raise typer.Exit()
 
 def get_cfg() -> cfg.ContextFreeGrammar:
@@ -154,7 +154,7 @@ def show_cfg() -> None:
     """    
     cfg = get_cfg()
     _check_cfg(cfg)
-    typer.echo(cfg.cfg_contents)
+    display.general_secho(cfg.cfg_contents)
 
 """ Helper functions for testing """
 @app.command(name = "test-fs")

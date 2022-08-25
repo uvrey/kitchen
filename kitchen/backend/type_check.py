@@ -167,7 +167,7 @@ class SemanticAnalyser:
 # generate demo showcase videos in 1080p
 
 # GRAMMARS
-# validate grammars and language spec MED
+# validate grammars and language spec 
 # validity checks on inputs
 
 # TODO - INTEGRATION 

@@ -157,7 +157,7 @@ class ParsingTable:
         """Prints the parse table for testing purposes
         """        
         # print heading
-        typer.echo(self.pt_dict)
+        display.general_secho(self.pt_dict)
 
 
 

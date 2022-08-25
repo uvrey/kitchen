@@ -106,9 +106,6 @@ class ParserLL1:
         else:
             init_input(self, inp)
 
-        # display.info_secho("MAPPED TO TOKENS:")
-        # display.show_tokens(self.tokens)
-
         if None in self.tokens:
             display.fail_secho("Not all tokens from the input stream were \
                 matched :(\nParsing failed.")
