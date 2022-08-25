@@ -14,8 +14,14 @@ CFG_SCALE_HEIGHT = 6.25*m.config["frame_height"]/10
 CFG_SCALE_WIDTH = 0.8*m.config["frame_width"]
 GRID_ITEM_SCALE = 0.4
 CFG_SCALE = 0.7
-COLOURS = [m.BLUE_A, m.TEAL_B, m.GREEN_B, m.YELLOW_B, m.GOLD_B,
-                     m.RED_B, m.MAROON_B, m.PURPLE_A, m.LIGHT_PINK, m.LIGHT_BROWN]
+COLOURS_LIGHT = [m.BLUE_A, m.TEAL_B, m.GREEN_B, m.YELLOW_B, m.GOLD_B,
+                     m.RED_B, m.MAROON_B, m.PURPLE_A, m.LIGHT_PINK, 
+                     m.LIGHT_BROWN]
+
+COLOURS_DARK = [m.BLUE_E, m.TEAL_E, m.GREEN_E, m.YELLOW_E, m.GOLD_E,
+                     m.RED_E, m.MAROON_E, m.PURPLE_E, m.PINK, 
+                     m.GRAY_BROWN]
+
 
 (
     DARK,

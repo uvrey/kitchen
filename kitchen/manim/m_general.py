@@ -6,7 +6,8 @@ import manim as m
 
 from kitchen import (
     SUCCESS,
-    COLOURS,
+    COLOURS_DARK,
+    COLOURS_LIGHT
 )
 
 from kitchen.helpers import (
@@ -138,11 +139,16 @@ def get_token_colour(self):
         Color: A unique colour if available, otherwise one which contrasts
         the theme.
     """    
-    for index, col in enumerate(COLOURS, start=0):
+    if config.get_theme_name() == "dark":
+        colour_palette = COLOURS_LIGHT
+    else:
+        colour_palette = COLOURS_DARK
+
+    for index, col in enumerate(colour_palette, start=0):
         if not self.token_has_this_colour[index]:
             self.token_has_this_colour[index] = True
             return col
-    return config.get_opp_col()
+    return m.DARKER_GRAY()
 
 # fades the scene out
 def fade_scene(self):

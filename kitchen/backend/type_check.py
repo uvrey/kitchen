@@ -10,6 +10,8 @@ import networkx as nx
 
 from kitchen.helpers import display
 
+from kitchen import COLOURS_LIGHT, COLOURS_DARK
+
 class SemanticAnalyser:
     def __init__(self, cfg, root, inp):
         """Initialises the SemanticAnalyser.
@@ -217,7 +219,6 @@ class SemanticAnalyser:
 # # and for each terminal in Follow(A), make entry A –> α in the table.
 # # If the First(α) contains ε and Follow(A) contains $ as terminal, then 
 # # make entry A –> α in the table for the $. 
-
 
 # FEATURES
 # - unique filenames and timestamps

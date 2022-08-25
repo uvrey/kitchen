@@ -5,6 +5,7 @@
 import manim as m
 import re
 import anytree
+import typer
 
 from kitchen import ( 
     CFG_SCALE_WIDTH,
@@ -47,9 +48,15 @@ def set_up_label(g, vertex_id, label, color = m.GRAY):
     # fade vertex
     new_vertex.fade_to(color, alpha = 1)
 
+    # set label color
+    if re.match(RE_TERMINAL, label):
+        label_col = config.get_theme_col()
+    else:
+        label_col = config.get_opp_col()
+
     # add the new label above
-    rendered_label = m.Tex(
-        mg.to_tex(label), color = config.get_opp_col())\
+    rendered_label = m.MathTex(
+        mg.to_math_tex(label), color = label_col)\
             .scale(0.5)
     rendered_label.move_to(new_vertex.get_center())
     new_vertex.add(rendered_label)
@@ -86,7 +93,7 @@ def reset_g(self, g, root, anim=[]):
         ),
     )
 
-    g.shift(m.RIGHT)
+
 
 # general function for mapping elements in some list to another list
 def map_token_lists(self, lhs, rhs):
@@ -100,7 +107,7 @@ def map_token_lists(self, lhs, rhs):
         arrow = m.Arrow(start=m.LEFT, end=m.RIGHT, buff=0)\
             .next_to(lh, m.RIGHT)
         rh = m.Text(rhs[index], weight=m.BOLD, 
-        color=mg.get_token_colour(self)).next_to(
+        color=self.tok_cols[index]).next_to(
             arrow, m.RIGHT)
         small_group.add(lh, arrow, rh)
         map_group.add(small_group)
@@ -306,7 +313,7 @@ class MParseTree(m.Scene):
                     token = None, parent_id = node.vertex_id, vertex_id =
                     v_id)
                     new_vertex = create_vertex(g, new_node, r'\varepsilon', 
-                    color = m.BLUE_D)
+                    color = m.GRAY)
                     self.play(m.FadeIn(new_vertex))
         return SUCCESS
 
@@ -358,6 +365,9 @@ class MParseTree(m.Scene):
         # copy the tokens
         original_tokens = self.tokens[:]
 
+        # set up terminal index
+        t_index = 0
+
         # initialise a way to track the parent nodes
         self.parents = []
 
@@ -372,7 +382,7 @@ class MParseTree(m.Scene):
         keys = mg.get_manim_cfg_group(self).to_edge(m.DOWN)
 
         # create the input group here
-        m_tok = {}
+        m_tok = []
         m_tok_gp = m.VGroup()
         m_tok_gp.add(m.Tex("Token stream: ")).scale(0.5)
 
@@ -380,11 +390,10 @@ class MParseTree(m.Scene):
             try:
                 tex = m.MathTex("\\text{"+t.value+"}").scale(0.5)
                 m_tok_gp.add(tex)
-                m_tok[t.type] = tex
             except:
                 tex = m.MathTex("\\text{"+t+"}").scale(0.5)
                 m_tok_gp.add(tex)
-                m_tok[t] = tex
+            m_tok.append(tex)
         m_tok_gp.arrange(m.RIGHT)
 
         # show the parsing table
@@ -411,9 +420,8 @@ class MParseTree(m.Scene):
         g = m.Graph([start_symbol], [], vertex_config=VCONFIG,
                   labels = False, label_fill_color=config.get_opp_col())
 
-        set_up_label(g, start_symbol, start_symbol, m.BLUE_D)
+        set_up_label(g, start_symbol, start_symbol, m.GRAY)
 
-        g.to_edge(m.UP).shift(m.DOWN)
         self.add(g)
         self.root.manim.move_to(g[start_symbol].get_center())
          
@@ -472,7 +480,7 @@ class MParseTree(m.Scene):
                         sounds.add_sound_to_scene(self, sounds.CLICK)
                         new_vertex = create_vertex(g, popped,
                                             mg.to_math_tex(popped.id), 
-                                            color = m.BLUE_D, 
+                                            color = self.tok_cols[t_index], 
                                             vertex_ids=self.vertex_ids)
                         self.play(m.FadeIn(new_vertex))
                         reset_g(self, g, start_symbol)
@@ -481,16 +489,8 @@ class MParseTree(m.Scene):
                     if len(self.tokens) == 1:
                         self.check_for_epsilons(g)
 
-                    # pop off the stack and 'flash'
-                    self.play(
-                        m.Circumscribe(new_vertex, color=self.tok_cols\
-                            [lang_spec.get_index_by_token_type(\
-                            original_tokens, top)], 
-                            shape = m.Circle),
-                    )
-
-                    sounds.add_sound_to_scene(self, sounds.POP)
-                    self.s.pop(anim=anims, vertex=new_vertex, 
+                    self.s.pop(tok_cols = self.tok_cols, ti = t_index, 
+                    anim=anims, vertex=new_vertex, token = m_tok[t_index],
                     matching=True, msg=r'\text{Matched }' +
                             mg.to_tex(self.s.stack[-1]) + r'\text{!}')
 
@@ -498,15 +498,14 @@ class MParseTree(m.Scene):
                     sounds.add_sound_to_scene(sounds.YAY, self)
                     self.play(m.ApplyWave(m_tok_gp))
                     self.play(
-                        m.LaggedStart(m.Indicate(m_tok[next], 
-                        color=self.tok_cols[lang_spec\
-                            .get_index_by_token_type(original_tokens, next)],
-                            scale_factor=1.5),
-                            m.FadeToColor(m_tok[next], 
-                            color=self.tok_cols[lang_spec\
-                                .get_index_by_token_type(original_tokens,\
-                                next)])),
+                        m.LaggedStart(m.Indicate(m_tok[t_index], 
+                        color=self.tok_cols[t_index],
+                            scale_factor=3),
+                            m.FadeToColor(m_tok[t_index], 
+                            color=self.tok_cols[t_index])),
                     )
+                    # increase number of terminals
+                    t_index = t_index + 1
 
                 else:
                     sounds.add_sound_to_scene(self, sounds.FAIL)
@@ -538,7 +537,7 @@ class MParseTree(m.Scene):
                         sounds.add_sound_to_scene(self, sounds.CLICK)
                         new_vertex = create_vertex(g, replaced_parent, \
                             mg.to_math_tex(self.parents[-1].id), \
-                            vertex_ids=self.vertex_ids, color = m.BLUE_D)
+                            vertex_ids=self.vertex_ids, color = m.GRAY)
                         self.play(m.FadeIn(new_vertex))
                         reset_g(self, g, start_symbol)
 

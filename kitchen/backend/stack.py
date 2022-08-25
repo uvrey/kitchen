@@ -12,6 +12,7 @@ from kitchen import (
 
 from kitchen.helpers import (
     config,
+    display,
     sounds
 )
 
@@ -30,7 +31,8 @@ class Stack:
         self.mstack.set_stroke(width=2, color = m.GRAY)
 
 
-    def pop(self, msg, vertex=None, anim=[], matching=False):
+    def pop(self, msg, tok_cols = None, ti = -1, vertex=None, anim=[], 
+    token = None, matching=False):
         # set up stack in backend
         if self.stack == []:
             return
@@ -54,26 +56,31 @@ class Stack:
                         self.scene.play(
                             a
                         )
+
+                    sounds.add_sound_to_scene(self.scene, sounds.POP)
                     self.scene.play(m.FadeOut(top_text))
 
                 else:
                     # match a terminal in the stack
                     self.scene.play(
                         m.FadeIn(m_msg),
-                        m.Indicate(top_text, color=m.BLUE_D),
-                        m.FadeToColor(top_text, m.BLUE_D),
+                        m.FadeToColor(top_text, tok_cols[ti]),
                     )
 
                     sounds.add_sound_to_scene(self.scene, sounds.TWINKLE)
                     self.scene.play(
                         m.Flash(top_text, line_length=0.3,
-                              num_lines=30, color=m.BLUE_D,
+                              num_lines=30, color=tok_cols[ti],
                               flash_radius=0.3,
                               time_width=0.3),
                         m.Flash(vertex, line_length=0.4,
-                              num_lines=30, color=m.BLUE_D,
+                              num_lines=30, color=tok_cols[ti],
                               flash_radius=0.3,
                               time_width=0.3),
+                        m.Flash(token, line_length=0.2,
+                            num_lines=20, color=tok_cols[ti],
+                            flash_radius=0.3,
+                            time_width=0.3),
                         m.FadeOut(top_text))
 
                 self.scene.play(m.FadeOut(m_msg))
@@ -118,14 +125,12 @@ class Stack:
             t.scale(0.6)
             t.move_to(self.texts[-1].get_top()).shift(m.UP*0.5)
             self.texts.append(t)
-
         
         if msg != None:
             sounds.add_sound_to_scene(self.scene, sounds.CLANG)
             self.scene.play(
-                m.LaggedStart(
                     m.FadeIn(t, shift=m.DOWN),
-                    m.Write(m_msg),),
+                    m.Write(m_msg)
             )
 
             self.scene.play(
@@ -137,7 +142,7 @@ class Stack:
                 sounds.add_sound_to_scene(self.scene, sounds.CLANG)
                 self.scene.play(
                     m.FadeIn(t, shift=m.DOWN),
-                    m.AnimationGroup(*[a for a in anim]),
+                    *[a for a in anim]
                 )
             else:
                 self.scene.play(
