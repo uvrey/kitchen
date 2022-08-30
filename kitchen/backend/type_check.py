@@ -158,8 +158,9 @@ class SemanticAnalyser:
 # Token colours (LL(1)) :)
 # pt test cases :)
 # token colours - type checking :)
-# light and dark mode - type and ll1
-
+# light and dark mode - type and ll1 :)
+# validate grammars and language spec :)
+# validity checks on inputs :)
 # remove debugging output :)
 
 
@@ -167,10 +168,6 @@ class SemanticAnalyser:
 # TESTING
 # fs, fw, ll1 test cases written
 # generate demo showcase videos in 1080p
-
-# GRAMMARS
-# validate grammars and language spec 
-# validity checks on inputs
 
 # TODO - INTEGRATION 
 # start dsl tool from the typer app HIGH
@@ -188,7 +185,7 @@ class SemanticAnalyser:
 # how to autogenerate documentation
 
 # README 
-# - better installation guidelines
+# better installation guidelines
 # clean up code   
 # clean git repo
 
@@ -250,7 +247,8 @@ class SemanticAnalyser:
 # - so it can't clear the cache
 # Known issues:
 # - No sound: clear partial movie directory and restart.
-# Currently, there is a lot of interplay between a scene and its renderer. This is a flaw in Manim’s current architecture, and we are working on reducing this interdependency to achieve a less convoluted code flow.
+# Currently, there is a lot of interplay between a scene and its renderer. This is a flaw in 
+# Manim’s current architecture, and we are working on reducing this interdependency to achieve a less convoluted code flow.
 
 #  moov atom not found
 # [concat @ 0000020ab91ebc40] Impossible to open...

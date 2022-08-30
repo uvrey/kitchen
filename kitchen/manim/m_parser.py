@@ -564,7 +564,10 @@ class MParseTree(m.Scene):
                     cfg_line = self.manim_production_groups[prods[0].strip(
                     )][:]
                     cfg_line.next_to(self.s.mstack, m.DOWN).shift(
-                        0.8*m.DOWN).scale_to_fit_width(3*self.s.mstack.width)
+                        0.8*m.DOWN).scale(0.8)
+                    
+                    if cfg_line.width > 3*self.s.mstack.width:
+                        cfg_line.scale_to_fit_width(3*self.s.mstack.width)
 
                     self.play(
                         m.FadeIn(cfg_line)
@@ -641,10 +644,6 @@ class MParseTree(m.Scene):
                 except KeyError:
                     self._call_ptable_error(top, next)
                     return
-
-                self.play(
-                    m.FadeOut(cfg_line)
-                )
 
         # in case parsing finishes but there are still tokens left in the stack
         if len(self.tokens) > 0:

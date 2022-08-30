@@ -125,7 +125,11 @@ def pretty_print_config_settings(output_config, narr):
     structure_secho("\tNarration: " + str(narr_setting))
 
 def print_set(set, name=""):
-    df= pd.DataFrame(data=set,  columns = set.keys(), index = [name])
+    printable_set = {}
+    for key in set.keys():
+        printable_set[key] = ", ".join(set[key])
+    df= pd.DataFrame(data=printable_set,  columns = set.keys(), index = \
+        [name])
     structure_secho(df.transpose().to_markdown())
 
 def print_welcome():
@@ -150,8 +154,8 @@ def print_menu():
             ("show parsetable", "pt", "Display parse table"), 
             ("vis parsetable", "vpt", "Visualise parse table calculation"), 
             ("ll1 <input>", "<input>", "Show LL(1) parse tree"), 
-            ("ll1 v <input>", "v <input>", "Visualise LL(1) parse tree \
-                construction")]
+            ("ll1 v <input>", "v <input>", "Visualise LL(1) parse tree "+
+                "construction")]
         
     df= pd.DataFrame(data=cmds,  columns = ["Command", "Shortcut", "Detail"])
     info_secho(df.to_markdown(index=False))
