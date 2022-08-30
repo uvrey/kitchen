@@ -303,9 +303,9 @@ class MParseTree(m.Scene):
             int: Status code.
         """        
         # notify user
-        mg.display_msg(self, ["We can now check if any productions led ", 
-        "to $\\varepsilon$, and so disappeared."], script = "Let's check if " +
-        "any productions led to epsilon.")
+        mg.display_msg(self, ["We can now check if any productions derived ", 
+        "\\varepsilon."], script = "Let's check if " +
+        "any productions derived epsilon.")
 
         # look for any epsilons that came before and add.
         for node in self.root.descendants:
@@ -497,10 +497,6 @@ class MParseTree(m.Scene):
                         self.play(m.FadeIn(new_vertex))
                         reset_g(self, g, start_symbol)
 
-                    # if we have matched our last token
-                    if len(self.tokens) == 1:
-                        self.check_for_epsilons(g)
-
                     self.s.pop(tok_cols = self.tok_cols, ti = t_index, 
                     anim=anims, vertex=new_vertex, token = m_tok[t_index],
                     matching=True, msg=r'\text{Matched }' +
@@ -658,6 +654,9 @@ class MParseTree(m.Scene):
         sounds.narrate("Stack emptied.", self)
         self.s.write_under_stack("\\text{Stack emptied.}")
         reset_g(self, g, start_symbol, anim=[m.FadeOut(self.s.mstack)])
+
+        # if we have matched our last token
+        self.check_for_epsilons(g)
 
         sounds.add_sound_to_scene(self, sounds.YAY)
         mg.display_msg(self, ["Successfully parsed `" + self.inp + "'!"], 
