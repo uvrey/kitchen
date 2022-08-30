@@ -315,7 +315,7 @@ class MParseTree(m.Scene):
                
                     v_id = node.id + "_#"
                     if v_id in self.vertex_ids:
-                        v_id = node.id + "_#_" + self.id_count
+                        v_id = node.id + "_#_" + str(self.id_count)
 
                     new_node = anytree.Node("#", parent=node, id= "#", 
                     token = None, parent_id = node.vertex_id, vertex_id =
