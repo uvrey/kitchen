@@ -49,8 +49,14 @@ class MFollowSet(m.Scene):
 
         # sets up CFG keys
         keys = mg.get_manim_cfg_group(self)
-        keys.scale_to_fit_width(CFG_SCALE_WIDTH/3)
-        keys.scale_to_fit_height(CFG_SCALE_HEIGHT/2)
+
+        keys.scale(0.8)
+        if keys.width > CFG_SCALE_WIDTH/ 3:
+            keys.scale_to_fit_width(CFG_SCALE_WIDTH/ 3)
+        
+        if keys.height > CFG_SCALE_HEIGHT/2:
+            keys.scale_to_fit_height(CFG_SCALE_HEIGHT/ 2)
+
         keys.fade_to(m.GRAY, 1).to_edge(m.LEFT)
 
         # draws follow set title
@@ -108,7 +114,7 @@ class MFollowSet(m.Scene):
                             for t in tmp_anim:
                                 anims.append(t) 
 
-                            mg.display_msg(self, ["Follow(" + mg.to_tex(item) +
+                            mg.display_msg(self, ["Follow(" + item +
                             ") may not exist"], script = "A standalone " +
                             "non epsilon terminal won't have a follow set.")
 
@@ -211,9 +217,9 @@ class MFollowSet(m.Scene):
                                     if index + 1 == len(pps) - 1:
                                         # if B -> # and A -> aB, then 
                                         # follow(a) = Follow(A) 
-                                        if production not in self.follow_set\
+                                        if production not in self.cfg.follow_set\
                                             [item]: 
-                                            self.follow_set[item].append\
+                                            self.cfg.follow_set[item].append\
                                                 (production)
                                             self._add_to_follow_vis(
                                             item, production, keys, 
@@ -230,7 +236,7 @@ class MFollowSet(m.Scene):
                                              " might not actually appear \
                                                 after " + item)
                                     else:
-                                        self.follow_set[item].append(next_item)
+                                        self.cfg.follow_set[item].append(next_item)
                                         self._add_to_follow_vis(
                                             item, next_item, keys,
                                             [r'\varepsilon \subseteq First('+
@@ -276,6 +282,12 @@ class MFollowSet(m.Scene):
 
         # shows success
         sounds.add_sound_to_scene(self, sounds.YAY)
+        self.play(
+            m.Flash(keys, line_length=0.3,
+            num_lines=30, color=m.BLUE_D,
+            flash_radius=0.3,
+            time_width=0.3),
+        )
         sounds.narrate("We found the follow set!", self)
                             
 
@@ -301,7 +313,8 @@ class MFollowSet(m.Scene):
             if re.match(RE_NONTERMINAL, item):
                 # non terminal
                 new_element = m.Tex(
-                    r'Follow(', item, ')', color=m.BLUE_D).scale(0.8)
+                    r'Follow(', mg.to_tex(item), ')', color=m.BLUE_D).\
+                        scale(0.8)
 
             else:
                 # append it directly as a terminal
@@ -309,7 +322,7 @@ class MFollowSet(m.Scene):
                 new_element = m.Tex(
                     element, color=m.TEAL).scale(0.8)
                     
-            if new_element.height> self.cfg.manim_followset_lead\
+            if new_element.height > self.cfg.manim_followset_lead\
                     [production].height:
                     new_element.scale_to_fit_height\
                 (self.cfg.manim_followset_lead[production].height)
@@ -358,9 +371,16 @@ class MFollowSet(m.Scene):
             if self.cfg.manim_followset_lead[production] == None:
                 self.cfg.manim_followset_lead[production] = \
                     m.Tex("Follow(" + production + "):", 
-                    color = config.get_opp_col()).scale_to_fit_height\
-                        (2*cfg_line.height).next_to\
-                        (keys, m.RIGHT).align_to(cfg_line, m.UP)
+                    color = config.get_opp_col())
+                    
+                if self.cfg.manim_followset_lead[production].height > \
+                    1.5*cfg_line.height:
+                    self.cfg.manim_followset_lead[production].scale_to_fit_height\
+                        (1.5*cfg_line.height).next_to\
+                        (keys, m.RIGHT)
+                self.cfg.manim_followset_lead[production].align_to(cfg_line, \
+                    m.UP)      
+
 
                 # prepares content group
                 self.cfg.manim_followset_contents[production].next_to(

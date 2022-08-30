@@ -49,9 +49,15 @@ class MFirstSet(m.Scene):
         self.cfg.start_symbol, [])
 
         # success message and sound
+        self.play(
+            m.Flash(keys, line_length=0.3,
+            num_lines=30, color=m.BLUE_D,
+            flash_radius=0.3,
+            time_width=0.3),
+        )
         sounds.add_sound_to_scene(self, sounds.YAY)
         mg.display_msg(self, ["Successfully found the first set :)"], 
-        script= "Woohoo! We got the first set!")
+        script= "We successfully found the first set.")
 
     def tear_down(self):
         """Clear first set structures at the end of the animation.
@@ -99,8 +105,7 @@ class MFirstSet(m.Scene):
         sounds.narrate("Let's get the first set of non-terminal " + production\
             , self)
         self.cfg.manim_firstset_lead[production] = m.Tex("First(" + 
-        production + "):", color = config.get_opp_col()).scale_to_fit_height\
-                (1.5*cfg_line.height).align_to(cfg_line, m.UP)
+        production + "):", color = config.get_opp_col()).align_to(cfg_line, m.UP)
         self.cfg.manim_firstset_contents[production].next_to\
             (self.cfg.manim_firstset_lead[production], m.RIGHT)
 
