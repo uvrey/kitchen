@@ -1,6 +1,7 @@
 """ Creates the Kitchen CLI"""
 # kitchen/cli.py
 
+from ast import excepthandler
 import typer
 from typing import Optional
 
@@ -75,9 +76,12 @@ def _check_cfg(cfg) -> None:
     Raises:
         typer.Abort: Aborts when CFG is invalid.
     """  
-    if cfg.prods in ERRORS:
-        display.fail_secho('"CFG file invalid with "{ERRORS[cfg.prods]}"')
-        raise typer.Abort()
+    try:
+        if cfg.prods in ERRORS:
+            display.fail_secho('"CFG file invalid with "{ERRORS[cfg.prods]}"')
+            raise typer.Abort()
+    except:
+        pass
 
 @app.command()
 def init(
