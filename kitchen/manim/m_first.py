@@ -35,6 +35,7 @@ class MFirstSet(m.Scene):
 
         keys = mg.get_manim_cfg_group(self)
         keys.scale_to_fit_width(CFG_SCALE_WIDTH/ 3)
+        keys.scale_to_fit_height(CFG_SCALE_HEIGHT/ 2)
 
         # show key for colour coding
         guide = mg.get_guide(arr_right = True).scale_to_fit_width\
@@ -93,8 +94,7 @@ class MFirstSet(m.Scene):
 
         self.cfg.manim_firstset_lead[production] = m.Tex("First(" + 
         production + "):", color = config.get_opp_col()).scale_to_fit_height\
-                (2*cfg_line.height).next_to\
-            (keys, m.RIGHT).align_to(cfg_line, m.UP)
+                (2*cfg_line.height).align_to(cfg_line, m.UP)
 
         self.play(m.FadeIn(self.cfg.manim_firstset_lead[production]))
 
@@ -134,9 +134,8 @@ class MFirstSet(m.Scene):
                                     self.manim_firstset_contents[ps].add(
                                         new_element)
                                     self.manim_firstset_contents[ps]\
-                                        .arrange_in_grid(row=1, buff = 0.5)\
                                         .next_to(self.manim_firstset_lead[ps], 
-                                        m.RIGHT)
+                                        m.RIGHT).arrange_in_grid(row=1, buff = 0.5)
 
                                     # fade in new terminal and corresponding 
                                     # element of the cfg
@@ -158,9 +157,9 @@ class MFirstSet(m.Scene):
                                     ["Note: Since First(" + ps + ") may lead \
                                     to ", "the same production via more than \
                                     one", "production, the CFG is ambiguous."],
-                                     script = "This CFG is ambiguous, since \
-                                        more than one production leads to the \
-                                        same terminal.")
+                                     script = "This CFG is ambiguous, since "+
+                                        "more than one production derives the "+
+                                        "same terminal.")
                             break
                         else:
                             # highlight the non-terminal
@@ -176,10 +175,10 @@ class MFirstSet(m.Scene):
                                 prev_element.scale_to_fit_height(1.5*cfg_line.height)
 
                             # display the message alongside narration
-                            mg.display_msg(self, [production + " leads to " + 
+                            mg.display_msg(self, [production + " derives " + 
                                 current_item + ",", "so First("+production +
                                 ") \\subseteq First("+current_item+")"], 
-                                script=production + ", leads to another non \
+                                script=production + ", derives another non \
                                     terminal" + current_item + ", so their \
                                     first sets will overlap.")
 
@@ -244,24 +243,24 @@ class MFirstSet(m.Scene):
                             self.cfg.manim_firstset_contents[ps].add(
                                 new_element)
                             self.cfg.manim_firstset_contents[ps]\
-                                .arrange_in_grid(row=1, buff = 0.5).next_to(
-                                self.cfg.manim_firstset_lead[ps], m.RIGHT)
+                            .next_to(self.cfg.manim_firstset_lead[ps], m.RIGHT)\
+                                .arrange_in_grid(row=1, buff = 0.5)
                         else:
                             mg.display_msg(self, ["Note: Since First("+ps+") \
                                 may lead to ", "the same production via more \
                                 than one", "production, the CFG is \
                                 ambiguous."], script = "This CFG is \
                                 ambiguous, since more than one production \
-                                leads to the same terminal.")
+                                derives the same terminal.")
 
                         # Notify as to what is happening
                         msg = []
                         if len(pstack) > 1 and ps != production:
                             msg = ["Terminal " + terminal_to_write +
                                     " is also", "added to First(" + ps +
-                                    "),", "since " + ps + " leads to " +
+                                    "),", "since " + ps + " derives " +
                                     production]
-                            script = ps + " leads to " + production + \
+                            script = ps + " derives " + production + \
                             ", so we add " + first_terminal[0] + " to both. "
                         else:
                             msg = ["Terminal " + terminal_to_write +

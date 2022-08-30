@@ -142,22 +142,33 @@ def print_welcome():
 def print_menu():
     """Helper function to print the application menu.
     """    
-    cmds = [("quit", "q", "Exit app"), 
-            ("config", "c", "Configure animation settings"), 
-            ("show cfg", "cfg", "Display CFG"), 
-            ("show spec", "spec", "Display language specification"), 
-            ("dsl tool", "dsl", "Open DSL tool"), 
-            ("show first", "fs", "Display first set"), 
-            ("vis first", "vfs", "Visualise first set calculation"), 
-            ("show follow", "fw", "Display follow set"), 
-            ("vis follow", "vfw", "Visualise follow set calculation"), 
-            ("show parsetable", "pt", "Display parse table"), 
-            ("vis parsetable", "vpt", "Visualise parse table calculation"), 
-            ("ll1 <input>", "<input>", "Show LL(1) parse tree"), 
-            ("ll1 v <input>", "v <input>", "Visualise LL(1) parse tree "+
-                "construction")]
-        
-    df= pd.DataFrame(data=cmds,  columns = ["Command", "Shortcut", "Detail"])
+    app_cmds = [("Exit app", "\\quit", "\\q"), 
+            ("Configure animation settings", "\\config", "\\c"), 
+            ("Display CFG", "\\show cfg", "\\cfg"), 
+            ("Display language specification", "\\show spec", "\\spec"), 
+            ("Open DSL tool", "\\dsl tool", "\\dsl")]
+
+    calcs=  [("Display first set", "\\show first", "\\fs"), 
+            ("Display follow set", "\\show follow", "\\fw"), 
+            ("Display parse table", "\\show parsetable", "\\pt"),
+            ("Display LL(1) parse tree", "\\ll1 <input>", "<input>")]
+    
+    anims = [("Visualise parse table calculation", "\\vis parsetable", "vpt"), 
+             ("Visualise first set calculation", "\\vis first", "\\vfs"), 
+            ("Visualise follow set calculation", "\\vis follow", "\\vfw"), 
+            ("Visualise LL(1) parse tree "+
+                "construction", "\\ll1 v <input>", "\\v <input>")]
+    
+    structure_secho("Use these commands to adjust settings.")
+    df= pd.DataFrame(data=app_cmds,  columns = ["Detail", "Command", "Shortcut"])
+    info_secho(df.to_markdown(index=False))
+
+    structure_secho("\n\nUse these commands to check your calculations")
+    df= pd.DataFrame(data=calcs,  columns = ["Detail", "Command", "Shortcut"])
+    info_secho(df.to_markdown(index=False))
+
+    structure_secho("\n\nUse these commands to generate an explanation video.")
+    df= pd.DataFrame(data=anims,  columns = ["Detail", "Command", "Shortcut"])
     info_secho(df.to_markdown(index=False))
 
 def print_parsetree(root):

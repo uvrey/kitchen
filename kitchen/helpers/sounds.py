@@ -92,6 +92,8 @@ def narrate(script, scene) -> int:
         if not os.path.isfile(_new_narration):
             return SOUND_ERROR
         scene.add_sound(_new_narration)
+        scene.wait()
+        scene.wait()
     return SUCCESS
 
 def init_narr_dir() -> None:

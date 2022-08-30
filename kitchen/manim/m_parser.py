@@ -524,7 +524,7 @@ class MParseTree(m.Scene):
                     error.ERR_parsing_error(self.root, 
                         "Unexpected token [" + top + "]")
                     error.ERR_manim_parsing_error(self, ["Invalid input: '" +
-                     top + "'"], script = top + " leads to a parsing error," +
+                     top + "'"], script = top + " triggers a parsing error," +
                         " so this input is not valid." )
                     return
 
@@ -675,7 +675,7 @@ class MParseTree(m.Scene):
         sounds.add_sound_to_scene(self, sounds.FAIL)
         mg.display_msg(self, ["No such entry at ParseTable[" + 
         top + ", " + next + "].", "Invalid input: `" + next + "'"],
-        script = next + " leads to a parsing error, so this "+
+        script = next + " triggers a parsing error, so this "+
             "input is not valid." )
         error.ERR_parsing_error(self.root, 
             "No such entry at ParseTable[" + top + ", " + next +

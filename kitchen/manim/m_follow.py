@@ -50,6 +50,7 @@ class MFollowSet(m.Scene):
         # sets up CFG keys
         keys = mg.get_manim_cfg_group(self)
         keys.scale_to_fit_width(CFG_SCALE_WIDTH/3)
+        keys.scale_to_fit_height(CFG_SCALE_HEIGHT/2)
         keys.fade_to(m.GRAY, 1).to_edge(m.LEFT)
 
         # draws follow set title
