@@ -4,6 +4,7 @@
 import manim as m
 
 from kitchen import (
+        CFG_SCALE,
         CFG_SCALE_HEIGHT, 
         CFG_SCALE_WIDTH, 
         ERROR, 
@@ -137,7 +138,12 @@ class MParsingTable(m.Scene):
         ll1_title = mg.get_title_mobject("LL(1) parsing: parse table")
         sounds.narrate("Let's find the parse table for this grammar.", self)
         keys = mg.get_manim_cfg_group(self)
-        keys.scale_to_fit_height(CFG_SCALE_HEIGHT/3)
+        keys.scale(0.8)
+        if keys.width > CFG_SCALE_WIDTH/ 3:
+            keys.scale_to_fit_width(CFG_SCALE_WIDTH/ 3)
+        
+        if keys.height > CFG_SCALE_HEIGHT/2:
+            keys.scale_to_fit_height(CFG_SCALE_HEIGHT/ 2)
         all_elements.add(keys)
 
         # shows key for colour coding
@@ -165,15 +171,17 @@ class MParsingTable(m.Scene):
         guide.scale(0.6)
         
         # arranges all items
-        all_elements.arrange_in_grid(rows = 1, buff = 2)
+        all_elements.arrange_in_grid(rows = 1, buff = 1.5)
         all_elements.center()
 
         # scales everything nicely
         all_elements.scale_to_fit_width(CFG_SCALE_WIDTH)
+        if all_elements.height > 0.7*CFG_SCALE_HEIGHT:
+            all_elements.scale_to_fit_height(0.7*CFG_SCALE_HEIGHT)
 
         # makes sure elements are showing
         if all_elements.height > CFG_SCALE_HEIGHT or len(self.ts) > 4:
-            all_elements.scale_to_fit_height(CFG_SCALE_HEIGHT)
+            all_elements.scale_to_fit_height(0.7*CFG_SCALE_HEIGHT)
 
         # adds cfg's heading
         cfg_heading.next_to(keys, m.UP)
@@ -262,7 +270,7 @@ class MParsingTable(m.Scene):
         self.wait()
         self.wait()
         sounds.add_sound_to_scene(self, sounds.YAY)
-        sounds.narrate("The parse table is complete. Yay!", self)
+        sounds.narrate("The parse table is complete!", self)
         return SUCCESS
 
     def vis_add_to_parsetable(self, nt: str, t: str, prod: str):
