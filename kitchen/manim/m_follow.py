@@ -301,16 +301,17 @@ class MFollowSet(m.Scene):
             if re.match(RE_NONTERMINAL, item):
                 # non terminal
                 new_element = m.Tex(
-                    r'Follow(', item, ')', color=m.BLUE_D)\
-                    .scale_to_fit_height\
-                (self.cfg.manim_followset_lead[production].height)
+                    r'Follow(', item, ')', color=m.BLUE_D).scale(0.8)
 
             else:
                 # append it directly as a terminal
                 element = mg.to_tex(item) 
                 new_element = m.Tex(
-                    element, color=m.TEAL)\
-                    .scale_to_fit_height\
+                    element, color=m.TEAL).scale(0.8)
+                    
+            if new_element.height> self.cfg.manim_followset_lead\
+                    [production].height:
+                    new_element.scale_to_fit_height\
                 (self.cfg.manim_followset_lead[production].height)
 
             # add to the content group

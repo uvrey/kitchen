@@ -34,8 +34,12 @@ class MFirstSet(m.Scene):
         self.play(fs_title.animate.to_edge(m.UP))
 
         keys = mg.get_manim_cfg_group(self)
-        keys.scale_to_fit_width(CFG_SCALE_WIDTH/ 3)
-        keys.scale_to_fit_height(CFG_SCALE_HEIGHT/ 2)
+        keys.scale(0.8)
+        if keys.width > CFG_SCALE_WIDTH/ 3:
+            keys.scale_to_fit_width(CFG_SCALE_WIDTH/ 3)
+        
+        if keys.height > CFG_SCALE_HEIGHT/2:
+            keys.scale_to_fit_height(CFG_SCALE_HEIGHT/ 2)
 
         # show key for colour coding
         guide = mg.get_guide(arr_right = True).scale_to_fit_width\
@@ -92,9 +96,13 @@ class MFirstSet(m.Scene):
             keys.animate.to_edge(m.LEFT)
         )
 
+        sounds.narrate("Let's get the first set of non-terminal " + production\
+            , self)
         self.cfg.manim_firstset_lead[production] = m.Tex("First(" + 
         production + "):", color = config.get_opp_col()).scale_to_fit_height\
-                (2*cfg_line.height).align_to(cfg_line, m.UP)
+                (1.5*cfg_line.height).align_to(cfg_line, m.UP)
+        self.cfg.manim_firstset_contents[production].next_to\
+            (self.cfg.manim_firstset_lead[production], m.RIGHT)
 
         self.play(m.FadeIn(self.cfg.manim_firstset_lead[production]))
 
@@ -127,15 +135,19 @@ class MFirstSet(m.Scene):
                                     self.firstset[ps].append(current_item)
                                     # add this terminal and play VGroup of 
                                     # each production in the stack
-                                    new_element = m.Tex(
-                                        mg.to_tex(terminal_to_write), 
-                                        color=m.TEAL)\
-                                            .scale_to_fit_height(1.5*cfg_line.height)
+                                    new_element = m.Tex(mg.to_tex(current_item), 
+                                        color=m.TEAL)
+
+                                    if new_element.height > cfg_line.height:
+                                        new_element.scale_to_fit_height\
+                                            (1.5*cfg_line.height)
+
                                     self.manim_firstset_contents[ps].add(
                                         new_element)
                                     self.manim_firstset_contents[ps]\
-                                        .next_to(self.manim_firstset_lead[ps], 
-                                        m.RIGHT).arrange_in_grid(row=1, buff = 0.5)
+                                        .arrange_in_grid\
+                                        (rows = 1, buff = 0.5).next_to\
+                                    (self.cfg.manim_firstset_lead[ps], m.RIGHT)
 
                                     # fade in new terminal and corresponding 
                                     # element of the cfg
@@ -238,35 +250,38 @@ class MFirstSet(m.Scene):
                             # add this terminal and play VGroup of each 
                             # production in the stack
                             new_element = m.Tex(
-                                    terminal_to_write, color=m.TEAL)\
-                                        .scale_to_fit_height(1.5*cfg_line.height)
+                                    terminal_to_write, color=m.TEAL)
+                            if new_element.height > 1.5*cfg_line.height:
+                                        new_element.scale_to_fit_height\
+                                            (1.5*cfg_line.height)
                             self.cfg.manim_firstset_contents[ps].add(
                                 new_element)
                             self.cfg.manim_firstset_contents[ps]\
-                            .next_to(self.cfg.manim_firstset_lead[ps], m.RIGHT)\
-                                .arrange_in_grid(row=1, buff = 0.5)
+                                .arrange_in_grid(rows=1, buff = 0.5).next_to\
+                                    (self.cfg.manim_firstset_lead[ps], m.RIGHT)
                         else:
-                            mg.display_msg(self, ["Note: Since First("+ps+") \
-                                may lead to ", "the same production via more \
-                                than one", "production, the CFG is \
-                                ambiguous."], script = "This CFG is \
+                            mg.display_msg(self, ["Note: Since First("+ps+") "+
+                                "may lead to ", "the same production via more "+
+                                "than one", "production, the CFG is "+
+                                "ambiguous."], script = "This CFG is \
                                 ambiguous, since more than one production \
                                 derives the same terminal.")
 
                         # Notify as to what is happening
                         msg = []
                         if len(pstack) > 1 and ps != production:
-                            msg = ["Terminal " + terminal_to_write +
+                            msg = ["Terminal " + first_terminal[0] +
                                     " is also", "added to First(" + ps +
                                     "),", "since " + ps + " derives " +
                                     production]
                             script = ps + " derives " + production + \
                             ", so we add " + first_terminal[0] + " to both. "
                         else:
-                            msg = ["Terminal " + terminal_to_write +
+                            msg = ["Terminal " + first_terminal[0] +
                                     " is ", "added to First(" + ps + ")"]
                             script = "Let's add terminal " + \
-                            first_terminal[0] + "!"
+                            first_terminal[0] + " to the first set of " +\
+                            "non-terminal " + ps
                         mg.display_msg(self, msg, script)
 
                         # fade in new terminal and corresponding element of 

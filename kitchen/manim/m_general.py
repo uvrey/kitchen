@@ -39,10 +39,10 @@ def to_tex(item):
     Returns:
         str: Tex-compatible string.
     """    
-    tex_item = item.replace(r'$', r'\$').replace(r'\varepsilon', 
+    tex_item = item.replace(r'$', r'\$').replace(r'#', r'\varepsilon').\
+    replace(r'\subseteq', r'$\subseteq$').replace(r'->', r'$\to$')
+    tex_item = tex_item.replace(r'\varepsilon', 
     r'$\varepsilon$').replace(r'{', r'\[').replace(r'}', r'\]')
-    tex_item = tex_item.replace(r'#', r'$\varepsilon$').replace(r'\subseteq',
-     r'$\subseteq$').replace(r'->', r'$\to$')
     return tex_item
 
 def to_math_tex(item):

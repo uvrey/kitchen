@@ -374,7 +374,7 @@ def _process_command(inp, cfg, spec) -> None:
                     sem_analyser.init_analysis()
                 else:
                     display.fail_secho("Parsing failed. Cannot generate "+
-                    "semantic analysis.\n(Have you input a language spec?")
+                    "semantic analysis.\n(Have you provided a language spec?")
 
     elif inp[0:5] == "\\tree":
             stripped = inp.strip()
@@ -414,7 +414,7 @@ def _process_command(inp, cfg, spec) -> None:
                         sem_analyser.render()
                 else:
                     display.fail_secho("Parsing failed. Cannot generate "+
-                    "semantic analysis.\n(Have you input a language spec?")
+                    "semantic analysis.\n(Have you provided a language spec?")
        
     elif inp == "\\show cfg" or inp == "\\cfg":
         cfg.show_contents()
