@@ -1,5 +1,5 @@
 """ Generates semantic analysis. """
-# kitchen/backend/type_check.py
+# kitchen/backend/semantic.py
 
 import anytree
 import pandas as pd
@@ -43,6 +43,7 @@ class SemanticAnalyser:
         lhs = True
         lh_type = None
         for node in anytree.PreOrderIter(self.root):
+            display.info_secho(node.id)
             if node.token != None:
                 try:
                     if not lhs:

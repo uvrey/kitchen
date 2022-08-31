@@ -115,8 +115,9 @@ class MFollowSet(m.Scene):
                                 anims.append(t) 
 
                             mg.display_msg(self, ["Follow(" + item +
-                            ") may not exist"], script = "A standalone " +
-                            "non epsilon terminal won't have a follow set.")
+                            ") may not exist"], script = "Nothing can " +
+                            "follow " + item + " so it does not have a "+
+                            "follow set.")
 
                         else:
                             # just highlight the terminal

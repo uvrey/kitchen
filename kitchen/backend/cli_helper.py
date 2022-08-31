@@ -22,7 +22,7 @@ from kitchen.helpers import (
 from kitchen.backend import (
     parse_table as pt,
     parser as p,
-    type_check as tc,
+    semantic as tc,
     context_free_grammar as cofg
 )
 
@@ -31,7 +31,7 @@ from kitchen.manim import (
     m_follow, 
     m_parse_table, 
     m_parser,
-    m_type_check
+    m_semantic
 )
 
 # from kitchen.dsl import (
@@ -408,7 +408,7 @@ def _process_command(inp, cfg, spec) -> None:
                     config.OUTPUT_CONFIG["output_file"] = "TypeCheck"
                     config.configure_output_file_name(config.TYPE_CHECK)
                     with m.tempconfig(config.OUTPUT_CONFIG):
-                        sem_analyser = m_type_check.MSemanticAnalyser()
+                        sem_analyser = m_semantic.MSemanticAnalyser()
                         sem_analyser.setup_manim(cfg, 
                         cfg.parser_ll1.root, to_sem, spec)
                         sem_analyser.render()

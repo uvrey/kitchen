@@ -1,5 +1,5 @@
 """ Generates semantic analysis. """
-# kitchen/backend/type_check.py
+# kitchen/backend/semantic.py
 
 import re
 from symtable import Symbol
@@ -148,7 +148,7 @@ class MSemanticAnalyser(m.Scene):
         """        
         # play the intro
         mg.display_msg(self, ["Semantic Analysis"], script = "Let's " +
-        " begin semantic analysis.")
+        " begin semantic analysis.", central = True)
         mg.display_msg(self, ["We begin by traversing the tree we got when ",\
         " parsing the token stream."], script = "Let us traverse" + 
         " the parse tree.")

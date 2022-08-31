@@ -144,9 +144,10 @@ def print_menu():
     """    
     app_cmds = [("Exit app", "\\quit", "\\q"), 
             ("Configure animation settings", "\\config", "\\c"), 
-            ("Display CFG", "\\show cfg", "\\cfg"), 
-            ("Display language specification", "\\show spec", "\\spec"), 
-            ("Open DSL tool", "\\dsl tool", "\\dsl")]
+            ("Display context-free-grammar", "\\show cfg", "\\cfg"), 
+            ("Display language specification", "\\show spec", "\\spec")]
+
+    dsl = [("Open DSL tool", "\\dsl tool", "\\dsl")]
 
     calcs=  [("Display first set", "\\show first", "\\fs"), 
             ("Display follow set", "\\show follow", "\\fw"), 
@@ -159,8 +160,14 @@ def print_menu():
             ("Visualise LL(1) parse tree "+
                 "construction", "\\ll1 v <input>", "\\v <input>")]
     
-    structure_secho("Use these commands to adjust settings.")
+    structure_secho("Use these commands to see what files are loaded\n" +
+    " and adjust the animation settings.")
     df= pd.DataFrame(data=app_cmds,  columns = ["Detail", "Command", "Shortcut"])
+    info_secho(df.to_markdown(index=False))
+
+    structure_secho("\n\nUse this command to open the domain-specific language" +
+    " design tool.")
+    df= pd.DataFrame(data=dsl,  columns = ["Detail", "Command", "Shortcut"])
     info_secho(df.to_markdown(index=False))
 
     structure_secho("\n\nUse these commands to check your calculations")
