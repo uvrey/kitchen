@@ -214,6 +214,17 @@ class MParseTree(m.Scene):
         table.get_vertical_lines()[2].set_stroke(width=8, color=m.LIGHT_GRAY)
         return table
 
+    def _create_table_thumbnail(self, row_vals, row_labels, col_labels):
+        row_labels = row_labels
+        col_labels = col_labels
+
+        table = m.MathTable(
+            row_vals,
+            row_labels=[m.MathTex(mg.to_math_tex(rl)) for rl in row_labels],
+            col_labels=[m.MathTex(mg.to_math_tex(cl)) for cl in col_labels],
+            include_outer_lines=False)
+        return table
+
     def init_m_ll1_parsetable(self):
         """Sets up the parse table structure without generating an animation.
         """        
@@ -226,6 +237,8 @@ class MParseTree(m.Scene):
 
         self.mtable = self.init_m_table(
             row_vals, row_labels, col_labels)
+        self.th_table = self._create_table_thumbnail(row_vals, row_labels,\
+             col_labels)
         self.mtable.fade_to(config.get_opp_col(), alpha = 1)
 
         self.mtable.get_row_labels().fade_to(color=m.RED, alpha=1)
@@ -303,7 +316,7 @@ class MParseTree(m.Scene):
             int: Status code.
         """        
         # notify user
-        mg.display_msg(self, ["We can now check if any productions derived ", 
+        mg.display_msg(self, ["We can now check if any","productions derived ", 
         "\\varepsilon."], script = "Let's check if " +
         "any productions derived epsilon.")
 
@@ -325,11 +338,12 @@ class MParseTree(m.Scene):
                     self.play(m.FadeIn(new_vertex))
         return SUCCESS
 
-    def _parsing_successful(self, tokens, semantic: bool, testing = False, 
+    def _parsing_successful(self, g, tokens, semantic: bool, testing = False, 
         verbose = True):
         types = lang_spec.get_token_format(tokens, types=True)
         values = lang_spec.get_token_format(tokens, values=True)
-        
+        self.check_for_epsilons(g)
+
         if not semantic:
             if testing:
                 display.success_secho("Success.")
@@ -340,7 +354,7 @@ class MParseTree(m.Scene):
             if verbose:
                 mg.display_msg(self, ["Parsing successful!", values + 
                 " is a valid input."], script = "Parsing successful. " +
-                "That was a valid input.")
+                "That was a valid input.", success = True)
                 display.success_secho("\nSuccessfully parsed token stream '" + 
                 types + "'\nfrom input stream '" + values + 
                 "'.\n\nParse tree:")
@@ -423,10 +437,15 @@ class MParseTree(m.Scene):
             ll1_title.animate.to_edge(m.UP),
             m_tok_gp.animate.to_edge(m.UR).shift(m.DOWN + m.LEFT),
             self.s.mstack.animate.to_edge(m.LEFT).shift(
-                m.DOWN+m.RIGHT).align_to(self.mtable.get_center),
+                m.DOWN+m.RIGHT).align_to(self.mtable.get_center), 
             m.Create(arr),
             m.Write(arr_caption)
         )
+
+        # add the parsing table thumbnail
+        self.th_table.scale_to_fit_width(CFG_SCALE_WIDTH/2.5)
+        self.th_table.next_to(m_tok_gp, m.DOWN)
+        self.play(m.FadeIn(self.th_table))
 
         # create our first label
         g = m.Graph([start_symbol], [], vertex_config=VCONFIG,
@@ -454,7 +473,7 @@ class MParseTree(m.Scene):
                     if "#" in self.cfg.first_set[self.s.stack[-1]] and \
                     len(self.s.stack) == 1:
                         self.s.pop(msg = self.s.stack[-1] + r'\to \varepsilon')
-                        self._parsing_successful(original_tokens, False)
+                        self._parsing_successful(g, original_tokens, False)
                         return SUCCESS
                     # otherwise calls an error
                     error.ERR_parsing_error(self.root)
@@ -525,8 +544,8 @@ class MParseTree(m.Scene):
                     return
 
             elif re.match(RE_NONTERMINAL, top):
-                mg.display_msg(self, ["We must find the entry at \
-                        ParseTable["+top+"]["+next+"]"], script = "Let's " +
+                mg.display_msg(self, ["We must find the entry at ",\
+                        "ParseTable["+top+"]["+next+"]"], script = "Let's " +
                             "consider the parse table entry at non-terminal " +
                             top + "'s row and terminal " + next.strip() + "'s"+
                             " column.")
@@ -549,12 +568,12 @@ class MParseTree(m.Scene):
                         self.play(m.FadeIn(new_vertex))
                         reset_g(self, g, start_symbol)
 
-                    sounds.add_sound_to_scene(self, sounds.POP)
-                    self.s.pop(r'\text{Replacing }' + top + r'...')
-
                     # highlight parse table row
                     self._fade_in_mtable(highlight  = True, 
                     row = mg.row(self.nts, top), col = mg.col(self.ts, next))
+
+                    sounds.add_sound_to_scene(self, sounds.POP)
+                    self.s.pop(r'\text{Replacing }' + top + r'...')
                     
                     #  copy the cfg_line rather than manipulate it directly
                     cfg_line = self.manim_production_groups[prods[0].strip(
@@ -651,20 +670,12 @@ class MParseTree(m.Scene):
             return
 
         # fade out the stack and transform the parse tree
-        sounds.narrate("Stack emptied.", self)
         self.s.write_under_stack("\\text{Stack emptied.}")
+        sounds.narrate("Stack emptied.", self)
         reset_g(self, g, start_symbol, anim=[m.FadeOut(self.s.mstack)])
 
         # if we have matched our last token
-        self.check_for_epsilons(g)
-
-        sounds.add_sound_to_scene(self, sounds.YAY)
-        mg.display_msg(self, ["Successfully parsed `" + self.inp + "'!"], 
-            script= "Parsing successful! That was a valid input.")
-
-        display.success_secho("Successfully parsed '" + self.inp +
-                              "'!\nParse tree:")
-        display.print_parsetree(self.root)
+        self._parsing_successful(g, original_tokens, False)
         return SUCCESS
 
 

@@ -96,6 +96,8 @@ class MParsingTable(m.Scene):
     def construct(self):
         """Creates a scene to visualise the parsing table construction.
         """        
+        mg.display_msg(self, ["Please note:", "This calculation assumes we have",
+        "already found the first", "and follow sets"], central = True)
         self._vis_populate_table()
 
     def _init_pt_dict(self):

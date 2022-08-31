@@ -59,7 +59,8 @@ def to_math_tex(item):
     .replace(r'->', r'\to')
     return tex_item
 
-def display_msg(self, msg, script = "", anim=[], error = False):
+def display_msg(self, msg, script = "", anim=[], error = False, central =\
+    False, success = False):
     """Displays a set of messages in full-screen, alongside optional narration. 
 
     Args:
@@ -78,14 +79,17 @@ def display_msg(self, msg, script = "", anim=[], error = False):
             if error:
                 col = m.RED
             else:
-                col = config.get_opp_col()
-            msg_txt = m.Tex(to_tex(ms), color=col)
+                if success: col = m.GREEN
+                else: col = m.BLUE_C
+            msg_txt = m.Tex(to_tex(ms), color=col).scale(0.7)
             msg_group.add(msg_txt)
         msg_group.arrange(m.DOWN)
+        if not central:
+            msg_group.to_edge(m.RIGHT).shift(m.DOWN)
         
         # create fading area
         rect = m.Rectangle(width=20, height=10, color=config.get_theme_col(), 
-        fill_opacity=0.9)
+        fill_opacity=0.8)
 
         self.play(
             m.FadeIn(rect),

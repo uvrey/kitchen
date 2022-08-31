@@ -83,9 +83,9 @@ def highlight_error(s):
 def show_config_opts():
     """Shows the configuration options.
     """    
-    opts_str = ("Options:\n\tQuality: -q <high | med | low>\n\t" +
-                "Preview: -p <y | n>\n\tAnimation Theme: -t <dark | light>\n\t" +
-                "Narration: -n <y / n>")
+    opts_str = ("Options:\n\tQuality: \t \\c -q high | med | low\n\t" +
+                "Preview:\t \\c -p y | n\n\tAnimation Theme: \\c -t dark | light\n\t" +
+                "Narration:\t \\c -n y | n")
     info_secho(opts_str)
 
 def show_tokens(tokens):
@@ -137,7 +137,7 @@ def print_welcome():
     """    
     info_secho(
         "Welcome to Kitchen\n"+
-        "type \\m for the menu\n")
+        "If it's your first time here, type \\m for the menu!\n")
 
 def print_menu():
     """Helper function to print the application menu.
@@ -153,7 +153,7 @@ def print_menu():
             ("Display parse table", "\\show parsetable", "\\pt"),
             ("Display LL(1) parse tree", "\\ll1 <input>", "<input>")]
     
-    anims = [("Visualise parse table calculation", "\\vis parsetable", "vpt"), 
+    anims = [("Visualise parse table calculation", "\\vis parsetable", "\\vpt"), 
              ("Visualise first set calculation", "\\vis first", "\\vfs"), 
             ("Visualise follow set calculation", "\\vis follow", "\\vfw"), 
             ("Visualise LL(1) parse tree "+

@@ -262,7 +262,7 @@ def _set_quality(inp: str) -> bool:
     try:
         q_index = inp.index("-q")
         if inp[q_index + 1] not in opts:
-            display.fail_secho("\t Options: -q <high | med | low>")
+            display.fail_secho("\t Options: \\c -q high | med | low")
         else:
             OUTPUT_CONFIG["quality"] = qs[opts.index(inp[q_index + 1])]
             display.success_secho("Success: set 'quality' to '" + 
@@ -287,7 +287,7 @@ def _set_theme(inp: str) -> bool:
     try:
         t_index = inp.index("-t")
         if inp[t_index + 1] not in opts:
-            display.fail_secho("\t Options: -t <dark | light>")
+            display.fail_secho("\t Options: \\c -t dark | light")
         else:
             set_theme(ts[opts.index(inp[t_index + 1])])
             display.success_secho("Success: set 'theme' to '" + 
@@ -311,7 +311,7 @@ def _set_preview(inp: str) -> None:
     try:
         p_index = inp.index("-p")
         if inp[p_index + 1] not in opts:
-            display.fail_secho("\t Options: -p <y | n>")
+            display.fail_secho("\t Options: \c -p y | n")
         else:
             OUTPUT_CONFIG["preview"] = ps[opts.index(inp[p_index + 1])]
             display.success_secho("Success: set 'preview' to '" + 
@@ -344,7 +344,7 @@ def _set_narration(inp: str) -> None:
             str(narr) + "'\n")
             return True
         else:
-            display.fail_secho("\t Options: -n <y | n>")          
+            display.fail_secho("\t Options: \\c -n y | n")          
     except:
         return False   
 
