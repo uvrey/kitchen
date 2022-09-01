@@ -74,11 +74,8 @@ def swap(scene, row: int, col: int, new_val: str) -> m.MathTable:
         m.FadeOut(t_old),
     )
 
-    scene.play(
-        m.ApplyWave(t_new),
-    )
-
-    # pause before concluding
+    # pauses to allow table to be read
+    scene.wait()
     scene.wait()
 
 

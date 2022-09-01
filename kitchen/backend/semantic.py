@@ -164,17 +164,20 @@ class SemanticAnalyser:
 # validity checks on inputs :)
 # remove debugging output :)
 
+# USER FEEDBACK
+        """
+        Split commands into groups
+        """
+
 
 # TODO - DEVELOPMENT
 # TESTING
-# fs, fw, ll1 test cases written
 # generate demo showcase videos in 1080p
 
 # TODO - INTEGRATION 
 # start dsl tool from the typer app HIGH
 
 # TODO - DETAILS LOW
-# Neaten up cli_helper parsing code
 # Code style choices
 # gray lines for tables
 

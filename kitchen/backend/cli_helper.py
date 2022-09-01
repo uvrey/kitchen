@@ -281,11 +281,14 @@ def _process_command(inp, cfg, spec) -> None:
         typer.Exit: Exits the application when the user requests this. 
     """   
 
-    if inp == "\\m":
+    if inp == "\\m" or inp == "\\menu":
         display.print_menu()
 
-    elif inp == "\\q":
+    elif inp == "\\q" or inp == "\\quit":
         raise typer.Exit()
+
+    elif inp == "\\tutorial" or inp == "\\tut":
+        display.display_tutorial()
 
     elif inp == "\\dsl":
        #dsl.dsl_tool.main()
@@ -425,7 +428,7 @@ def _process_command(inp, cfg, spec) -> None:
         else:
             display.fail_secho("No specification provided.")
 
-    elif inp.strip()[0:2] == "\\c":
+    elif inp.strip()[0:2] == "\\c" or inp == "\\config":
         config.edit_config(inp.strip()[2:].strip())
 
     elif inp[0:4] == "\\ll1":

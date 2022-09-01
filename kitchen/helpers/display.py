@@ -1,6 +1,7 @@
 """ Contains functions for displaying information to the console. """
 # kitchen/helpers/display.py
 
+from distutils.log import info
 from turtle import heading
 import typer
 import anytree
@@ -139,7 +140,7 @@ def print_welcome():
         "Welcome to Kitchen\n"+
         "If it's your first time here, type \\m for the menu!\n")
 
-def print_menu():
+def print_menu(help = False):
     """Helper function to print the application menu.
     """    
     app_cmds = [("Exit app", "\\quit", "\\q"), 
@@ -160,21 +161,35 @@ def print_menu():
             ("Visualise LL(1) parse tree "+
                 "construction", "\\ll1 v <input>", "\\v <input>")]
     
+    if help:
+        success_secho("\nWith these commands, you can see the contents of files"+
+        "\nand adjust the animation settings.\nFor example, you can change "+
+        "\nthe video's resolution (high: 1080p, medium:720p, low: 480p)")
+
     structure_secho("Use these commands to see what files are loaded\n" +
     " and adjust the animation settings.")
     df= pd.DataFrame(data=app_cmds,  columns = ["Detail", "Command", "Shortcut"])
     info_secho(df.to_markdown(index=False))
 
-    structure_secho("\n\nUse this command to open the domain-specific language" +
+    if help: 
+        success_secho("\nThis command opens up another tool.")
+
+    structure_secho("\nUse this command to open the domain-specific language" +
     " design tool.")
     df= pd.DataFrame(data=dsl,  columns = ["Detail", "Command", "Shortcut"])
     info_secho(df.to_markdown(index=False))
 
-    structure_secho("\n\nUse these commands to check your calculations")
+    if help:
+        success_secho("\nWhen you are practicing problems, this is the place to be.")
+
+    structure_secho("\nUse these commands to check your calculations")
     df= pd.DataFrame(data=calcs,  columns = ["Detail", "Command", "Shortcut"])
     info_secho(df.to_markdown(index=False))
 
-    structure_secho("\n\nUse these commands to generate an explanation video.")
+    if help:
+        success_secho("If you need a bit more explanation, generate it here!"+
+        "\nThese videos live in the 'kitchen\\media\\videos' directory.")
+    structure_secho("\nUse these commands to generate an explanation video.")
     df= pd.DataFrame(data=anims,  columns = ["Detail", "Command", "Shortcut"])
     info_secho(df.to_markdown(index=False))
 
@@ -215,3 +230,24 @@ def to_math_tex(item):
     tex_item = item.replace(r'$', r'\$').replace("#", r'\varepsilon')\
     .replace("->", "\\to")
     return tex_item
+
+
+def display_tutorial():
+    success_secho("Welcome to the tutorial!\nType \\q to quit\n")
+    done = False
+    success_secho("Kitchen uses several commands.\n" +
+                    "You can see these at any time by typing \\m")
+    input = typer.prompt("Try this now")
+    if _compare_input("\\m", input):
+        print_menu(help = True)
+        success_secho("Great job!\nScroll up to see information about the menu.")
+        success_secho("(You can come back to this tutorial anytime using \\tut)")
+
+def _compare_input(expected, input):
+    if input == expected:
+        return True
+    elif input == "\\q":
+        return -1
+    else:
+        success_secho("Hmm.. that wasn't quite right. Try again?")
+        return 0
