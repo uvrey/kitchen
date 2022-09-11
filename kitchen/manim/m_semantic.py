@@ -147,6 +147,12 @@ class MSemanticAnalyser(m.Scene):
         """Constructs the semantic analysis scene.
         """        
         # play the intro
+
+      
+        mg.display_msg(self, ["Semantic Analysis checks that a token stream",
+        "is placed in the right context.", "Here, identifiers must be immutable",
+        "and we can't use them until they", "have been assigned."], central = \
+        True)
         mg.display_msg(self, ["Semantic Analysis"], script = "Let's " +
         " begin semantic analysis.", central = True)
         mg.display_msg(self, ["We begin by traversing the tree we got when ",\
@@ -223,7 +229,7 @@ class MSemanticAnalyser(m.Scene):
         reset_g(self, g, start_symbol)
 
         # start semantic analysis
-        self.init_analysis(start_symbol, g)
+        self.init_analysis(start_symbol, g, True)
 
     def _update_symbol_table(self, contents):
         """Creates an updated symbol table.
@@ -263,7 +269,7 @@ class MSemanticAnalyser(m.Scene):
         self.print_symbol_table()
         return 
 
-    def init_analysis(self, start_symbol, g):
+    def init_analysis(self, start_symbol, g, start):
         """Analyses a given input based on two basic semantic rules:
            Variable uniqueness and mutability.
         """        
@@ -273,7 +279,7 @@ class MSemanticAnalyser(m.Scene):
         for node in anytree.PreOrderIter(self.root):
             try:
                 # draw manim vertex
-                if node.id != start_symbol:
+                if node.id != start_symbol or not start:
                     try: 
                         if re.match(RE_NONTERMINAL, node.id):
                             v_id = node.parent.id + "_" + node.id
@@ -331,7 +337,7 @@ class MSemanticAnalyser(m.Scene):
                         self.wait()
 
                     except: 
-                        pass
+                        start = False
 
                 if node.token != None:
                     if not lhs:

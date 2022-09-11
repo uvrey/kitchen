@@ -29,6 +29,9 @@ class MFollowSet(m.Scene):
     def construct(self):   
         """Creates the follow set calculation scene.
         """          
+        mg.display_msg(self, ["The Follow set of X contains all the TERMINALS",\
+        "which can appear straight AFTER X."], central = \
+        True)
         sounds.narrate("Let's find the follow set.", self)
         display.info_secho("Visualising follow set calculation:")
         self.vis_follow_set(True)

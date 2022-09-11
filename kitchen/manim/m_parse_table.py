@@ -93,6 +93,11 @@ class MParsingTable(m.Scene):
     def construct(self):
         """Creates a scene to visualise the parsing table construction.
         """        
+        mg.display_msg(self, ["The Parsing Table helps us check if",\
+        "an ordering of tokens is valid.", "When the table has no entry at the",
+        "column of a terminal and row of the"," non-terminal which derived it,",
+        "this is a parsing error."], central = \
+        True)
         mg.display_msg(self, ["Please note:", "This calculation assumes we have",
         "already found the first", "and follow sets"], central = True)
         self._vis_populate_table()
@@ -230,18 +235,21 @@ class MParsingTable(m.Scene):
                         # $ in Follow(A)
                         prod = key + " -> " + item
 
+                        # narrates events
+                        mg.display_msg(self, \
+                        [key + "derives epsilon so " + key + " may disappear.",
+                        "Since " + f + " is in Follow("+ key+ ")", f + 
+                        " will then be derived."],
+                        script = key + 
+                        "derives epsilon, so " + key + " may disappear." +
+                        "if it does, " + f + "will then be derived.")
+
+                        self.wait()
+
                         if f == "$":
                             code = self.vis_add_to_parsetable(key, "$", prod)
                         else:
                             code = self.vis_add_to_parsetable(key, f, prod)
-                        
-                        # narrates events
-                        mg.display_msg(self, ["Following " + prod + 
-                        "adds #", " to First(" + mg.to_tex(key) + ")"], 
-                        script = "If we follow "+key+"'s production, we \
-                            find an epsilon. So, we add this production \
-                            to the parse table.")
-                        self.wait()
 
                         if code == ERROR:
                             sounds.add_sound_to_scene(self, sounds.FAIL)

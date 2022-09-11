@@ -150,6 +150,10 @@ class MParseTree(m.Scene):
         self.ts = sorted(cfg.terminals)
 
     def construct(self):
+        mg.display_msg(self, ["LL(1) Parsing builds up a parse tree",
+        "as a token stream is read.", "If this is successful,",
+        "the input string is valid!"], central = \
+        True)
         self.vis_parse_ll1()
     
     def tear_down(self):
@@ -324,12 +328,13 @@ class MParseTree(m.Scene):
         for node in self.root.descendants:
             if re.match(RE_NONTERMINAL, node.id):
                 if len(node.children) == 0 and "#" in \
-                self.cfg.first_set[node.id]:
-               
+                self.cfg.first_set[node.id]:    
                     v_id = node.id + "_#"
                     if v_id in self.vertex_ids:
                         v_id = node.id + "_#_" + str(self.id_count)
 
+                    mg.display_msg(self, [node.id + " derives \\varepsilon."],
+                    script = node.id + " derives \\varepsilon.")
                     new_node = anytree.Node("#", parent=node, id= "#", 
                     token = None, parent_id = node.vertex_id, vertex_id =
                     v_id)

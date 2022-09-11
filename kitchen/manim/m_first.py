@@ -22,7 +22,10 @@ class MFirstSet(m.Scene):
             cfg (ContextFreeGrammar): Loaded CFG.
         """                    
         self.cfg = cfg
-
+        mg.display_msg(self, ["The First set of X contains all the TERMINALS",\
+            "which can BEGIN a string that is", "derived from X."], central = \
+                True)
+        
     def construct(self):
         """Constructs the scene.
         """        
