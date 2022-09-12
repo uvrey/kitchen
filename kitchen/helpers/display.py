@@ -126,6 +126,12 @@ def pretty_print_config_settings(output_config, narr):
     structure_secho("\tNarration: " + str(narr_setting))
 
 def print_set(set, name=""):
+    """Prints the First or Follow Set in the correct format.
+
+    Args:
+        set (dict): First or Follow Set.
+        name (str, optional): Name of set. Defaults to "".
+    """    
     printable_set = {}
     for key in set.keys():
         printable_set[key] = ", ".join(set[key])

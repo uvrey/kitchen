@@ -1,10 +1,8 @@
 """ Generates a visualisation of the parse table calculation. """
 # kitchen/backend/parse_table.py
 
-import manim as m
 import pandas as pd
 import re
-import typer
 
 from kitchen import (
     RE_TERMINAL,

@@ -13,7 +13,7 @@ from kitchen import (
 from kitchen.helpers import (
     sounds,
     config,
-    display,
+    display
 )
 
 from kitchen.backend import *
@@ -81,7 +81,9 @@ def display_msg(self, msg, script = "", anim=[], error = False, central =\
             else:
                 if success: col = m.GREEN
                 else: col = m.BLUE_C
-            msg_txt = m.Tex(to_tex(ms), color=col).scale(0.7)
+            msg = to_tex(ms)
+            display.fail_secho(msg)
+            msg_txt = m.Tex(msg, color=col).scale(0.7)
             msg_group.add(msg_txt)
         msg_group.arrange(m.DOWN)
         if not central:

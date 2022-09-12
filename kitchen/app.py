@@ -1,7 +1,6 @@
 """ Creates the Kitchen CLI"""
 # kitchen/cli.py
 
-from ast import excepthandler
 import typer
 from typing import Optional
 
@@ -188,7 +187,6 @@ def find_pt() -> None:
     else:
         error.ERR_ambiguous_grammar(testing = True)
 
-# TODO ADD more tests here
 @app.command(name = "test-ll1")
 def find_ll1(  
     inp: str = typer.Option(
@@ -205,10 +203,10 @@ def find_ll1(
     if not cfg.parsetable_calculated:
         cli_helper._set_parsetable(cfg)
 
-    # set up the cfg parser with no spec (testing token streams)
+    # sets up the cfg parser with no spec (testing token streams)
     code = cli_helper._set_cfg_parser_ll1(inp, cfg, None)
 
-    # parse the input
+    # parses the input
     if code == SUCCESS:
         cfg.parser_ll1.parse_ll1(cfg.start_symbol, inp, testing=True)
     else:

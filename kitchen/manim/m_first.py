@@ -63,7 +63,7 @@ class MFirstSet(m.Scene):
         script= "We successfully found the first set.")
 
     def tear_down(self):
-        """Clear first set structures at the end of the animation.
+        """Clears first set structures at the end of the animation.
         """        
         self.cfg.vis_has_epsilon = False
         self.cfg.manim_firstset_lead = {}
@@ -220,7 +220,8 @@ class MFirstSet(m.Scene):
                             got_eps = had_eps and has_eps
                             len_okay = len(pstack) == 1 and j != len(p_nt) - 1
                             if not got_eps and len_okay:
-                                self.cfg.first_set[production].remove("#")
+                                if "#" in self.cfg.first_set[production]:
+                                    self.cfg.first_set[production].remove("#")
 
                             if not self.cfg.vis_has_epsilon:
                                 break

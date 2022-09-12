@@ -9,8 +9,7 @@ from kitchen import (
         CFG_SCALE_WIDTH, 
         RE_PRODUCTION, 
         RE_TERMINAL, 
-        RE_NONTERMINAL,
-        TEXT_SCALE
+        RE_NONTERMINAL
 )
 
 from kitchen.helpers import sounds, config, display
@@ -29,7 +28,7 @@ class MFollowSet(m.Scene):
     def construct(self):   
         """Creates the follow set calculation scene.
         """          
-        mg.display_msg(self, ["The Follow set of X contains all the TERMINALS",\
+        mg.display_msg(self, ["The Follow Set of X contains all the TERMINALS",\
         "which can appear straight AFTER X."], central = \
         True)
         sounds.narrate("Let's find the follow set.", self)
@@ -214,8 +213,8 @@ class MFollowSet(m.Scene):
                                         self.cfg.follow_set[item].append(t)
                                         self._add_to_follow_vis(
                                             item, t, keys, 
-                                            [t + r'in \{First(' + next_item +
-                                            r') - \varepsilon\}'])
+                                            [t + r'in {First(' + next_item +
+                                            r') - \varepsilon}'])
                                 else:
 
                                     if index + 1 == len(pps) - 1:

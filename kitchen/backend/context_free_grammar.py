@@ -10,7 +10,6 @@ import manim as m
 import typer
 
 from kitchen import (
-    CFG_ERROR_NT_FORMAT,
     CFG_FILE_ERROR,
     ERROR, 
     SUCCESS, RE_TERMINAL, 

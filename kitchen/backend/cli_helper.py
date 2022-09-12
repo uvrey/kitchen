@@ -196,10 +196,10 @@ def _init_parsing_ll1(inp, cfg, spec, semantic = False) -> int:
         code = _set_parsetable(cfg)
 
     if code == SUCCESS:
-        # set up the cfg parser 
+        # sets up the cfg parser 
         code = _set_cfg_parser_ll1(inp, cfg, spec)
 
-        # parse the input
+        # parses the input
         if code == SUCCESS:
             if inp == cfg.parser_ll1.inp:
                 inp = ""

@@ -4,7 +4,6 @@
 import manim as m
 
 from kitchen import (
-        CFG_SCALE,
         CFG_SCALE_HEIGHT, 
         CFG_SCALE_WIDTH, 
         ERROR, 

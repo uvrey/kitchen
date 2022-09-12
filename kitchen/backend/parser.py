@@ -5,10 +5,7 @@ import os
 import anytree
 import re
 from kitchen.helpers.config import TREE_PNG
-import typer
 from anytree.exporter import DotExporter
-import graphviz
-from graphviz import Source, render
 
 from kitchen import (
         RE_NONTERMINAL, 
@@ -57,12 +54,24 @@ def get_tokens_from_input(inp, spec = None) -> list:
 
 class ParserLL1:
     def __init__(self, inp, cfg, spec = None):
+        """Initialises the parser object.
+
+        Args:
+            inp (str): Input string.
+            cfg (ContextFreeGrammar): _description_
+            spec (_type_, optional): _description_. Defaults to None.
+        """        
         self.cfg = cfg
         self.pt_dict = cfg.parsetable.pt_dict
         self.spec = spec
         init_input(self, inp)
 
     def check_for_epsilons(self):
+        """Represents epsilon when it is derived by a non-terminal.
+
+        Returns:
+            int: Status code. 
+        """        
         # look for any epsilons that came before and add.
         for node in self.root.descendants:
             if re.match(RE_NONTERMINAL, node.id):
@@ -73,6 +82,15 @@ class ParserLL1:
 
     def _parsing_successful(self, tokens, semantic: bool, testing = False, 
         verbose = True):
+        """Notifies the viewer when parsing is successful.
+
+        Args:
+            tokens (list): List of tokens.
+            semantic (bool): If parsing is being completed for semantic
+            analysis.
+            testing (bool, optional): Testing mode. Defaults to False.
+            verbose (bool, optional): Verbose mode. Defaults to True.
+        """        
         types = lang_spec.get_token_format(tokens, types=True)
         values = lang_spec.get_token_format(tokens, values=True)
         
@@ -91,7 +109,7 @@ class ParserLL1:
 
     def parse_ll1(self, start_symbol, inp="", semantic = False, 
         testing = False) -> int:
-        """LL(1) Parser, which generates a parse tree and stores this to 
+        """LL(1) Parser: Generates a parse tree and stores this to 
         self.root
         Args:
             input (str): Input string to be parsed
@@ -293,6 +311,12 @@ class ParserLL1:
         return None
 
     def _call_ptable_error(self, top, next):
+        """Calls a parsing table error.
+
+        Args:
+            top (str): Non-terminal in row.
+            next (str): Terminal in column. 
+        """        
         error.ERR_parsing_error(self.root,
                 "ParseTable[" + top + ", " + next + "] is empty.")
 

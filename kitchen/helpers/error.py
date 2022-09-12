@@ -153,7 +153,7 @@ def ERR_ambiguous_grammar(testing = False):
     typer.echo(msg_str)
 
 def ERR_manim_parsing_error(scene, msg=[], script = ""):
-    """Visualise the parsing error in Manim. 
+    """Visualises the parsing error in Manim. 
 
     Args:
         scene (Scene): Scene to be animated. 

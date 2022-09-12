@@ -237,9 +237,9 @@ def configure_output_file_name(file_type: int, inp = "") -> None:
     elif file_type == PARSETABLE:
         file_name = "ParseTable_" + get_time()
     elif file_type == TYPE_CHECK:
-        file_name = "TypeCheck_" + get_time()
+        file_name = "SemanticAnalysis_" + get_time()
     elif file_type == TREE_PNG:
-        file_name = "Tree_" + get_time()
+        file_name = "ParseTree_" + get_time()
         return file_name
     
     # if clear name given, set new output file name

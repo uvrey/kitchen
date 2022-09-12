@@ -1,5 +1,5 @@
 """ Stack class. """
-# kitchen/backend/stack.py
+# kitchen/backend/m_stack.py
 
 import manim as m
 from typer import *
@@ -18,6 +18,13 @@ from kitchen.helpers import (
 
 class Stack:
     def __init__(self, scene, left_edge, height):
+        """Initialises the Stack.
+
+        Args:
+            scene (Scene): Manim Scene.
+            left_edge (int): X co-ordinate of left edge.
+            height (int): Height of Stack.
+        """        
         self.stack = []
         self.texts = []
         self.mstack_height = height
@@ -33,7 +40,19 @@ class Stack:
 
     def pop(self, msg, tok_cols = None, ti = -1, vertex=None, anim=[], 
     token = None, matching=False):
-        # set up stack in backend
+        """Pops an element from the top of the stack.
+
+        Args:
+            msg (str): Accompanying message.
+            tok_cols (list, optional): List of token colours. Defaults to None.
+            ti (int, optional): Terminal index. Defaults to -1.
+            vertex (Dot, optional): Graph vertex. Defaults to None.
+            anim (list, optional): List of animations. Defaults to [].
+            token (str, optional): Token. Defaults to None.
+            matching (bool, optional): If the token matched a terminal. 
+            Defaults to False.
+        """    
+        # sets up stack in backend
         if self.stack == []:
             return
         else:
@@ -87,6 +106,13 @@ class Stack:
                 self.texts.pop()
 
     def write_under_stack(self, msg, fade_out=True):
+        """Writes a message underneath the Stack. 
+
+        Args:
+            msg (str): Message to be written.
+            fade_out (bool, optional): Whether to fade out the message. 
+            Defaults to True.
+        """        
         # set up message
         m_msg = m.MathTex(msg, color = config.get_opp_col()).next_to(self.mstack, m.DOWN)\
             .scale_to_fit_width(3*self.mstack.width)
@@ -99,7 +125,13 @@ class Stack:
             )
 
     def push(self, a, msg=None, anim=[]):
+        """Pushes an element onto the stack.
 
+        Args:
+            a (str): Element to be pushed.
+            msg (str, optional): Accompanying message. Defaults to None.
+            anim (list, optional): List of animations. Defaults to [].
+        """        
         # set up message
         if msg != None:
             m_msg = m.Tex(msg, color = config.get_opp_col())\

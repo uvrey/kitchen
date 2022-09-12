@@ -5,7 +5,6 @@
 import manim as m
 import re
 import anytree
-import typer
 
 from kitchen import ( 
     CFG_SCALE_WIDTH,
@@ -16,7 +15,7 @@ from kitchen import (
     ERROR
 )
 
-from kitchen.backend import stack
+from kitchen.manim import m_stack
 
 from kitchen.helpers import (
     lang_spec, 
@@ -35,13 +34,28 @@ ECONFIG_TEMP = {"color": m.GRAY, "fill_opacity": 0.7}
 V_LABELS = {}
 
 def create_tokens(tokens):
-    # Write equations
+    """Creates the list of tokens to be displayed.
+
+    Args:
+        tokens (list): List of token strings to be converted to MathTex tokens.
+
+    Returns:
+        list: List of tokens as MathTex objects. 
+    """    
     token_gp = []
     for t in tokens:
         token_gp.append(m.MathTex("\\text{"+t+"}", color = config.get_opp_col()))
     return token_gp
 
 def set_up_label(g, vertex_id, label, color = m.GRAY):
+    """Creates the label for a vertex.
+
+    Args:
+        g (Graph): Parsing tree.
+        vertex_id (str): Unique vertex identifier.
+        label (str): Manim vertex label contents.
+        color (Color, optional): `manim' colour. Defaults to m.GRAY.
+    """    
     # add label above
     new_vertex = g[vertex_id]
 
@@ -71,6 +85,19 @@ def set_up_label(g, vertex_id, label, color = m.GRAY):
     new_vertex.add(rendered_label)
     
 def create_vertex(g, node, label, color=m.GRAY,  link=True, epsilon = False):
+    """Creates a vertex inside a Manim Graph. 
+
+    Args:
+        g (Graph): Parsing tree.
+        node (Node): `anytree' node.
+        label (str): Manim vertex label contents.
+        color (Color, optional): Colour of node. Defaults to m.GRAY.
+        link (bool, optional): If the vertex must be connected. Defaults to True.
+        epsilon (bool, optional): If the vertex is an epsilon. Defaults to False.
+
+    Returns:
+        Dot: Manim vertex.
+    """    
     global m
 
     try:
@@ -94,6 +121,13 @@ def create_vertex(g, node, label, color=m.GRAY,  link=True, epsilon = False):
         pass
 
 def reset_g(self, g, root, anim=[]):
+    """Resets the Graph by moving it into an updated position.
+
+    Args:
+        g (Graph): Manim Graph representation of the parse tree.
+        root (str): Root node name.
+        anim (list, optional): Partnering animations. Defaults to [].
+    """    
     for a in anim:
         self.play(a)
 
@@ -105,8 +139,17 @@ def reset_g(self, g, root, anim=[]):
         ),
     )
 
-# general function for mapping elements in some list to another list
+
 def map_token_lists(self, lhs, rhs):
+    """Represents the mapping of input stream to tokens.
+
+    Args:
+        lhs (list): Input strings.
+        rhs (list): Token stream.
+
+    Returns:
+        VGroup: Mapping of group. 
+    """    
     # create token group
     map_group = m.VGroup()
 
@@ -153,6 +196,8 @@ class MParseTree(m.Scene):
         self.ts = sorted(cfg.terminals)
 
     def construct(self):
+        """Initialises the animation.
+        """        
         mg.display_msg(self, ["LL(1) Parsing builds up a parse tree",
         "as a token stream is read.", "If this is successful,",
         "the input string is valid!"], central = \
@@ -160,12 +205,15 @@ class MParseTree(m.Scene):
         self.vis_parse_ll1()
     
     def tear_down(self):
+        """Concludes the animation.
+        """        
         self.mtable = None
         self.root = None
         sounds.clear_narrs()
 
-    # shows the input stream and its association with the token stream
     def intro(self):
+        """Maps inputs to tokens and introduces the LL(1) parsing process.
+        """        
         # introducing the input
         title = m.Tex(r"Input to be parsed:", color = config.get_opp_col())
         sounds.narrate("Let's parse this input.", self)
@@ -205,6 +253,16 @@ class MParseTree(m.Scene):
         )
         
     def init_m_table(self, row_vals, row_labels, col_labels):
+        """Initialises the Manim MathTable.
+
+        Args:
+            row_vals (list): Row values.
+            row_labels (list): Row labels.
+            col_labels (list): Column labels.
+
+        Returns:
+            MathTable: Parsing table representation.
+        """        
         row_labels = row_labels
         col_labels = col_labels
 
@@ -222,6 +280,16 @@ class MParseTree(m.Scene):
         return table
 
     def _create_table_thumbnail(self, row_vals, row_labels, col_labels):
+        """Creates the smaller table to go under the token stream.
+
+        Args:
+            row_vals (list): Row values.
+            row_labels (list): Row labels.
+            col_labels (list): Column labels.
+
+        Returns:
+            MathTable: Parsing table representation.
+        """        
         row_labels = row_labels
         col_labels = col_labels
 
@@ -251,8 +319,13 @@ class MParseTree(m.Scene):
         self.mtable.get_row_labels().fade_to(color=m.RED, alpha=1)
         self.mtable.get_col_labels().fade_to(color=m.TEAL, alpha=1)
 
-    # get the rows as a list of lists
+
     def get_row_contents(self):
+        """Gets the row contents as a list of lists. 
+
+        Returns:
+            list: List of lists.
+        """        
         row_vals = []
         for n in self.nts:
             row = []
@@ -274,6 +347,16 @@ class MParseTree(m.Scene):
 
     def _fade_in_mtable(self, highlight = False, row = -1, col = -1, 
         first_time = False):
+        """Fades in the parsing table.
+
+        Args:
+            highlight (bool, optional): Whether to highlight the
+            entry as it is added. Defaults to False.
+            row (int, optional): Row of entry to be added. Defaults to -1.
+            col (int, optional): Column of entry to be added. Defaults to -1.
+            first_time (bool, optional): Whether the table is being
+            displayed for the first time. Defaults to False.
+        """        
         # create fading area
         rect = m.Rectangle(width=20, height=10, color=config.get_theme_col(), 
         fill_opacity=0.9)
@@ -348,6 +431,15 @@ class MParseTree(m.Scene):
 
     def _parsing_successful(self, g, tokens, semantic: bool, testing = False, 
         verbose = True):
+        """Communicates to the viewer that parsing was successful. 
+
+        Args:
+            g (Graph): Manim graph.
+            tokens (list): Original token stream.
+            semantic (bool): Semantic mode.
+            testing (bool, optional): Testing mode. Defaults to False.
+            verbose (bool, optional): Verbose mode. Defaults to True.
+        """        
         types = lang_spec.get_token_format(tokens, types=True)
         values = lang_spec.get_token_format(tokens, values=True)
         self.check_for_epsilons(g)
@@ -368,8 +460,12 @@ class MParseTree(m.Scene):
                 "'.\n\nParse tree:")
                 display.print_parsetree(self.root)
         
-    # Parse LL(1) in the CLI
     def vis_parse_ll1(self):
+        """Visualises the parsing of an input stream using LL(1) Parsing.
+
+        Returns:
+            int: Status code.
+        """        
         global V_LABELS
         global VCONFIG
         global m
@@ -381,7 +477,7 @@ class MParseTree(m.Scene):
             return
 
         # set up the stack and the parsing table
-        self.s = stack.Stack(self, m.DR, 5)
+        self.s = m_stack.Stack(self, m.DR, 5)
         self.init_m_ll1_parsetable()
         self.mtable.scale_to_fit_height(m.config["frame_height"]/2)
         V_LABELS = {}
@@ -688,6 +784,12 @@ class MParseTree(m.Scene):
 
 
     def _call_ptable_error(self, top, next):
+        """Calls a parsing error.
+
+        Args:
+            top (str): Non-terminal.
+            next (str): Terminal.
+        """        
         error.ERR_parsing_error(self.root,
                 "ParseTable[" + top + ", " + next + "] is empty.")
         sounds.add_sound_to_scene(self, sounds.FAIL)

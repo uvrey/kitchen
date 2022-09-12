@@ -21,8 +21,6 @@ from kitchen.helpers import (
 
 from kitchen.manim import (
     m_general as mg, 
-    m_parser as mp,
-    m_parse_table as mpt
 )
 
 from kitchen import (
@@ -47,19 +45,19 @@ def set_up_label(g, vertex_id, label, color = m.GRAY):
         label (_type_): _description_
         color (_type_, optional): _description_. Defaults to m.GRAY.
     """    
-    # add label above
+    # adds label above
     new_vertex = g[vertex_id]
 
-    # fade vertex
+    # fades vertex
     new_vertex.fade_to(color, alpha = 1)
 
-  # set label color
+  # sets label color
     if re.match(RE_TERMINAL, label):
         label_col = config.get_theme_col()
     else:
         label_col = m.WHITE
 
-    # add the new label above
+    # adds the new label above
     rendered_label = m.MathTex(
         mg.to_math_tex(label), color = label_col).scale(0.5)
 
@@ -123,7 +121,6 @@ def reset_g(self, g, root):
             layout_config = LCONFIG,
         ),
     )
-
 
 class MSemanticAnalyser(m.Scene):
     def setup_manim(self, cfg, root, inp, spec):
@@ -189,9 +186,9 @@ class MSemanticAnalyser(m.Scene):
         "is placed in the right context.", "Here, identifiers must be immutable",
         "and we can't use them until they", "have been assigned."], central = \
         True)
-        # mg.display_msg(self, ["Please note: If a non-terminal remains as a",
-        #  "leaf at the end of parsing,", "it derives epsilon."], central = \
-        # True)
+        mg.display_msg(self, ["Please note: If a non-terminal remains as a",
+         "leaf at the end of parsing,", "it derives epsilon."], central = \
+        True)
         mg.display_msg(self, ["Let's begin", "Semantic Analysis"], script = "Let's " +
         " begin semantic analysis.", central = True)
         mg.display_msg(self, ["We begin by traversing the tree we got when ",\
