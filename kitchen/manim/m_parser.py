@@ -29,7 +29,7 @@ from kitchen.helpers import (
 from kitchen.manim import m_general as mg
 
 VCONFIG = {"radius": 0.2, "color": m.BLUE_D, "fill_opacity": 1}
-LCONFIG = {"vertex_spacing": (1.5, 1)}
+LCONFIG = {"vertex_spacing": (1.5, 2)}
 ECONFIG = {"color": config.get_opp_col()}
 ECONFIG_TEMP = {"color": m.GRAY, "fill_opacity": 0.7}
 V_LABELS = {}
@@ -70,11 +70,14 @@ def set_up_label(g, vertex_id, label, color = m.GRAY):
     rendered_label.move_to(new_vertex.get_center())
     new_vertex.add(rendered_label)
     
-def create_vertex(g, node, label, color=m.GRAY,  link=True, vertex_ids = None):
+def create_vertex(g, node, label, color=m.GRAY,  link=True, epsilon = False):
     global m
 
     try:
-        pos = g[node.parent_id].get_center() + m.DOWN
+        if epsilon:
+            pos = g[node.parent_id].get_center() + m.DOWN
+        else:
+            pos = g[node.parent_id].get_center() + 0.5*m.DOWN
         v = g._add_vertex(
             node.vertex_id, vertex_config={"color": color}, position=pos)
         v.fill_colour = color
@@ -339,7 +342,7 @@ class MParseTree(m.Scene):
                     token = None, parent_id = node.vertex_id, vertex_id =
                     v_id)
                     new_vertex = create_vertex(g, new_node, r'\varepsilon', 
-                    color = m.GRAY)
+                    color = m.GRAY, epsilon= True)
                     self.play(m.FadeIn(new_vertex))
         return SUCCESS
 

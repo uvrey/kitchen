@@ -115,11 +115,13 @@ class ParserLL1:
         tokens = self.tokens[:]
         original_tokens = self.tokens[:]
         self.stack = []
+        self.id_count = 0
 
         # add start symbol to the stack
         self.stack.append(start_symbol)
         self.root = anytree.Node(start_symbol, id = start_symbol, token = None)
         self.parents = []
+        self.vertex_ids = []
 
         while self.stack != []:
             # in case we run out of input before the stack is empty
@@ -174,6 +176,9 @@ class ParserLL1:
                 try:
                     pt_entry = self.pt_dict[top][next]
 
+                    if self.parents != []:
+                        replaced_parent = self.parents[-1]
+
                     if pt_entry == "Error":
                         self._call_ptable_error(top, next)
                         return
@@ -199,15 +204,34 @@ class ParserLL1:
                     for p in ps:
                         # add to the tree
                         if top == start_symbol:
+                            v_id = self.root.id + "_" + p
+                            if v_id in self.vertex_ids:
+                                v_id = v_id + "_" + str(self.id_count)
+                                self.id_count = self.id_count + 1
+           
                             new_node = anytree.Node(p, parent=self.root, id=p, 
                             tmp_p = self.root.id, tmp_parent = self.root, 
+                            vertex_id = v_id,
+                            parent_id = self.root.id,
                             token = None)
+                            self.vertex_ids.append(v_id)
+
                         else:
                             # add connecting node if it is a non-terminal
+                              # add connecting node if it is a non-terminal
+                            v_id = replaced_parent.id + "_" + p
+
+                            if v_id in self.vertex_ids:
+                                v_id = v_id + "_" + str(self.id_count)
+                                self.id_count = self.id_count + 1
+                          
                             new_node = anytree.Node(
                                 p, id=p, parent = None, tmp_p=prods[0].strip(),
-                                tmp_parent = self.parents[-1], token = None)
-                                    
+                                vertex_id = v_id,
+                                parent_id = replaced_parent.vertex_id,
+                                tmp_parent = replaced_parent, token = None)
+                            self.vertex_ids.append(v_id)
+
                         # we don't need to match epsilon, and we also only 
                         # want non-terminals as parent nodes
                         if p != "#":

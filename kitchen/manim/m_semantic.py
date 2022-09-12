@@ -90,6 +90,8 @@ def create_vertex(g, vertex_id, parent_id, label, color=m.GRAY,  link=True):
         _type_: _description_
     """    
     global m
+    display.info_secho("making: " + vertex_id + ", parent:" + parent_id)
+    typer.echo(g.vertices)
     pos = g[parent_id].get_center() + m.DOWN
     v = g._add_vertex(
         vertex_id, vertex_config={"color": color}, position=pos)
@@ -153,11 +155,11 @@ class MSemanticAnalyser(m.Scene):
         "is placed in the right context.", "Here, identifiers must be immutable",
         "and we can't use them until they", "have been assigned."], central = \
         True)
-        mg.display_msg(self, ["Semantic Analysis"], script = "Let's " +
+        mg.display_msg(self, ["Let's begin", "Semantic Analysis"], script = "Let's " +
         " begin semantic analysis.", central = True)
         mg.display_msg(self, ["We begin by traversing the tree we got when ",\
-        " parsing the token stream."], script = "Let us traverse" + 
-        " the parse tree.")
+        " parsing the token stream."], script = "We begin by traversing the "+
+        "tree we got when parsing the token stream.")
 
         # draws follow set title
         sem_title = mg.get_title_mobject("Semantic Analysis") 
@@ -217,7 +219,7 @@ class MSemanticAnalyser(m.Scene):
             m.Write(arr_caption)
         )
 
-        # create the table
+        # # create the table
         self.table = self._update_symbol_table([[".", "."]])
 
         # create the manim graph
@@ -256,7 +258,6 @@ class MSemanticAnalyser(m.Scene):
             table.scale_to_fit_width(CFG_SCALE_HEIGHT)
         return table
 
-
     def _call_error(self, msg = ""):
         """Displays an error when encountered in the type-checking process.
 
@@ -279,19 +280,16 @@ class MSemanticAnalyser(m.Scene):
         for node in anytree.PreOrderIter(self.root):
             try:
                 # draw manim vertex
-                if node.id != start_symbol or not start:
+                if node.id == start_symbol and start:
+                    start = False
+                else:
                     try: 
-                        if re.match(RE_NONTERMINAL, node.id):
-                            v_id = node.parent.id + "_" + node.id
+                        if re.match(RE_TERMINAL, node.id):
+                            tok_col =  self.tok_cols[t_index]
+                        else:
                             tok_col = m.GRAY
-                        else:
-                            v_id = node.parent.id + "_" + node.token.value
-                            tok_col = self.tok_cols[t_index]
-                        if node.parent.id != start_symbol:
-                            p_id = node.parent.parent.id + "_" + node.parent.id
-                        else:
-                            p_id = start_symbol 
-                        v = create_vertex(g, v_id, p_id, node.id, tok_col)
+                        v = create_vertex(g, node.vertex_id, node.parent_id, 
+                        node.id, tok_col)
                         sounds.add_sound_to_scene(self, sounds.CLICK)
                         self.play(m.FadeIn(v))
 
@@ -328,7 +326,7 @@ class MSemanticAnalyser(m.Scene):
                             
                             if node.token.type != node.token.value:
                                 sounds.narrate("We matched a terminal that"+
-                                " may an operator.", self)
+                                " may be an operator.", self)
                                 self.wait()
                             else:
                                 sounds.narrate("We matched a terminal!", self)
@@ -337,31 +335,31 @@ class MSemanticAnalyser(m.Scene):
                         self.wait()
 
                     except: 
-                        start = False
+                        pass
 
-                if node.token != None:
-                    if not lhs:
-                        if node.token.value not in self.symbol['Symbol'] \
-                            and lh_type == node.token.type:
-                            self._call_error(node.token.value + 
-                            " has not yet been defined.")
-                            return
-                        lhs = True
-                    else:
-                        if node.token.value != "=":
-                            if node.token.value in self.symbol['Symbol']:
-                                self._call_error("The symbol " + 
-                                node.token.value + " has already been " + 
-                                "defined.")
+                    if node.token != None:
+                        if not lhs:
+                            if node.token.value not in self.symbol['Symbol'] \
+                                and lh_type == node.token.type:
+                                self._call_error(node.token.value + 
+                                " has not yet been defined.")
                                 return
-                            else:
-                                lh_type = node.token.type
+                            lhs = True
                         else:
-                            lhs = False
-                    
-                    if node.token.value != node.token.type:
-                        self.symbol['Symbol'].append(node.token.value)
-                        self.symbol['Type'].append(node.token.type)
+                            if node.token.value != "=":
+                                if node.token.value in self.symbol['Symbol']:
+                                    self._call_error("The symbol " + 
+                                    node.token.value + " has already been " + 
+                                    "defined.")
+                                    return
+                                else:
+                                    lh_type = node.token.type
+                            else:
+                                lhs = False
+                        
+                        if node.token.value != node.token.type:
+                            self.symbol['Symbol'].append(node.token.value)
+                            self.symbol['Type'].append(node.token.type)
                         self.fade_in_table()
             except:
                 self._call_error("Cannot semantically analyse only "+
