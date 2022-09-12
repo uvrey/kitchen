@@ -196,7 +196,7 @@ class MSemanticAnalyser(m.Scene):
         " begin semantic analysis.", central = True)
         mg.display_msg(self, ["We begin by traversing the tree we got when ",\
         " parsing the token stream."], script = "We begin by traversing the "+
-        "tree we got when parsing the token stream.")
+        "tree we got when parsing the token stream.", central = True)
 
         # draws follow set title
         sem_title = mg.get_title_mobject("Semantic Analysis") 
@@ -407,7 +407,7 @@ class MSemanticAnalyser(m.Scene):
                 return
 
         
-        self.check_for_epsilons()
+        self.check_for_epsilons(g)
         sounds.add_sound_to_scene(self, sounds.SUCCESS)
         mg.display_msg(self, ["Semantic analysis complete!"], script = 
         "Semantic analysis complete! That was a valid input. Here is " +
