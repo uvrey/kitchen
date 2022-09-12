@@ -34,9 +34,12 @@ Sample CFGs are available in the `.\samples\example_cfgs` folder.
 ![semantic 2](https://user-images.githubusercontent.com/77244149/189752817-ca53b906-66da-4c45-b9f2-881bac0e6216.png)
 
 ## Installation
+These instructions assume that a Windows system is used. Kitchen is compatible with Linux, but issues installing LaTeX for Manim may be experienced. This is because some style packages may be absent. It is recommended to install the complete LaTeX suite in this case, or intall  (https://miktex.org/howto/install-miktex-unx)[MikTeX for Linux] to manage this.
 
-### Windows
-To run Kitchen on Windows, you will need to install several packages.
+For detailed instructions to install Manim for Linux, please see below:
+https://docs.manim.community/en/v0.3.0/installation.html
+
+However, in brief, to begin using Kitchen, you will need to install several packages.
 
 **Requirements:**
 - Python3
