@@ -98,14 +98,14 @@ From an elevated command prompt, install `graphviz` via `choco install graphviz`
   use the following command to do this (A CFG is provided for your 
   convience, but you can replace the last argument with your choice of path).
   
-```python
+```
 python3 -m kitchen init -cfg ".\samples\example_cfgs\cfg_12.txt" 
 ```
 
   If you would like to also include a language specification, please include it
   as an additional path. For example:
 
-```python
+```
 python3 -m kitchen init -cfg ".\samples\example_cfgs\cfg_12.txt" ".\samples\test_spec.txt"
 ```
   
@@ -121,7 +121,7 @@ python3 -m kitchen run
   For your convenience, here is this menu! It contains all the commands which
   kitchen supports. 
 
-```python
+```
 Use these commands to see what files are loaded
  and adjust the animation settings.
 | Detail                         | Command    | Shortcut   |
