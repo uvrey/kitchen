@@ -41,8 +41,8 @@ class MFirstSet(m.Scene):
         if keys.width > CFG_SCALE_WIDTH/ 3:
             keys.scale_to_fit_width(CFG_SCALE_WIDTH/ 3)
         
-        if keys.height > CFG_SCALE_HEIGHT/2:
-            keys.scale_to_fit_height(CFG_SCALE_HEIGHT/ 2)
+        if keys.height > 6/5*CFG_SCALE_HEIGHT/2:
+            keys.scale_to_fit_height(6/5*CFG_SCALE_HEIGHT/ 2)
 
         # show key for colour coding
         guide = mg.get_guide(arr_right = True).scale_to_fit_width\

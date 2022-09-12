@@ -56,8 +56,8 @@ class MFollowSet(m.Scene):
         if keys.width > CFG_SCALE_WIDTH/ 3:
             keys.scale_to_fit_width(CFG_SCALE_WIDTH/ 3)
         
-        if keys.height > CFG_SCALE_HEIGHT/2:
-            keys.scale_to_fit_height(CFG_SCALE_HEIGHT/ 2)
+        if keys.height > 6/5*CFG_SCALE_HEIGHT/2:
+            keys.scale_to_fit_height(6/5*CFG_SCALE_HEIGHT/ 2)
 
         keys.fade_to(m.GRAY, 1).to_edge(m.LEFT)
 
