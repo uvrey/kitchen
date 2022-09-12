@@ -147,6 +147,40 @@ class MSemanticAnalyser(m.Scene):
                 for t in self.tokens:
                     self.tok_cols.append(mg.get_token_colour(self))
 
+
+    def check_for_epsilons(self, g):
+        """Checks if any non-terminals lead to epsilon and add this connection,
+        only if the node is on the graph. 
+
+        Args:
+            g (Graph): Graph MObjects.
+
+        Returns:
+            int: Status code.
+        """        
+        # notify user
+        mg.display_msg(self, ["We can now check if any","productions derived ", 
+        "\\varepsilon."], script = "Let's check if " +
+        "any productions derived epsilon.")
+
+        # look for any epsilons that came before and add.
+        for node in self.root.descendants:
+            if re.match(RE_NONTERMINAL, node.id):
+                if len(node.children) == 0 and "#" in \
+                self.cfg.first_set[node.id]:    
+                    v_id = node.id + "_#"
+                    if v_id in self.vertex_ids:
+                        v_id = node.id + "_#_" + str(self.id_count)
+
+                    mg.display_msg(self, [node.id + " derives \\varepsilon."],
+                    script = node.id + " derives \\varepsilon.")
+                    new_node = anytree.Node("#", parent=node, id= "#", 
+                    token = None, parent_id = node.vertex_id, vertex_id =
+                    v_id)
+                    new_vertex = create_vertex(g, new_node, r'\varepsilon', 
+                    color = m.GRAY, epsilon= True)
+                    self.play(m.FadeIn(new_vertex))
+
     def construct(self):
         """Constructs the semantic analysis scene.
         """        
@@ -155,9 +189,9 @@ class MSemanticAnalyser(m.Scene):
         "is placed in the right context.", "Here, identifiers must be immutable",
         "and we can't use them until they", "have been assigned."], central = \
         True)
-        mg.display_msg(self, ["Please note: If a non-terminal remains as a",
-         "leaf at the end of parsing,", "it derives epsilon."], central = \
-        True)
+        # mg.display_msg(self, ["Please note: If a non-terminal remains as a",
+        #  "leaf at the end of parsing,", "it derives epsilon."], central = \
+        # True)
         mg.display_msg(self, ["Let's begin", "Semantic Analysis"], script = "Let's " +
         " begin semantic analysis.", central = True)
         mg.display_msg(self, ["We begin by traversing the tree we got when ",\
@@ -328,21 +362,20 @@ class MSemanticAnalyser(m.Scene):
                             )
                             
                             if node.token.type != node.token.value:
-                                sounds.narrate("We matched a terminal that"+
-                                " may be an operator.", self)
+                                mg.display_msg(self, ["We matched a terminal"+
+                                " that", "may be an operator."], script = 
+                                "We matched a terminal that"+
+                                " may be an operator.")
                                 self.wait()
                             else:
-                                sounds.narrate("We matched a terminal!", self)
+                                mg.display_msg(self, ["We matched a terminal!"],
+                                script = "We matched a terminal!")
                             t_index = t_index + 1
 
                         self.wait()
 
                     except: 
-                        typer.echo("we may have an epsilon")
-                        if node.id == "#":
-                            v = create_vertex(g, node.vertex_id, node.parent_id, 
-                            node.id, m.GRAY, epsilon = True)
-                            sounds.add_sound_to_scene(self, sounds.CLICK)
+                      pass
 
                     if node.token != None:
                         if not lhs:
@@ -372,7 +405,9 @@ class MSemanticAnalyser(m.Scene):
                 self._call_error("Cannot semantically analyse only "+
                     "a token stream.")
                 return
+
         
+        self.check_for_epsilons()
         sounds.add_sound_to_scene(self, sounds.SUCCESS)
         mg.display_msg(self, ["Semantic analysis complete!"], script = 
         "Semantic analysis complete! That was a valid input. Here is " +
