@@ -1,5 +1,22 @@
-# ComVizTT
-Compiler Visualiser and Teaching Tool
+# Kitchen: A Compiler Visualiser and Teaching Tool
+Kitchen calculates, visualises and explains five algorithms in Compiler
+Theory:
+
+- First Set
+- Follow Set 
+- Parsing Table
+- LL(1) Parse Tree
+- Simplified Semantic Analysis
+
+Kitchen is designed to perform each of these algorithms given
+an arbitrary, but somewhat constrained Context-Free Grammar
+(CFG) as input. 
+
+Visualisations are created as .mp4 videos, and can be found inside the
+`.\media\videos\<resolution>` directory, where `<resolution>` is 
+`1080p60`, `720p30` or `480p15`. 
+
+Sample CFGs are available in the `.\samples\example_cfgs` folder.
 
 ## Installation
 
@@ -66,19 +83,62 @@ From an elevated command prompt, install `graphviz` via `choco install graphviz`
   use the following command to do this (A CFG is provided for your 
   convience, but you can replace the last argument with your choice of path).
   
-  ``` python3 -m kitchen init -cfg ".\samples\example_cfgs\cfg_12.txt" ```
+```python
+python3 -m kitchen init -cfg ".\samples\example_cfgs\cfg_12.txt" 
+```
 
   If you would like to also include a language specification, please include it
   as an additional path. For example:
 
-`python3 -m kitchen init -cfg ".\samples\example_cfgs\cfg_12.txt" ".\samples\test_spec.txt"`
+```python
+python3 -m kitchen init -cfg ".\samples\example_cfgs\cfg_12.txt" ".\samples\test_spec.txt"
+```
   
   Now, to run the application, use:
 
-  `> python3 -m kitchen run`
+```python
+python3 -m kitchen run
+```
 
   From here, `\m` will display the menu, and `\tut' will take you through
   a quick tutorial.
+
+  For your convenience, here is this menu! It contains all the commands which
+  kitchen supports. 
+
+```python
+Use these commands to see what files are loaded
+ and adjust the animation settings.
+| Detail                         | Command    | Shortcut   |
+|:-------------------------------|:-----------|:-----------|
+| Exit app                       | \quit      | \q         |
+| Configure animation settings   | \config    | \c         |
+| Display Context-Free Grammar   | \show cfg  | \cfg       |
+| Display Language Specification | \show spec | \spec      |
+
+Use this command to open the domain-specific language design tool.
+| Detail        | Command   | Shortcut   |
+|:--------------|:----------|:-----------|
+| Open DSL tool | \dsl tool | \dsl       |
+
+Use these commands to check your calculations
+| Detail                   | Command          | Shortcut   |
+|:-------------------------|:-----------------|:-----------|
+| Display First Set        | \show first      | \fs        |
+| Display Follow Set       | \show follow     | \fw        |
+| Display Parse Table      | \show parsetable | \pt        |
+| Display LL(1) Parse Tree | \ll1 <input>     | <input>    |
+| Display Symbol Table     | \sem <input>     | <input>    |
+
+Use these commands to generate an explanation video.
+| Detail                                  | Command         | Shortcut   |
+|:----------------------------------------|:----------------|:-----------|
+| Visualise Parsing Table calculation     | \vis parsetable | \vpt       |
+| Visualise First Set calculation         | \vis first      | \vfs       |
+| Visualise Follow Set calculation        | \vis follow     | \vfw       |
+| Visualise LL(1) Parse Tree construction | \ll1 v <input>  | \v <input> |
+| Visualise Semantic Analysis             | \vsem <input>   | \v <input> |
+```
 
 ## App Options
 The application also contains several options. While `run` and `init` are most

@@ -142,11 +142,11 @@ class MParsingTable(m.Scene):
         sounds.narrate("Let's find the parse table for this grammar.", self)
         keys = mg.get_manim_cfg_group(self)
         keys.scale(0.8)
-        if keys.width > CFG_SCALE_WIDTH/ 3:
-            keys.scale_to_fit_width(CFG_SCALE_WIDTH/ 3)
+        if keys.width > 6/5*CFG_SCALE_WIDTH/ 3:
+            keys.scale_to_fit_width(6/5*CFG_SCALE_WIDTH/ 3)
         
-        if keys.height > CFG_SCALE_HEIGHT/2:
-            keys.scale_to_fit_height(CFG_SCALE_HEIGHT/ 2)
+        if keys.height > 6/5*CFG_SCALE_HEIGHT/2:
+            keys.scale_to_fit_height(6/5*CFG_SCALE_HEIGHT/ 2)
         all_elements.add(keys)
 
         # shows key for colour coding

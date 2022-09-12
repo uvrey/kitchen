@@ -91,7 +91,7 @@ def load_app(cfg_path, spec_path = None, testing = False) -> None:
             cfg_path, fg=typer.colors.GREEN)
             if spec_path != None:
                 typer.secho(f"\t The language specification path is " + 
-                cfg_path, fg=typer.colors.GREEN)
+                spec_path, fg=typer.colors.GREEN)
 
 def _set_parsetable(cfg) -> int:
     """Sets the up and calculates the parsetable structures.
