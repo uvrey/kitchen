@@ -121,8 +121,8 @@ python3 -m kitchen run
   From here, `\m` will display the menu, and `\tut' will take you through
   a quick tutorial.
 
-  For your convenience, here is this menu! It contains all the commands which
-  kitchen supports. 
+  For your convenience, here is this menu. It contains all the commands which
+  Kitchen supports :)
 
 ```
 Use these commands to see what files are loaded
