@@ -28,9 +28,8 @@ Sample CFGs are available in the `.\samples\example_cfgs` folder.
 #### Dark Theme
 ![matching](https://user-images.githubusercontent.com/77244149/189752748-8bb6cb44-1189-4315-87a8-ba6a3661342e.png)
 #### Light Theme
-![light_0](https://user-images.githubusercontent.com/77244149/189753009-737bb5e6-e3f2-4ddd-b62d-facf84014f06.png)
-![light_1](https://user-images.githubusercontent.com/77244149/189753016-5eafe12b-fc25-48a0-a8f4-552259dd3308.png)
-### Semantic Analysis
+[light_1](https://user-images.githubusercontent.com/77244149/189753257-4a9a5545-8726-4ebe-9f63-31aa27e98b9d.png)
+### Semantic Analysis!
 ![semantic](https://user-images.githubusercontent.com/77244149/189752534-89258b52-a816-4a64-9c3b-94a71eddffea.png)
 ![semantic 2](https://user-images.githubusercontent.com/77244149/189752817-ca53b906-66da-4c45-b9f2-881bac0e6216.png)
 
