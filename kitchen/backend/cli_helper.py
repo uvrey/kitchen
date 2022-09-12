@@ -429,7 +429,10 @@ def _process_command(inp, cfg, spec) -> None:
             display.fail_secho("No specification provided.")
 
     elif inp.strip()[0:2] == "\\c" or inp == "\\config":
-        config.edit_config(inp.strip()[2:].strip())
+        if inp == "\\c":
+            config.edit_config(inp.strip()[2:].strip())
+        else:
+            config.edit_config(inp.strip()[7:].strip())
 
     elif inp[0:4] == "\\ll1":
         code = _prepare_to_parse(cfg)
