@@ -113,10 +113,7 @@ class MFirstSet(m.Scene):
         if self.cfg.manim_firstset_lead[production].height > \
                 1.5*cfg_line.height:
                 self.cfg.manim_firstset_lead[production].scale_to_fit_height\
-                    (1.5*cfg_line.height).next_to\
-                    (keys, m.RIGHT)
-        self.cfg.manim_firstset_lead[production].align_to(cfg_line, \
-            m.UP)      
+                    (1.5*cfg_line.height)
 
         self.cfg.manim_firstset_contents[production].next_to\
             (self.cfg.manim_firstset_lead[production], m.RIGHT)

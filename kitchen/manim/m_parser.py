@@ -615,8 +615,7 @@ class MParseTree(m.Scene):
                         sounds.add_sound_to_scene(self, sounds.CLICK)
                         new_vertex = create_vertex(g, popped,
                                             mg.to_math_tex(popped.id), 
-                                            color = self.tok_cols[t_index], 
-                                            vertex_ids=self.vertex_ids)
+                                            color = self.tok_cols[t_index])
                         self.play(m.FadeIn(new_vertex))
                         reset_g(self, g, start_symbol)
 
@@ -668,7 +667,7 @@ class MParseTree(m.Scene):
                         sounds.add_sound_to_scene(self, sounds.CLICK)
                         new_vertex = create_vertex(g, replaced_parent, \
                             mg.to_math_tex(self.parents[-1].id), \
-                            vertex_ids=self.vertex_ids, color = m.GRAY)
+                                color = m.GRAY)
                         self.play(m.FadeIn(new_vertex))
                         reset_g(self, g, start_symbol)
 
