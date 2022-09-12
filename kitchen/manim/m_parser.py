@@ -29,7 +29,7 @@ from kitchen.helpers import (
 from kitchen.manim import m_general as mg
 
 VCONFIG = {"radius": 0.2, "color": m.BLUE_D, "fill_opacity": 1}
-LCONFIG = {"vertex_spacing": (1.5, 2)}
+LCONFIG = {"vertex_spacing": (2, 1)}
 ECONFIG = {"color": config.get_opp_col()}
 ECONFIG_TEMP = {"color": m.GRAY, "fill_opacity": 0.7}
 V_LABELS = {}

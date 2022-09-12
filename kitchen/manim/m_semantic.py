@@ -34,7 +34,7 @@ from kitchen import (
 )
 
 VCONFIG = {"radius": 0.2, "color": m.BLUE_D, "fill_opacity": 1}
-LCONFIG = {"vertex_spacing": (2.5, 1)}
+LCONFIG = {"vertex_spacing": (2, 1)}
 ECONFIG = {"color": config.get_opp_col()}
 
 
@@ -74,7 +74,8 @@ def set_up_label(g, vertex_id, label, color = m.GRAY):
     rendered_label.move_to(new_vertex.get_center())
     new_vertex.add(rendered_label)
     
-def create_vertex(g, vertex_id, parent_id, label, color=m.GRAY,  link=True):
+def create_vertex(g, vertex_id, parent_id, label, color=m.GRAY,  link=True,
+                epsilon = False):
     """Creates a vertex in a given Manim Graph.
 
     Args:
@@ -87,12 +88,13 @@ def create_vertex(g, vertex_id, parent_id, label, color=m.GRAY,  link=True):
         be linked with an edge. Defaults to True.
 
     Returns:
-        _type_: _description_
+        Dot: Manim representation of a Graph vertex.
     """    
     global m
-    display.info_secho("making: " + vertex_id + ", parent:" + parent_id)
-    typer.echo(g.vertices)
-    pos = g[parent_id].get_center() + m.DOWN
+    if epsilon:
+        pos = g[parent_id].get_center() + 0.5*m.DOWN
+    else:
+        pos = g[parent_id].get_center() + m.DOWN
     v = g._add_vertex(
         vertex_id, vertex_config={"color": color}, position=pos)
     v.fill_colour = color
@@ -148,12 +150,13 @@ class MSemanticAnalyser(m.Scene):
     def construct(self):
         """Constructs the semantic analysis scene.
         """        
-        # play the intro
-
-      
+        # play the intro      
         mg.display_msg(self, ["Semantic Analysis checks that a token stream",
         "is placed in the right context.", "Here, identifiers must be immutable",
         "and we can't use them until they", "have been assigned."], central = \
+        True)
+        mg.display_msg(self, ["Please note: If a non-terminal remains as a",
+         "leaf at the end of parsing,", "it derives epsilon."], central = \
         True)
         mg.display_msg(self, ["Let's begin", "Semantic Analysis"], script = "Let's " +
         " begin semantic analysis.", central = True)
@@ -335,7 +338,11 @@ class MSemanticAnalyser(m.Scene):
                         self.wait()
 
                     except: 
-                        pass
+                        typer.echo("we may have an epsilon")
+                        if node.id == "#":
+                            v = create_vertex(g, node.vertex_id, node.parent_id, 
+                            node.id, m.GRAY, epsilon = True)
+                            sounds.add_sound_to_scene(self, sounds.CLICK)
 
                     if node.token != None:
                         if not lhs:
