@@ -1,15 +1,10 @@
 # ComVizTT
 Compiler Visualiser and Teaching Tool
 
-
-python3 dsl-tool/dsltool.py to run DSL design tool. Defaults are fine.
-python3 <generated file>_gccsem.py will generate python output code for your input.
-
-
 ## Installation
 
 ### Windows
-To run Kitchen, you will need to install several packages.
+To run Kitchen on Windows, you will need to install several packages.
 
 **Requirements:**
 - Python3
@@ -56,28 +51,54 @@ Exporting the parse trees to PNG files requires an additonal package called `gra
 
 From an elevated command prompt, install `graphviz` via `choco install graphviz`
  
- **3. 
+ **3. Using narration**
+ The generation of narration is enabled by the gTTS library. Make sure you are
+ connected to the internet when doing so, otherwise the video will not generate.
+
+ For offline rendering, it is recommended to turn narration off. This is achieved
+ by inserting the following command at Kitchen's prompt.
+
+ `Input: \c -n n`
 ## Compiling and Executing
   
-  To run the program, use the following command:
+  To run the program, the Context-Free Grammar file needs to be specified.
   
-  ``` python3 cli.py ```
+  use the following command to do this (A CFG is provided for your 
+  convience, but you can replace the last argument with your choice of path).
   
-  The regex and CLI file will need to be provided.
+  ``` python3 -m kitchen init -cfg ".\samples\example_cfgs\cfg_12.txt" ```
+
+  If you would like to also include a language specification, please include it
+  as an additional path. For example:
+
+`python3 -m kitchen init -cfg ".\samples\example_cfgs\cfg_12.txt" ".\samples\test_spec.txt"`
   
-  From here, `\m` will display the menu. 
+  Now, to run the application, use:
+
+  `> python3 -m kitchen run`
+
+  From here, `\m` will display the menu, and `\tut' will take you through
+  a quick tutorial.
 
 ## App Options
+The application also contains several options. While `run` and `init` are most
+helpful, you may view help, as well as the application version using the below 
+commands. 
 
 ```python3 -m kitchen --help```
 ```python3 -m kitchen -v ```
 
 ## Documentation
-For complete documentation, run the following in the command-line:
+To view the complete documentation online, simply run the following in the 
+command-line at the root of the directory:
 ``` python3 -m pdoc --http localhost:8080 kitchen```
   
 ## Running tests
-Execute `python -m pytest tests/` from this project’s root directory.
+Kitchen makes use of several tests. To run these, the CFGs in the samples directory
+(particularly in the `example_cfgs` and `expected_fs` etc. folders must not be removed. 
+
+Execute `python -m pytest tests/` from the project’s root directory to 
+initiate the tests. 
 
 
 
