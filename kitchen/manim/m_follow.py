@@ -31,8 +31,8 @@ class MFollowSet(m.Scene):
         mg.display_msg(self, ["The Follow Set of X contains all the TERMINALS",\
         "which can appear straight AFTER X."], central = \
         True)
-        sounds.narrate("Let's find the follow set.", self)
-        display.info_secho("Visualising follow set calculation:")
+        sounds.narrate("Let's find the Follow Set.", self)
+        display.info_secho("Visualising the Follow Set calculation:")
         self.vis_follow_set(True)
     
     def tear_down(self):
@@ -86,7 +86,7 @@ class MFollowSet(m.Scene):
                     production, "$", keys, [production + " is the start " +
                         "symbol,", "so we append $", "to Follow(" +
                     production + ")"], script = production + ", is the " +
-                        "start symbol, so we append $ to its follow set.")
+                        "start symbol, so we append $ to its Follow Set.")
                 is_start_symbol = False
 
             # inspect each element in the production
@@ -119,7 +119,7 @@ class MFollowSet(m.Scene):
                             mg.display_msg(self, ["Follow(" + item +
                             ") may not exist"], script = "Nothing can " +
                             "follow " + item + " so it does not have a "+
-                            "follow set.")
+                            "Follow Set.")
 
                         else:
                             # just highlight the terminal
@@ -154,13 +154,13 @@ class MFollowSet(m.Scene):
                             self._add_to_follow_vis(
                                 item, production, keys, ["Follow(" + 
                                 production + ") \\subseteq Follow(" +
-                                item + ")"], script = "The follow set of " +
+                                item + ")"], script = "The Follow Set of " +
                                 production + " is a subset of that of " + 
                                 item + " ")
                         else:
                             mg.display_msg(self, [next_item + ", is already " +
                                 "in Follow(" + item + ")"], script=item +
-                                "is already in the follow set.")                                   
+                                "is already in the Follow Set.")                                   
                     
                     elif index < len(pps) - 1:
                         next_item = pps[index + 1]
@@ -174,8 +174,8 @@ class MFollowSet(m.Scene):
                             else:
                                 mg.display_msg(self, [next_item +", is "+
                                     "already in Follow(" + item + ")"], 
-                                    script=item + "is already in the follow " +
-                                    "set.")   
+                                    script=item + "is already in the Follow " +
+                                    "Set.")   
                         else:
                             # we add the first of the non-terminal at this 
                             # next index
@@ -203,9 +203,9 @@ class MFollowSet(m.Scene):
                             
                             mg.display_msg(self, [r'{First (' +next_item +
                                 r') - #}', r'\subseteq Follow (' + item + 
-                                r')'], script = "The first set of " + 
+                                r')'], script = "The First Set of " + 
                                 next_item + " without epsilon is a subset of "+
-                                    "of " + item + "'s follow set.")
+                                    "of " + item + "'s Follow Set.")
 
                             for t in tmp_first:
                                 if t != "#":
@@ -226,12 +226,12 @@ class MFollowSet(m.Scene):
                                                 (production)
                                             self._add_to_follow_vis(
                                             item, production, keys, 
-                                            [r'\varepsilon \subseteq First(' +
+                                            [r'\varepsilon \subseteq First (' +
                                             next_item+r'),', r'so '+ 
                                             next_item + r'may not', 
                                             r'actually appear after' + item,
-                                            r' From this, Follow(' + item +
-                                             r') \subseteq Follow(' + 
+                                            r' From this, Follow (' + item +
+                                             r') \subseteq Follow (' + 
                                              production + r')'], 
                                              script = "Epsilon is in the \
                                              first set of " + item + " so the \
@@ -242,11 +242,11 @@ class MFollowSet(m.Scene):
                                         self.cfg.follow_set[item].append(next_item)
                                         self._add_to_follow_vis(
                                             item, next_item, keys,
-                                            [r'\varepsilon \subseteq First('+
+                                            [r'\varepsilon \subseteq First ('+
                                             next_item+r'),', r'so '+next_item+
                                             r'may not', r'actually appear after '
                                             +item], script = "Epsilon is in \
-                                            the first set of " + item + " so \
+                                            the First Set of " + item + " so \
                                             the non-terminal "+next_item + 
                                             " might not actually appear after " 
                                             + item)
@@ -276,6 +276,8 @@ class MFollowSet(m.Scene):
                     new_fs_group.add(m.Tex(mg.to_tex("$"), color = m.BLUE_D))
                 new_fs_group.arrange_in_grid(rows=1, buff=0.5).next_to(
                     self.cfg.manim_followset_lead[key], m.RIGHT)
+                new_fs_group.scale_to_fit_height(\
+                    self.cfg.manim_followset_lead[key].height)
 
                 # transforms to new contents
                 self.play(

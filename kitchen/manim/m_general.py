@@ -43,7 +43,6 @@ def to_tex(item):
     replace(r'\subseteq', r'$\subseteq$').replace(r'->', r'$\to$')
     tex_item = tex_item.replace(r'\varepsilon', 
     r'$\varepsilon$').replace(r'{', r'$\{$').replace(r'}', r'$\}$')
-    #display.fail_secho(tex_item)
     return tex_item
 
 def to_math_tex(item):
@@ -82,7 +81,6 @@ def display_msg(self, msg, script = "", anim=[], error = False, central =\
                 if success: col = m.GREEN
                 else: col = m.BLUE_C
             msg = to_tex(ms)
-            display.fail_secho(msg)
             msg_txt = m.Tex(msg, color=col).scale(0.7)
             msg_group.add(msg_txt)
         msg_group.arrange(m.DOWN)

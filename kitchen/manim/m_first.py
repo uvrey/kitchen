@@ -22,14 +22,14 @@ class MFirstSet(m.Scene):
             cfg (ContextFreeGrammar): Loaded CFG.
         """                    
         self.cfg = cfg
-        mg.display_msg(self, ["The First set of X contains all the TERMINALS",\
+        mg.display_msg(self, ["The First Set of X contains all the TERMINALS",\
             "which can BEGIN a string that is", "derived from X."], central = \
                 True)
         
     def construct(self):
         """Constructs the scene.
         """        
-        sounds.narrate("Let's find the first set!", self)
+        sounds.narrate("Let's find the First Set!", self)
         display.info_secho("Visualising the First Set:")
 
         # set title and scaling here since the function is recursive
@@ -59,8 +59,8 @@ class MFirstSet(m.Scene):
             time_width=0.3),
         )
         sounds.add_sound_to_scene(self, sounds.YAY)
-        mg.display_msg(self, ["Successfully found the first set :)"], 
-        script= "We successfully found the first set.")
+        mg.display_msg(self, ["Successfully found the First Set :)"], 
+        script= "We successfully found the First Set.")
 
     def tear_down(self):
         """Clears first set structures at the end of the animation.
@@ -109,6 +109,15 @@ class MFirstSet(m.Scene):
             , self)
         self.cfg.manim_firstset_lead[production] = m.Tex("First(" + 
         production + "):", color = config.get_opp_col()).align_to(cfg_line, m.UP)
+
+        if self.cfg.manim_firstset_lead[production].height > \
+                1.5*cfg_line.height:
+                self.cfg.manim_firstset_lead[production].scale_to_fit_height\
+                    (1.5*cfg_line.height).next_to\
+                    (keys, m.RIGHT)
+        self.cfg.manim_firstset_lead[production].align_to(cfg_line, \
+            m.UP)      
+
         self.cfg.manim_firstset_contents[production].next_to\
             (self.cfg.manim_firstset_lead[production], m.RIGHT)
 
