@@ -167,7 +167,11 @@ commands.
 ```python3 -m kitchen -v ```
 
 ## Documentation
-To view the complete documentation online, simply run the following in the 
+To view the complete documentation online, `pdoc` needs to be installed:
+
+`pip install pdoc`
+
+Once it is, simply run the following in the 
 command-line at the root of the directory:
 ``` python3 -m pdoc --http localhost:8080 kitchen```
   
