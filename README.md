@@ -32,11 +32,14 @@ In this installation, we will use pip and Chocolatey. Ensure Pip is upgraded by 
   
 3. Install LaTeX on Windows
   MikTeX is recommended: https://miktex.org/m.DOWNload
-  It will also assist with installing extra packages when you run the code for the first time.
+  It will also assist with installing extra style packages when you run the code for the first time.
   
 
 **1. Set up virtual environment:**
-Navigate to the ComVizTT directory and create a virtual environment, then activate it:
+Since Kitchen requires several dependencies, it is recommended to make use of a 
+virtual environment. 
+
+To do this, navigate to the ComVizTT directory and create a virtual environment, then activate it. Detailed instructions are provided here:
 https://mothergeo-py.readthedocs.io/en/latest/development/how-to/venv-win.html
 
 ```python3 -m virtualenv <env_name>\```
@@ -53,6 +56,7 @@ Exporting the parse trees to PNG files requires an additonal package called `gra
 
 From an elevated command prompt, install `graphviz` via `choco install graphviz`
  
+ **3. 
 ## Compiling and Executing
   
   To run the program, use the following command:

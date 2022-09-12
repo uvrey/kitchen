@@ -381,11 +381,9 @@ class MFollowSet(m.Scene):
                 if self.cfg.manim_followset_lead[production].height > \
                     1.5*cfg_line.height:
                     self.cfg.manim_followset_lead[production].scale_to_fit_height\
-                        (1.5*cfg_line.height).next_to\
-                        (keys, m.RIGHT)
+                        (1.5*cfg_line.height)
                 self.cfg.manim_followset_lead[production].align_to(cfg_line, \
                     m.UP)      
-
 
                 # prepares content group
                 self.cfg.manim_followset_contents[production].next_to(
