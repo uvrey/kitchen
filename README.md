@@ -41,6 +41,7 @@ https://docs.manim.community/en/v0.3.0/installation.html
 
 However, in brief, to begin using Kitchen, you will need to install several packages.
 
+### Setting up 
 **Requirements:**
 - Python3
 - Pip
@@ -48,10 +49,10 @@ However, in brief, to begin using Kitchen, you will need to install several pack
 
 **0. Make sure your package managers are up to date.**
 
-In this installation, we will use pip and Chocolatey. Ensure Pip is upgraded by running:
+In this installation, we will use Pip and Chocolatey. Ensure Pip is upgraded by running:
 ```python -m pip install -–upgrade pip```
 
-**2. Install manim and other dependencies; remembering to use Powershell as admin. **
+**2. Install `manim` and other dependencies; remembering to use Powershell as admin. **
   ```choco install manimce```  
   Alternatively:   ```python3 -m pip install manim```
   
@@ -60,11 +61,11 @@ In this installation, we will use pip and Chocolatey. Ensure Pip is upgraded by 
   
   Some packages may require a reboot, so please do this :)
   
-3. Install LaTeX on Windows
+**3. Install LaTeX**
   MikTeX is recommended: https://miktex.org/m.DOWNload
   It will also assist with installing extra style packages when you run the code for the first time.
   
-
+### Getting going
 **1. Set up virtual environment:**
 Since Kitchen requires several dependencies, it is recommended to make use of a 
 virtual environment. 
@@ -80,7 +81,6 @@ Activate this environment.
 Then, install the requirements:
 ```python3 -m pip install -r requirements.txt```
 
-
 **2. Exporting parse trees**
 Exporting the parse trees to PNG files requires an additonal package called `graphviz`.
 
@@ -94,6 +94,7 @@ From an elevated command prompt, install `graphviz` via `choco install graphviz`
  by inserting the following command at Kitchen's prompt.
 
  `Input: \c -n n`
+ 
 ## Compiling and Executing
   
   To run the program, the Context-Free Grammar file needs to be specified.
