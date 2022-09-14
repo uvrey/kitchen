@@ -1,6 +1,7 @@
 media/*
 venv/*
-samples/*
+assets/narration/*
+assets/tree_pngs/
 __pycache__
 __pycache__/*
 *.txt

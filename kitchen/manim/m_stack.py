@@ -23,8 +23,7 @@ class Stack:
         Args:
             scene (Scene): Manim Scene.
             left_edge (int): X co-ordinate of left edge.
-            height (int): Height of Stack.
-        """        
+            height (int): Height of Stack."""        
         self.stack = []
         self.texts = []
         self.mstack_height = height
