@@ -1,5 +1,11 @@
 # Kitchen: A Compiler Visualiser and Teaching Tool
-Kitchen calculates, visualises and explains five algorithms in Compiler
+Kitchen is a tool that supports the learning and teaching of Compiler Theory.
+
+## Domain-Specific Language Tool and General-Compiler Compiler
+Kitchen helps educators design and use Domain-Specific Languages in assignments, and allows students to verify the correctness of the compilers they build in class. 
+
+## Visualisation Engine
+Kitchen's Visualisation Engine calculates, visualises and explains five algorithms in Compiler
 Theory:
 
 - First Set
@@ -52,7 +58,7 @@ In brief, to begin using Kitchen, you will need to install several packages.
 In this installation, we will use Pip and Chocolatey. Ensure Pip is upgraded by running:
 ```python -m pip install -–upgrade pip```
 
-**2. Install `manim` and other dependencies; remembering to use Powershell as admin. **
+**1. Install `manim` and other dependencies; remembering to use Powershell as admin.**
   ```choco install manimce```  
   Alternatively:   ```python3 -m pip install manim```
   
@@ -61,7 +67,7 @@ In this installation, we will use Pip and Chocolatey. Ensure Pip is upgraded by 
   
   Some packages may require a reboot, so please do this :)
   
-**3. Install LaTeX**
+**2. Install LaTeX**
   MikTeX is recommended: https://miktex.org/m.DOWNload
   It will also assist with installing extra style packages when you run the code for the first time.
   
@@ -96,7 +102,7 @@ From an elevated command prompt, install `graphviz` via `choco install graphviz`
  `Input: \c -n n`
  
 ## Compiling and Executing
-  
+  ### Running Kitchen
   To run the program, the Context-Free Grammar file needs to be specified.
   
   use the following command to do this (A CFG is provided for your 
@@ -112,6 +118,7 @@ python3 -m kitchen init -cfg ".\samples\example_cfgs\cfg_12.txt"
 ```
 python3 -m kitchen init -cfg ".\samples\example_cfgs\cfg_12.txt" ".\samples\test_spec.txt"
 ```
+  **Please Note:** This file needs to be supplied to use the DSL tool and General-Compiler Compiler.
   
   Now, to run the application, use:
 
@@ -158,6 +165,10 @@ Use these commands to generate an explanation video.
 | Visualise LL(1) Parse Tree construction | \ll1 v <input>  | \v <input> |
 | Visualise Semantic Analysis             | \vsem <input>   | \v <input> |
 ```
+### Running the DSL Tool Independently
+Kitchen allows the DSL Tool to be accessed as a standalone resource. This is 
+achieved by running the following command:
+```python3 -m kitchen dsl-tool```
 
 ## App Options
 The application also contains several options. While `run` and `init` are most
