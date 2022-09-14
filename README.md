@@ -1,8 +1,35 @@
 # Kitchen: A Compiler Visualiser and Teaching Tool
 Kitchen is a tool that supports the learning and teaching of Compiler Theory.
 
+## Quick Start
+Once all the dependencies are installed (See *Installation*), Kitchen may be run as follows:
+
+### With only a Context-Free Grammar
+**When to use:**
+- You are testing out the app for the first time
+- You just want to generate simple parsing videos, which skip Lexical Analysis (so there is no mapping of an input string to a token stream).
+```
+python3 -m kitchen init -cfg ".\samples\example_cfgs\cfg.txt" 
+python3 -m kitchen run
+```
+
+### With a Language Specification
+**When to use:**
+- You want to parse actual input; where the strings you type in are mapped to tokens.
+- You just want to visualise Semantic Analysis.
+- You want to use the Domain-Specific Language Design tool. 
+```
+python3 -m kitchen init -cfg ".\samples\example_cfgs\cfg_id_language.txt" ".\samples\test_spec.txt"
+python3 -m kitchen run
+```
+
 ## Domain-Specific Language Tool and General-Compiler Compiler
 Kitchen helps educators design and use Domain-Specific Languages in assignments, and allows students to verify the correctness of the compilers they build in class. 
+
+Once a Language Specification has been initialised, only the DSL tool may started using the following command:
+```
+python3 -m kitchen dsl-tool
+```
 
 ## Visualisation Engine
 Kitchen's Visualisation Engine calculates, visualises and explains five algorithms in Compiler
@@ -91,6 +118,8 @@ Then, install the requirements:
 Exporting the parse trees to PNG files requires an additonal package called `graphviz`.
 
 From an elevated command prompt, install `graphviz` via `choco install graphviz`
+
+The parse trees will be exported to the `.\samples\tree_pngs` directory.
  
  **3. Using narration**
  The generation of narration is enabled by the gTTS library. Make sure you are
@@ -100,7 +129,7 @@ From an elevated command prompt, install `graphviz` via `choco install graphviz`
  by inserting the following command at Kitchen's prompt.
 
  `Input: \c -n n`
- 
+
 ## Compiling and Executing
   ### Running Kitchen
   To run the program, the Context-Free Grammar file needs to be specified.
@@ -122,7 +151,7 @@ python3 -m kitchen init -cfg ".\samples\example_cfgs\cfg_12.txt" ".\samples\test
   
   Now, to run the application, use:
 
-```python
+```
 python3 -m kitchen run
 ```
 
@@ -148,13 +177,14 @@ Use this command to open the domain-specific language design tool.
 | Open DSL tool | \dsl tool | \dsl       |
 
 Use these commands to check your calculations
-| Detail                   | Command          | Shortcut   |
-|:-------------------------|:-----------------|:-----------|
-| Display First Set        | \show first      | \fs        |
-| Display Follow Set       | \show follow     | \fw        |
-| Display Parse Table      | \show parsetable | \pt        |
-| Display LL(1) Parse Tree | \ll1 <input>     | <input>    |
-| Display Symbol Table     | \sem <input>     | <input>    |
+| Detail                          | Command          | Shortcut   |
+|:--------------------------------|:-----------------|:-----------|
+| Display First Set               | \show first      | \fs        |
+| Display Follow Set              | \show follow     | \fw        |
+| Display Parse Table             | \show parsetable | \pt        |
+| Display LL(1) Parse Tree        | \ll1 <input>     | <input>    |
+| Export LL(1) Parse Tree as .png | \tree <input>    |            |
+| Display Symbol Table            | \sem <input>     |            |
 
 Use these commands to generate an explanation video.
 | Detail                                  | Command         | Shortcut   |
@@ -163,7 +193,7 @@ Use these commands to generate an explanation video.
 | Visualise First Set calculation         | \vis first      | \vfs       |
 | Visualise Follow Set calculation        | \vis follow     | \vfw       |
 | Visualise LL(1) Parse Tree construction | \ll1 v <input>  | \v <input> |
-| Visualise Semantic Analysis             | \vsem <input>   | \v <input> |
+| Visualise Semantic Analysis             | \vsem <input>   |            |
 ```
 ### Running the DSL Tool Independently
 Kitchen allows the DSL Tool to be accessed as a standalone resource. This is 
