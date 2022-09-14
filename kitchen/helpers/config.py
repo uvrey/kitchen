@@ -374,7 +374,7 @@ def _show_config() -> None:
 def init_tree_png_dir() -> None:
     """Initialises the parse tree PNG directory.
     """    
-    tree_dir = os.getcwd() + r'\assets\tree_pngs'
+    tree_dir = os.getcwd() + r'/assets/tree_pngs'
     try:
         Path(tree_dir).mkdir(exist_ok=True)
     except OSError:

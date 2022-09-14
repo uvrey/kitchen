@@ -60,7 +60,7 @@ def _get_narration_path() -> str:
     """    
     global id
     id = id + 1
-    return os.getcwd() + r'\assets\narration\narr_' + str(id) + '.mp3'
+    return os.getcwd() + r'/assets/narration/narr_' + str(id) + '.mp3'
 
 def _get_narration(script: str) -> str:
     """Generates a gTTS narration .mp3 from a script and saves the file.
@@ -99,7 +99,7 @@ def narrate(script, scene) -> int:
 def init_narr_dir() -> None:
     """Initialises the narration directory.
     """    
-    narration_dir = os.getcwd() + r'\assets\narration'
+    narration_dir = os.getcwd() + r'/assets/narration'
     try:
         Path(narration_dir).mkdir(exist_ok=True)
     except OSError:
@@ -116,7 +116,7 @@ def clear_narrs():
 def clear_narr_dir():
     """Cleans the narration directory after the animation is created.
     """    
-    narration_dir = os.getcwd() + r'\assets\narration'
+    narration_dir = os.getcwd() + r'/assets/narration'
     shutil.rmtree(Path(narration_dir))
     return
 
@@ -130,32 +130,32 @@ def add_sound_to_scene(scene, sound_spec):
     Returns:
         int: Status code.
     """    
-    base_path = os.getcwd() + r'\assets\sounds'
+    base_path = os.getcwd() + r'/assets/sounds'
 
     if not os.path.isdir(base_path):
         return SOUND_ERROR
 
     try:
         if sound_spec == CLICK:
-            scene.add_sound(os.getcwd() + r'\assets\sounds\click.wav')
+            scene.add_sound(os.getcwd() + r'/assets/sounds/click.wav')
         elif sound_spec == FLASH:
             pass
         elif sound_spec == TYPE:
-            scene.add_sound(os.getcwd() + r'\assets\sounds\type.wav')
+            scene.add_sound(os.getcwd() + r'/assets/sounds/type.wav')
         elif sound_spec == CLANG:
-            scene.add_sound(os.getcwd() + r'\assets\sounds\clang.wav')
+            scene.add_sound(os.getcwd() + r'/assets/sounds/clang.wav')
         elif sound_spec == TWINKLE:
-            scene.add_sound(os.getcwd() + r'\assets\sounds\twinkle.wav') 
+            scene.add_sound(os.getcwd() + r'/assets/sounds/twinkle.wav') 
         elif sound_spec == FAIL:
-            scene.add_sound(os.getcwd() + r'\assets\sounds\fail.wav')
+            scene.add_sound(os.getcwd() + r'/assets/sounds/fail.wav')
         elif sound_spec == CLACK:
-            scene.add_sound(os.getcwd() + r'\assets\sounds\clack.wav')
+            scene.add_sound(os.getcwd() + r'/assets/sounds/clack.wav')
         elif sound_spec == YAY:
-            scene.add_sound(os.getcwd() + r'\assets\sounds\yay.wav')   
+            scene.add_sound(os.getcwd() + r'/assets/sounds/yay.wav')   
         elif sound_spec == POP:
-            scene.add_sound(os.getcwd() + r'\assets\sounds\pop.wav') 
+            scene.add_sound(os.getcwd() + r'/assets/sounds/pop.wav') 
         elif sound_spec==MOVE:
-            scene.add_sound(os.getcwd() + r'\assets\sounds\move.wav')
+            scene.add_sound(os.getcwd() + r'/assets/sounds/move.wav')
     except OSError:
         display.fail_secho("Sound [" + str(sound_spec) + "] not found -\
             please check your assets/sounds folder.")

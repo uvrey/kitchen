@@ -13,7 +13,7 @@ from kitchen.helpers import (
         config,
 )
 
-def get_spec_path(config_file: Path) -> Path:
+def get_spec_path(config_file: Path, as_str = False) -> Path:
     """Obtains the path to the currently-loaded language specification file.
 
     Returns:
@@ -21,7 +21,19 @@ def get_spec_path(config_file: Path) -> Path:
     """    
     config_parser = configparser.ConfigParser()
     config_parser.read(config_file)
-    return Path(config_parser["General"]["spec_path"])
+    
+    if as_str:
+        if config.CONFIG_FILE_PATH.exists():
+                spec_path = get_spec_path(config.CONFIG_FILE_PATH)
+        else:
+            display.fail_secho(
+                'Config file not found. Please run "kitchen init"',
+            )
+            raise typer.Exit(1)
+
+        return config_parser["General"]["spec_path"]
+    else:
+        return Path(config_parser["General"]["spec_path"])
 
 def get_spec(cfg):
     if config.CONFIG_FILE_PATH.exists():

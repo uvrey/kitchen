@@ -1,0 +1,124 @@
+LANGUAGE SPECIFICATION DOCUMENT
+
+# Specification document for DSL design tool. Fill in the blanks.
+# Blank lines and lines beginning with a # are ignored, so use them as
+# you please.
+
+---
+
+Reserved words:
+
+# R <Name> <Reserved word>
+# 
+# Name is what the reserved word is reffered to as internally.
+# Reserved word is the actual word as it appears in the DSL.
+
+
+
+
+
+---
+
+Tokens:
+
+# (T, I, or C) <Token name> <Regex of token>
+#
+# Use T header if you wish no special treatment for this token.
+# Use I header if you wish this token to be ignored in parsing stage.
+# Use C header if this token could contain reserved words inside.
+# Remember to escape special regex characters: 
+#     . ^ $ * + ? { } [ ] \ | ( ) 
+
+
+
+
+
+---
+
+Productions:
+
+# P <Non-terminal> -> <Production> [| <Alternate production>]
+# F [<Flag>]
+# I [<List of indexes>]
+# 
+# Empty productions may not be used as alternate productions.
+# Flags are used when building the abstract syntax tree to give context 
+# to the semantic analyser, for example, to denote a literal. Other 
+# flags are: STATEMENT, DECLARATION, ASSIGNMENT, DECLARE_ASSIGN, 
+# OPERATOR, IDENTIFIER, EMPTY
+# Symbols at the listed indexes are saved in the abstract syntax tree 
+# in the order they appear. 
+# 
+# For example:
+#    (I)    0              1       2    3      
+#     P EXPRESSION -> EXPRESSION plus TERM
+#     F OPERATOR
+#     I 2 1 3
+#     ...results in an AST entry of (OPERATOR, plus, p [1], p [3]).
+
+
+
+
+
+---
+
+Datatypes:
+
+# N <Name>
+# L <Literal name>
+#
+# Literal name is the flag used in the AST to reference a literal of 
+# this type.
+
+
+
+
+
+---
+    
+Booleans:
+
+# T <True symbol>
+# F <False symbol>
+# N <Boolean name>
+# L <Boolean literal name>
+#
+# This allows you to define your own boolean symbols for your language.
+# Since only one Boolean datatype is possible, it should be defined 
+# here.
+# The defaults correpond to Python's default values.
+
+T default
+F default
+N default
+L default
+
+---
+    
+Operators:
+
+# S <Symbol>
+# A <Number of arguments>
+# (T <List of types>)*
+# F <Format string>
+#
+# The list of types must choose a type name for each argument and, 
+# optionally, the return type last. 
+# Multiple alternate type lists are permitted.
+# Please enter a format string corresponding to your desired Python 
+# output code.
+# Remember, if these operators are used recursively, to surround your 
+# format string with parentheses.
+# 
+# For example:
+#     S @
+#     A 2
+#     T int string string
+#     F {1} + " is " + {0}
+#     ...will give @ 4 "answer" = "answer is 4".
+
+
+
+
+
+---
