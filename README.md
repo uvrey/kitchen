@@ -4,11 +4,6 @@ Kitchen is a tool that supports the learning and teaching of Compiler Theory.
 ## Domain-Specific Language Tool and General-Compiler Compiler
 Kitchen helps educators design and use Domain-Specific Languages in assignments, and allows students to verify the correctness of the compilers they build in class. 
 
-Once a Language Specification has been initialised, only the DSL tool may started using the following command:
-```
-python3 -m kitchen dsl-tool
-```
-
 ## Visualisation Engine
 Kitchen's Visualisation Engine calculates, visualises and explains five algorithms in Compiler
 Theory:
@@ -59,6 +54,12 @@ python3 -m kitchen run
 ```
 python3 -m kitchen init -cfg ".\samples\example_cfgs\cfg_id_language.txt" ".\samples\test_spec.txt"
 python3 -m kitchen run
+```
+
+### Only starting the DSL Tool
+Once a Language Specification has been initialised, only the DSL tool may started using the following command:
+```
+python3 -m kitchen dsl-tool
 ```
 
 ## Installation
@@ -202,6 +203,10 @@ commands.
 
 ```python3 -m kitchen --help```
 ```python3 -m kitchen -v ```
+
+To check which CFG is currently loaded without having to run Kitchen, use this command.
+```python3 -m kitchen show-cfg```
+
 
 ## Documentation
 To view the complete documentation online, `pdoc` needs to be installed:
