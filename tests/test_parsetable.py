@@ -15,7 +15,7 @@ def sample_path():
 
 @pytest.fixture
 def pt_out_path():
-    return ".\\samples\\expected_pt\\"
+    return "./samples/expected_pt/"
 
 """ Test calculation of first sets on existing CFG files """
 @pytest.mark.parametrize("sample_cfg", [

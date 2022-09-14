@@ -25,7 +25,7 @@ Visualisations are created as .mp4 videos, and can be found inside the
 `.\media\videos\<resolution>` directory, where `<resolution>` is 
 `1080p60`, `720p30` or `480p15`. 
 
-Sample CFGs are available in the `.\samples\example_cfgs` folder.
+Sample CFGs are available in the `./samples/example_cfgs` folder.
 
 ## :green_circle: Quick Start
 Kitchen requires one argument, which is the path to a Context-Free Grammar (CFG) file. This CFG contains the structure of some small language- here's an example:
@@ -34,7 +34,7 @@ S -> a B D h
 B -> b | #
 D -> d | #
 ```
-*Source:* `".\samples\example_cfgs\cfg_12.txt"`
+*Source:* `"./samples/example_cfgs/cfg_12.txt"`
 
 Using this CFG unlocks all of the Visulisation Engine's functionality, except for visualising Semantic Analysis. To do this, and also to use the DSL Tool, a Language Specification file is needed. You can find an example at `".\samples\test_spec.txt"`.
 
@@ -45,7 +45,7 @@ Once all the dependencies are installed (See *Installation*), Kitchen may be run
 - You are testing out the app for the first time
 - You just want to generate simple parsing videos, which skip Lexical Analysis (so there is no mapping of an input string to a token stream).
 ```
-python3 -m kitchen init -cfg ".\samples\example_cfgs\cfg.txt" 
+python3 -m kitchen init -cfg "./samples/example_cfgs/cfg.txt" 
 python3 -m kitchen run
 ```
 
@@ -55,7 +55,7 @@ python3 -m kitchen run
 - You just want to visualise Semantic Analysis.
 - You want to use the Domain-Specific Language Design tool. 
 ```
-python3 -m kitchen init -cfg ".\samples\example_cfgs\cfg_id_language.txt" ".\samples\test_spec.txt"
+python3 -m kitchen init -cfg "./samples/example_cfgs/cfg_id_language.txt" "./samples/test_spec.txt"
 python3 -m kitchen run
 ```
 
@@ -116,9 +116,10 @@ Then, install the requirements:
 **2. Exporting parse trees**
 Exporting the parse trees to PNG files requires an additonal package called `graphviz`.
 
-From an elevated command prompt, install `graphviz` via `choco install graphviz`
+From an elevated command prompt, install `graphviz` via `choco install graphviz`,
+or with your package manager of choice. 
 
-The parse trees will be exported to the `.\samples\tree_pngs` directory.
+The parse trees will be exported to the `./samples/tree_pngs` directory.
  
  **3. Using narration**
  The generation of narration is enabled by the gTTS library. Make sure you are
@@ -137,14 +138,14 @@ The parse trees will be exported to the `.\samples\tree_pngs` directory.
   convience, but you can replace the last argument with your choice of path).
   
 ```
-python3 -m kitchen init -cfg ".\samples\example_cfgs\cfg_12.txt" 
+python3 -m kitchen init -cfg "./samples/example_cfgs/cfg_12.txt" 
 ```
 
   If you would like to also include a language specification, please include it
   as an additional path. For example:
 
 ```
-python3 -m kitchen init -cfg ".\samples\example_cfgs\cfg_12.txt" ".\samples\test_spec.txt"
+python3 -m kitchen init -cfg "./samples/example_cfgs/cfg_12.txt" "./samples/test_spec.txt"
 ```
   **Please Note:** This file needs to be supplied to use the DSL tool and General-Compiler Compiler.
   

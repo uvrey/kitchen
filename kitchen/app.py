@@ -147,11 +147,10 @@ def run() -> None:
         input = typer.prompt("Input")
         cli_helper.handle_input(input, cfg, spec)
 
-# This starts the tool using `python3 -m kitchen dsl-tool`
 @app.command(name="dsl-tool")
 def init_dsl() -> None:
-
-    cfg = get_cfg()
+    """This starts the tool using `python3 -m kitchen dsl-tool`
+    """    
     spec = lang_spec.get_spec_path(config.CONFIG_FILE_PATH, True)
     if spec == None:
         display.fail_secho("No Language Specification provided.\n"+
@@ -170,12 +169,16 @@ def show_cfg() -> None:
 """ Helper functions for testing """
 @app.command(name = "test-fs")
 def find_fs() -> None:
+    """Tests the First Set.
+    """    
     cfg = get_cfg()
     _check_cfg(cfg)
     cfg.show_first_set_testing()
 
 @app.command(name = "test-fw")
 def find_fw() -> None:
+    """Tests the Follow Set.
+    """    
     cfg = get_cfg()
     _check_cfg(cfg)
     cfg.reset_first_set()
@@ -183,6 +186,8 @@ def find_fw() -> None:
 
 @app.command(name = "test-pt")
 def find_pt() -> None:
+    """Tests the Parsing Table.
+    """    
     cfg = get_cfg()
     _check_cfg(cfg)
     cfg.reset_first_set()
@@ -205,6 +210,15 @@ def find_ll1(
             "-i",
             prompt="Please an input to be parsed",
             )) -> None:
+    """Tests LL(1) Parsing
+
+    Args:
+        inp (str, optional): Input String. Defaults to typer.
+        Option( ..., "--input", "-i", prompt="Please an input to be parsed", ).
+
+    Returns:
+        int: Status Code
+    """            
     cfg = get_cfg()
     _check_cfg(cfg)
     cfg.reset_first_set()

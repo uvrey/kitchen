@@ -15,7 +15,7 @@ def test_version():
 
 @pytest.fixture
 def sample_path():
-    return ".\\samples\\example_cfgs\\"
+    return "./samples/example_cfgs/"
 
 
 """ Test initialisation and loading of CFGs """

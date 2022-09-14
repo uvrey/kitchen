@@ -11,11 +11,11 @@ runner = CliRunner()
 
 @pytest.fixture
 def sample_path():
-    return ".\\samples\\example_cfgs\\"
+    return "./samples/example_cfgs/"
 
 @pytest.fixture
 def ll1_out_path():
-    return ".\\samples\\expected_ll1\\"
+    return "./samples/expected_ll1/"
 
 """ Test calculation of first sets on existing CFG files """
 @pytest.mark.parametrize("sample_cfg, input_str", [

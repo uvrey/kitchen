@@ -311,7 +311,7 @@ def _set_preview(inp: str) -> None:
     try:
         p_index = inp.index("-p")
         if inp[p_index + 1] not in opts:
-            display.fail_secho("\t Options: \c -p y | n")
+            display.fail_secho("\t Options: \\c -p y | n")
         else:
             OUTPUT_CONFIG["preview"] = ps[opts.index(inp[p_index + 1])]
             display.success_secho("Success: set 'preview' to '" + 

@@ -38,7 +38,6 @@ def init_input(self, inp) -> int:
         self.tokens = get_tokens_from_input(inp, self.spec)
     return SUCCESS
 
-# TODO read the spec file and match
 def get_tokens_from_input(inp, spec = None) -> list:
     """Obtains the token stream of an input string. 
     Args:

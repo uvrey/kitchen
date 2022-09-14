@@ -280,7 +280,6 @@ def _process_command(inp, cfg, spec) -> None:
     Raises:
         typer.Exit: Exits the application when the user requests this. 
     """   
-
     if inp == "\\m" or inp == "\\menu":
         display.print_menu()
 

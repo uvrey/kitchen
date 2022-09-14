@@ -10,11 +10,11 @@ runner = CliRunner()
 
 @pytest.fixture
 def sample_path():
-    return ".\\samples\\example_cfgs\\"
+    return "./samples/example_cfgs/"
 
 @pytest.fixture
 def fs_out_path():
-    return ".\\samples\\expected_fs\\"
+    return "./samples/expected_fs/"
 
 """ Test calculation of first sets on existing CFG files """
 @pytest.mark.parametrize("sample_cfg", [
