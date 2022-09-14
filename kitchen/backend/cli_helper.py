@@ -290,7 +290,7 @@ def _process_command(inp, cfg, spec) -> None:
     elif inp == "\\tutorial" or inp == "\\tut":
         display.display_tutorial()
 
-    elif inp == "\\dsl":
+    elif inp == "\\dsl" or inp == "\\dsl tool":
        #dsl.dsl_tool.main()
         pass
 
