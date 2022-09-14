@@ -376,7 +376,8 @@ def _process_command(inp, cfg, spec) -> None:
                     sem_analyser.init_analysis()
                 else:
                     display.fail_secho("Parsing failed. Cannot generate "+
-                    "semantic analysis.\n(Have you provided a language spec?")
+                    "semantic analysis.\n(Is your input valid? " + 
+                    "Did you provide a Language Specification file?)")
 
     elif inp[0:5] == "\\tree":
             stripped = inp.strip()
@@ -416,7 +417,8 @@ def _process_command(inp, cfg, spec) -> None:
                         sem_analyser.render()
                 else:
                     display.fail_secho("Parsing failed. Cannot generate "+
-                    "semantic analysis.\n(Have you provided a language spec?")
+                    "semantic analysis.\n(Is your input valid? " + 
+                    "Did you provide a Language Specification file?)")
        
     elif inp == "\\show cfg" or inp == "\\cfg":
         cfg.show_contents()
@@ -425,7 +427,7 @@ def _process_command(inp, cfg, spec) -> None:
         if spec != None:
             spec.show_contents()
         else:
-            display.fail_secho("No specification provided.")
+            display.fail_secho("No Language Specification file provided.")
 
     elif inp.strip()[0:2] == "\\c" or inp == "\\config":
         if inp == "\\c":
@@ -448,7 +450,7 @@ def _process_command(inp, cfg, spec) -> None:
             _init_parsing_vis_shortcut(inp, cfg, spec)
     
     else:
-        display.fail_secho('Invalid command')
+        display.fail_secho('Invalid command.')
 
 
 

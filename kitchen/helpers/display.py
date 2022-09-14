@@ -144,13 +144,15 @@ def print_welcome():
     """    
     info_secho(
         "Welcome to Kitchen\n"+
-        "If it's your first time here, type \\m for the menu!\n")
+        "If it's your first time here, type \\tut for the tutorial,\n"+
+        "or \\m for the menu!\n")
 
 def print_menu(help = False):
     """Helper function to print the application menu.
     """    
     app_cmds = [("Exit app", "\\quit", "\\q"), 
             ("Configure animation settings", "\\config", "\\c"), 
+            ("Start the tutorial", "\\tutorial", "\\tut"), 
             ("Display Context-Free Grammar", "\\show cfg", "\\cfg"), 
             ("Display Language Specification", "\\show spec", "\\spec")]
 
