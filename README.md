@@ -1,28 +1,6 @@
 # Kitchen: A Compiler Visualiser and Teaching Tool
 Kitchen is a tool that supports the learning and teaching of Compiler Theory.
 
-## Quick Start
-Once all the dependencies are installed (See *Installation*), Kitchen may be run as follows:
-
-### With only a Context-Free Grammar
-**When to use:**
-- You are testing out the app for the first time
-- You just want to generate simple parsing videos, which skip Lexical Analysis (so there is no mapping of an input string to a token stream).
-```
-python3 -m kitchen init -cfg ".\samples\example_cfgs\cfg.txt" 
-python3 -m kitchen run
-```
-
-### With a Language Specification
-**When to use:**
-- You want to parse actual input; where the strings you type in are mapped to tokens.
-- You just want to visualise Semantic Analysis.
-- You want to use the Domain-Specific Language Design tool. 
-```
-python3 -m kitchen init -cfg ".\samples\example_cfgs\cfg_id_language.txt" ".\samples\test_spec.txt"
-python3 -m kitchen run
-```
-
 ## Domain-Specific Language Tool and General-Compiler Compiler
 Kitchen helps educators design and use Domain-Specific Languages in assignments, and allows students to verify the correctness of the compilers they build in class. 
 
@@ -51,20 +29,37 @@ Visualisations are created as .mp4 videos, and can be found inside the
 
 Sample CFGs are available in the `.\samples\example_cfgs` folder.
 
-## Example Visualisations
-### Follow Set calculation
-![follow](https://user-images.githubusercontent.com/77244149/189752729-0e51d1dd-742d-4774-99d0-36c392bc5db9.png)
-### Parsing Table calculation
-![parse_table2](https://user-images.githubusercontent.com/77244149/189752702-e5bf107f-73cd-4559-ab38-97fceed93cec.png)
+## Quick Start
+Kitchen requires one argument, which is the path to a Context-Free Grammar (CFG). This CFG contains the structure of some small language- here's an example:
+```
+S -> a B D h
+B -> b | #
+D -> d | #
+```
+*Source:* `".\samples\example_cfgs\cfg_12.txt"`
 
-### LL1(Parsing)
-#### Dark Theme
-![matching](https://user-images.githubusercontent.com/77244149/189752748-8bb6cb44-1189-4315-87a8-ba6a3661342e.png)
-#### Light Theme
-![light_1](https://user-images.githubusercontent.com/77244149/189753376-e248e159-0530-4b07-8c27-6c3eaf725d89.png)
-### Semantic Analysis
-![semantic](https://user-images.githubusercontent.com/77244149/189752534-89258b52-a816-4a64-9c3b-94a71eddffea.png)
-![semantic 2](https://user-images.githubusercontent.com/77244149/189752817-ca53b906-66da-4c45-b9f2-881bac0e6216.png)
+Using this CFG unlocks all of the Visulisation Engine's functionality, except for showing Semantic Analysis. To do this, and use the DSL Tool, a Language Specification is needed. You can find an example at `".\samples\test_spec.txt"`.
+
+Once all the dependencies are installed (See *Installation*), Kitchen may be run as follows:
+
+### Using only a Context-Free Grammar
+**When to use:**
+- You are testing out the app for the first time
+- You just want to generate simple parsing videos, which skip Lexical Analysis (so there is no mapping of an input string to a token stream).
+```
+python3 -m kitchen init -cfg ".\samples\example_cfgs\cfg.txt" 
+python3 -m kitchen run
+```
+
+### Also using a Language Specification
+**When to use:**
+- You want to parse actual input; where the strings you type in are mapped to tokens.
+- You just want to visualise Semantic Analysis.
+- You want to use the Domain-Specific Language Design tool. 
+```
+python3 -m kitchen init -cfg ".\samples\example_cfgs\cfg_id_language.txt" ".\samples\test_spec.txt"
+python3 -m kitchen run
+```
 
 ## Installation
 These instructions assume that a Windows system is used. Kitchen is compatible with Linux, but issues installing LaTeX for Manim may be experienced. This is because some style packages may be absent. It is recommended to install the complete LaTeX suite in this case, or install [MikTeX for Linux](https://miktex.org/howto/install-miktex-unx) to manage this.
@@ -224,6 +219,21 @@ Kitchen makes use of several tests. To run these, the CFGs in the samples direct
 Execute `python -m pytest tests/` from the project’s root directory to 
 initiate the tests. 
 
+
+## Example Visualisations
+### Follow Set calculation
+![follow](https://user-images.githubusercontent.com/77244149/189752729-0e51d1dd-742d-4774-99d0-36c392bc5db9.png)
+### Parsing Table calculation
+![parse_table2](https://user-images.githubusercontent.com/77244149/189752702-e5bf107f-73cd-4559-ab38-97fceed93cec.png)
+
+### LL1(Parsing)
+#### Dark Theme
+![matching](https://user-images.githubusercontent.com/77244149/189752748-8bb6cb44-1189-4315-87a8-ba6a3661342e.png)
+#### Light Theme
+![light_1](https://user-images.githubusercontent.com/77244149/189753376-e248e159-0530-4b07-8c27-6c3eaf725d89.png)
+### Semantic Analysis
+![semantic](https://user-images.githubusercontent.com/77244149/189752534-89258b52-a816-4a64-9c3b-94a71eddffea.png)
+![semantic 2](https://user-images.githubusercontent.com/77244149/189752817-ca53b906-66da-4c45-b9f2-881bac0e6216.png)
 
 
 
