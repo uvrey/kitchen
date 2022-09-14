@@ -36,6 +36,8 @@ D -> d | #
 ```
 *Source:* `"./samples/example_cfgs/cfg_12.txt"`
 
+This CFG may be customised. For best results, please select short names for your non-terminals.
+
 Using this CFG unlocks all of the Visulisation Engine's functionality, except for visualising Semantic Analysis. To do this, and also to use the DSL Tool, a Language Specification file is needed. You can find an example at `".\samples\test_spec.txt"`.
 
 Once all the dependencies are installed (See *Installation*), Kitchen may be run as follows:
