@@ -60,7 +60,7 @@ python3 -m kitchen run
 ```
 
 ### Only starting the DSL Tool
-Once a Language Specification has been initialised, only the DSL tool may started using the following command:
+Once a Language Specification has been initialised, only the DSL tool may be started using the following command:
 ```
 python3 -m kitchen dsl-tool
 ```
