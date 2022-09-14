@@ -1,5 +1,5 @@
 # Kitchen: A Compiler Visualiser and Teaching Tool
-Kitchen is a tool that supports the learning and teaching of Compiler Theory :woman_cook:.
+Kitchen supports the learning and teaching of Compiler Theory :woman_cook:.
 
 ## Domain-Specific Language Tool :hammer: and General-Compiler Compiler
 Kitchen helps educators design and use Domain-Specific Languages in assignments, and allows students to verify the correctness of the compilers they build in class. 
