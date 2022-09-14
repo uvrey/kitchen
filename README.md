@@ -213,7 +213,7 @@ To check which CFG is currently loaded without having to run Kitchen, use this c
 
 
 ## :books: Documentation
-To view the complete documentation online, `pdoc` needs to be installed:
+To view the complete documentation of the Visualisation Engine component online, `pdoc` needs to be installed:
 
 `pip install pdoc`
 
