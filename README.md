@@ -1,6 +1,8 @@
 ![Kitchen Cover](https://user-images.githubusercontent.com/77244149/190196872-aa2d75d1-f765-4dcc-890a-aa47393b8315.png)
-# Kitchen: A Compiler Visualiser and Teaching Tool
-Kitchen supports the learning and teaching of Compiler Theory :woman_cook:.
+# About
+Kitchen was developed by J.M. Rey and S. Van Riel as the central deliverable of their Computer Science Honours Research Project at the University of Cape Town in 2022.
+
+**Its goal?** To support the learning and teaching of Compiler Theory :woman_cook:.
 
 ## Domain-Specific Language Tool :hammer: and General-Compiler Compiler
 Kitchen helps educators design and use Domain-Specific Languages in assignments, and allows students to verify the correctness of the compilers they build in class. 
