@@ -34,9 +34,9 @@ from kitchen.manim import (
     m_semantic
 )
 
-# from kitchen.dsl import (
-#     // dsltool as dsl
-# )
+from dslmodule.dsltool import (
+     dsltool as dsl
+)
 
 def init_app(cfg_path: str, spec_path = None) -> int:
     """Initialises the application by creating its configuration file and
@@ -291,13 +291,12 @@ def _process_command(inp, cfg, spec) -> None:
         display.display_tutorial()
 
     elif inp == "\\dsl" or inp == "\\dsl tool":
-        spec = lang_spec.get_spec(cfg)
+        spec = lang_spec.get_spec_path(config.CONFIG_FILE_PATH, True)
         if spec == None:
             display.fail_secho("No Language Specification provided.\n"+
             "Please re-initialise Kitchen with this file to use the DSL Tool.")
         else:
-            # TODO start tool. Maybe with `dsl.dsl_tool.main()`
-            pass
+            dsl.main (spec)
 
     elif inp == "\\show first" or inp == "\\fs":
         cfg.show_first_set()
