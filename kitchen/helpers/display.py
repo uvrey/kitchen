@@ -160,14 +160,15 @@ def print_menu(help = False):
             ("Display Follow Set", "\\show follow", "\\fw"), 
             ("Display Parse Table", "\\show parsetable", "\\pt"),
             ("Display LL(1) Parse Tree", "\\ll1 <input>", "<input>"),
-            ("Display Symbol Table", "\\sem <input>", "<input>")]
+            ("Export LL(1) Parse Tree as .png", "\\tree <input>", ""),
+            ("Display Symbol Table", "\\sem <input>", "")]
     
     anims = [("Visualise Parsing Table calculation", "\\vis parsetable", "\\vpt"), 
              ("Visualise First Set calculation", "\\vis first", "\\vfs"), 
             ("Visualise Follow Set calculation", "\\vis follow", "\\vfw"), 
             ("Visualise LL(1) Parse Tree "+
                 "construction", "\\ll1 v <input>", "\\v <input>"),
-            ("Visualise Semantic Analysis", "\\vsem <input>", "\\v <input>")]
+            ("Visualise Semantic Analysis", "\\vsem <input>", "")]
     
     if help:
         success_secho("\nWith these commands, you can see the contents of files"+
