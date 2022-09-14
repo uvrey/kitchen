@@ -1,0 +1,16 @@
+Success.
+PROGRAM
+|-- STATEMENT
+|   |-- identifier
+|   |-- =
+|   +-- FACTOR
+|       +-- value
+|-- PROGRAM
+|   +-- #
+|-- STATEMENT
+|   |-- identifier
+|   |-- =
+|   +-- FACTOR
+|       +-- value
++-- PROGRAM
+    +-- #

@@ -1,0 +1,10 @@
+PROGRAM
++-- STATEMENT
+    |-- EXPRESSION
+    |   +-- TERM
+    |       +-- FACTOR
+    |           +-- identifier
+    |-- a
+    +-- TERM
+        +-- FACTOR
+            +-- identifier

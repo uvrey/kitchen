@@ -1,9 +1,0 @@
-d: a(a|b)*
-a: a
-b: b
-c: c
-e: e
-f: f
-g: g
-h: h
-(: (

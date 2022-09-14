@@ -1,0 +1,3 @@
+Z -> S $
+S -> x Y z S | a
+Y -> x Y z | y

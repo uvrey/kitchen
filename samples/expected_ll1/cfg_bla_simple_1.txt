@@ -1,0 +1,8 @@
+Success.
+PROGRAM
++-- STATEMENT
+    |-- EXPRESSION
+    |   +-- TERM
+    |       +-- FACTOR
+    |           +-- identifier
+    +-- +

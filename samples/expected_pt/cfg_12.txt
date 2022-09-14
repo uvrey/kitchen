@@ -1,0 +1,1 @@
+{'B': {'$': 'Error', 'a': 'Error', 'b': 'B -> b', 'd': 'B -> #', 'h': 'B -> #'}, 'D': {'$': 'Error', 'a': 'Error', 'b': 'Error', 'd': 'D -> d', 'h': 'D -> #'}, 'S': {'$': 'Error', 'a': 'S -> a B D h', 'b': 'Error', 'd': 'Error', 'h': 'Error'}}

@@ -1,0 +1,6 @@
+PROGRAM -> STATEMENT | PROGRAM                                 
+STATEMENT -> identifier = EXPRESSION
+EXPRESSION -> EXPRESSION a TERM | binary
+TERM -> FACTOR 
+FACTOR -> ( EXPRESSION ) | identifier
+

@@ -1,0 +1,3 @@
+PROGRAM -> STATEMENT PROGRAM | #                                
+STATEMENT -> identifier = FACTOR
+FACTOR -> value | identifier

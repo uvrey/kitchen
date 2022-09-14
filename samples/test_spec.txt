@@ -1,0 +1,38 @@
+LANGUAGE SPECIFICATION DOCUMENT
+
+# Specification document for DSL design tool. Fill in the blanks.
+# Blank lines and lines beginning with a # are ignored, so use them as
+# you please.
+
+---
+
+Reserved words:
+
+# R <Name> <Reserved word>
+# 
+# Name is what the reserved word is reffered to as internally.
+# Reserved word is the actual word as it appears in the DSL.
+R a a
+R d d
+R m m
+T = =
+
+
+---
+
+Tokens:
+
+# (T, I, or C) <Token name> <Regex of token>
+#
+# Use T header if you wish no special treatment for this token.
+# Use I header if you wish this token to be ignored in parsing stage.
+# Use C header if this token could contain reserved words inside.
+# Remember to escape special regex characters: 
+#     . ^ $ * + ? { } [ ] \ | ( ) 
+
+T identifier [a-z][A-Z]*
+T value ([a-z]|[A-Z]|[0-9])*
+T = \=
+T + \+
+T c [a-z][A-Z]*
+---

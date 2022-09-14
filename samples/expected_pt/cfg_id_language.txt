@@ -1,0 +1,1 @@
+{'FACTOR': {'$': 'Error', '=': 'Error', 'identifier': 'FACTOR -> identifier', 'value': 'FACTOR -> value'}, 'PROGRAM': {'$': 'PROGRAM -> #', '=': 'Error', 'identifier': 'PROGRAM -> STATEMENT PROGRAM', 'value': 'Error'}, 'STATEMENT': {'$': 'Error', '=': 'Error', 'identifier': 'STATEMENT -> identifier = FACTOR', 'value': 'Error'}}
