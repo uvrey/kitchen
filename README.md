@@ -220,7 +220,9 @@ To view the complete documentation of the Visualisation Engine component online,
 Once it is, simply run the following in the 
 command-line at the root of the directory:
 ``` python3 -m pdoc --http localhost:8080 kitchen```
-  
+
+*Please Note:* If issues are experienced while generating this, please rather peruse the source code itself to view the documentation at each function. 
+
 ## :test_tube: Running tests
 Kitchen makes use of several tests. To run these, the CFGs in the samples directory
 (particularly in the `example_cfgs` and `expected_fs` etc. folders must not be removed. 
