@@ -52,7 +52,7 @@ In brief, to begin using Kitchen, you will need to install several packages.
 In this installation, we will use Pip and Chocolatey. Ensure Pip is upgraded by running:
 ```python -m pip install -–upgrade pip```
 
-**2. Install `manim` and other dependencies; remembering to use Powershell as admin. **
+**1. Install `manim` and other dependencies; remembering to use Powershell as admin.**
   ```choco install manimce```  
   Alternatively:   ```python3 -m pip install manim```
   
@@ -61,7 +61,7 @@ In this installation, we will use Pip and Chocolatey. Ensure Pip is upgraded by 
   
   Some packages may require a reboot, so please do this :)
   
-**3. Install LaTeX**
+**2. Install LaTeX**
   MikTeX is recommended: https://miktex.org/m.DOWNload
   It will also assist with installing extra style packages when you run the code for the first time.
   
