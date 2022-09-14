@@ -267,6 +267,8 @@ class MParsingTable(m.Scene):
                                     " and column " + self.cfg.first_set\
                                     [key][j])
                     
+                    self.wait()
+                    self.wait()
                     code = self.vis_add_to_parsetable(
                          key, item, prod)
                     if code == ERROR:
