@@ -2,7 +2,7 @@
 # About Kitchen :woman_cook:
 Kitchen was developed by J.M. Rey and S. Van Riel as the central deliverable of their Computer Science Honours Research Project at the University of Cape Town in 2022.
 
-**Its goal?** To support the learning and teaching of Compiler Theory.
+**The Purpose of Kitchen** To support the learning and teaching of Compiler Theory.
 
 ## Domain-Specific Language Tool :hammer: and General-Compiler Compiler
 Kitchen helps educators design and use Domain-Specific Languages in assignments, and allows students to verify the correctness of the compilers they build in class. 
