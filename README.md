@@ -25,7 +25,7 @@ Visualisations are created as .mp4 videos, and can be found inside the
 Sample CFGs are available in the `.\samples\example_cfgs` folder.
 
 ## Quick Start
-Kitchen requires one argument, which is the path to a Context-Free Grammar (CFG). This CFG contains the structure of some small language- here's an example:
+Kitchen requires one argument, which is the path to a Context-Free Grammar (CFG) file. This CFG contains the structure of some small language- here's an example:
 ```
 S -> a B D h
 B -> b | #
@@ -33,7 +33,7 @@ D -> d | #
 ```
 *Source:* `".\samples\example_cfgs\cfg_12.txt"`
 
-Using this CFG unlocks all of the Visulisation Engine's functionality, except for showing Semantic Analysis. To do this, and use the DSL Tool, a Language Specification is needed. You can find an example at `".\samples\test_spec.txt"`.
+Using this CFG unlocks all of the Visulisation Engine's functionality, except for visualising Semantic Analysis. To do this, and also to use the DSL Tool, a Language Specification file is needed. You can find an example at `".\samples\test_spec.txt"`.
 
 Once all the dependencies are installed (See *Installation*), Kitchen may be run as follows:
 
