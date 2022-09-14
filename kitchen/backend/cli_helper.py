@@ -296,8 +296,8 @@ def _process_command(inp, cfg, spec) -> None:
             display.fail_secho("No Language Specification provided.\n"+
             "Please re-initialise Kitchen with this file to use the DSL Tool.")
         else:
+            # TODO start tool. Maybe with `dsl.dsl_tool.main()`
             pass
-            # TODO dsl.dsl_tool.main()
 
     elif inp == "\\show first" or inp == "\\fs":
         cfg.show_first_set()
