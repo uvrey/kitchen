@@ -1,10 +1,10 @@
-#:woman_cook: Kitchen: A Compiler Visualiser and Teaching Tool
-Kitchen is a tool that supports the learning and teaching of Compiler Theory.
+# Kitchen: A Compiler Visualiser and Teaching Tool
+Kitchen is a tool that supports the learning and teaching of Compiler Theory :woman_cook:.
 
-##:hammer: Domain-Specific Language Tool and General-Compiler Compiler
+## Domain-Specific Language Tool :hammer: and General-Compiler Compiler
 Kitchen helps educators design and use Domain-Specific Languages in assignments, and allows students to verify the correctness of the compilers they build in class. 
 
-##:eyes:Visualisation Engine
+## Visualisation Engine :eyes:
 Kitchen's Visualisation Engine calculates, visualises and explains five algorithms in Compiler
 Theory:
 
@@ -24,7 +24,7 @@ Visualisations are created as .mp4 videos, and can be found inside the
 
 Sample CFGs are available in the `.\samples\example_cfgs` folder.
 
-##:green_circle: Quick Start
+## :green_circle: Quick Start
 Kitchen requires one argument, which is the path to a Context-Free Grammar (CFG) file. This CFG contains the structure of some small language- here's an example:
 ```
 S -> a B D h
@@ -62,7 +62,7 @@ Once a Language Specification has been initialised, only the DSL tool may starte
 python3 -m kitchen dsl-tool
 ```
 
-##:black_circle: Installation
+## :black_circle: Installation
 These instructions assume that a Windows system is used. Kitchen is compatible with Linux, but issues installing LaTeX for Manim may be experienced. This is because some style packages may be absent. It is recommended to install the complete LaTeX suite in this case, or install [MikTeX for Linux](https://miktex.org/howto/install-miktex-unx) to manage this.
 
 For detailed instructions to install Manim for on your operating system, please see below:
@@ -126,7 +126,7 @@ The parse trees will be exported to the `.\samples\tree_pngs` directory.
 
  `Input: \c -n n`
 
-##:purple_circle: Compiling and Executing
+## :purple_circle: Compiling and Executing
   ### Running Kitchen
   To run the program, the Context-Free Grammar file needs to be specified.
   
@@ -196,7 +196,7 @@ Kitchen allows the DSL Tool to be accessed as a standalone resource. This is
 achieved by running the following command:
 ```python3 -m kitchen dsl-tool```
 
-##:grey_question: App Options
+## :grey_question: App Options
 The application also contains several options. While `run` and `init` are most
 helpful, you may view help, as well as the application version using the below 
 commands. 
@@ -208,7 +208,7 @@ To check which CFG is currently loaded without having to run Kitchen, use this c
 ```python3 -m kitchen show-cfg```
 
 
-##:books: Documentation
+## :books: Documentation
 To view the complete documentation online, `pdoc` needs to be installed:
 
 `pip install pdoc`
@@ -217,7 +217,7 @@ Once it is, simply run the following in the
 command-line at the root of the directory:
 ``` python3 -m pdoc --http localhost:8080 kitchen```
   
-##:test_tube: Running tests
+## :test_tube: Running tests
 Kitchen makes use of several tests. To run these, the CFGs in the samples directory
 (particularly in the `example_cfgs` and `expected_fs` etc. folders must not be removed. 
 
@@ -225,16 +225,16 @@ Execute `python -m pytest tests/` from the project’s root directory to
 initiate the tests. 
 
 
-##:arrow_forward: Example Visualisations
+## :arrow_forward: Example Visualisations
 ### Follow Set calculation
 ![follow](https://user-images.githubusercontent.com/77244149/189752729-0e51d1dd-742d-4774-99d0-36c392bc5db9.png)
 ### Parsing Table calculation
 ![parse_table2](https://user-images.githubusercontent.com/77244149/189752702-e5bf107f-73cd-4559-ab38-97fceed93cec.png)
 
 ### LL1(Parsing)
-####:crescent_moon: Dark Theme
+#### :crescent_moon: Dark Theme
 ![matching](https://user-images.githubusercontent.com/77244149/189752748-8bb6cb44-1189-4315-87a8-ba6a3661342e.png)
-####:sunny:Light Theme
+#### :sunny:Light Theme
 ![light_1](https://user-images.githubusercontent.com/77244149/189753376-e248e159-0530-4b07-8c27-6c3eaf725d89.png)
 ### Semantic Analysis
 ![semantic](https://user-images.githubusercontent.com/77244149/189752534-89258b52-a816-4a64-9c3b-94a71eddffea.png)
