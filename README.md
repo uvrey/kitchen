@@ -1,5 +1,11 @@
 # Kitchen: A Compiler Visualiser and Teaching Tool
-Kitchen calculates, visualises and explains five algorithms in Compiler
+Kitchen is a tool that supports the learning and teaching of Compiler Theory.
+
+## Domain-Specific Language Tool and General-Compiler Compiler
+Kitchen helps educators design and use Domain-Specific Languages in assignments, and allows students to verify the correctness of the compilers they build in class. 
+
+## Visualisation Engine
+Kitchen's Visualisation Engine calculates, visualises and explains five algorithms in Compiler
 Theory:
 
 - First Set
@@ -96,7 +102,7 @@ From an elevated command prompt, install `graphviz` via `choco install graphviz`
  `Input: \c -n n`
  
 ## Compiling and Executing
-  
+  ### Running Kitchen
   To run the program, the Context-Free Grammar file needs to be specified.
   
   use the following command to do this (A CFG is provided for your 
@@ -112,6 +118,7 @@ python3 -m kitchen init -cfg ".\samples\example_cfgs\cfg_12.txt"
 ```
 python3 -m kitchen init -cfg ".\samples\example_cfgs\cfg_12.txt" ".\samples\test_spec.txt"
 ```
+  **Please Note:** This file needs to be supplied to use the DSL tool and General-Compiler Compiler.
   
   Now, to run the application, use:
 
@@ -158,6 +165,10 @@ Use these commands to generate an explanation video.
 | Visualise LL(1) Parse Tree construction | \ll1 v <input>  | \v <input> |
 | Visualise Semantic Analysis             | \vsem <input>   | \v <input> |
 ```
+### Running the DSL Tool Independently
+Kitchen allows the DSL Tool to be accessed as a standalone resource. This is 
+achieved by running the following command:
+```python3 -m kitchen dsl-tool```
 
 ## App Options
 The application also contains several options. While `run` and `init` are most
