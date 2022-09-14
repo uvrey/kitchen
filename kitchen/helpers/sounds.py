@@ -138,8 +138,6 @@ def add_sound_to_scene(scene, sound_spec):
     try:
         if sound_spec == CLICK:
             scene.add_sound(os.getcwd() + r'/assets/sounds/click.wav')
-        elif sound_spec == FLASH:
-            pass
         elif sound_spec == TYPE:
             scene.add_sound(os.getcwd() + r'/assets/sounds/type.wav')
         elif sound_spec == CLANG:
