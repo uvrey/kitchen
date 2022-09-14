@@ -195,6 +195,15 @@ Use these commands to generate an explanation video.
 | Visualise LL(1) Parse Tree construction | \ll1 v <input>  | \v <input> |
 | Visualise Semantic Analysis             | \vsem <input>   |            |
 ```
+
+#### Troubleshooting
+If you are running Kitchen on Linux, you may encounter an issue saying:
+`Exception: Latex error converting to dvi. See log output above or the log file:...! LaTeX Error: File `standalone.cls' not found.`
+
+Or some variation thereof. To remedy this, please install the following package and restart the application:
+
+`sudo apt-get install texlive-latex-extra`
+
 ### Running the DSL Tool Independently
 Kitchen allows the DSL Tool to be accessed as a standalone resource. This is 
 achieved by running the following command:
