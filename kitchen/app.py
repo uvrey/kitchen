@@ -25,6 +25,10 @@ from kitchen.helpers import (
     error
 )
 
+from dslmodule.dsltool import (
+     dsltool as dsl
+)
+
 app = typer.Typer()
 
 def _version_callback(value: bool) -> None:
@@ -148,13 +152,12 @@ def run() -> None:
 def init_dsl() -> None:
 
     cfg = get_cfg()
-    spec = lang_spec.get_spec(cfg)
+    spec = lang_spec.get_spec_path(config.CONFIG_FILE_PATH, True)
     if spec == None:
         display.fail_secho("No Language Specification provided.\n"+
         "Please re-initialise Kitchen with this file to use the DSL Tool.")
     else:
-        # TODO start DSL app
-        pass
+        dsl.main (spec)
 
 @app.command(name="show-cfg")
 def show_cfg() -> None:
