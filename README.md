@@ -200,9 +200,11 @@ Use these commands to generate an explanation video.
 If you are running Kitchen on Linux, you may encounter an issue saying:
 `Exception: Latex error converting to dvi. See log output above or the log file:...! LaTeX Error: File `standalone.cls' not found.`
 
-Or some variation thereof. To remedy this, please install the following package and restart the application:
+Or some variation thereof. To remedy this, please first try this command.
+`choco install manim-latex`
 
-`sudo apt-get install texlive-latex-extra`
+If this does not work, please install the following packages and restart the application:
+`sudo apt-get install texlive-latex-extra texlive-fonts-extra texlive-latex-recommended texlive-science texlive-fonts-extra tipa`
 
 ### Running the DSL Tool Independently
 Kitchen allows the DSL Tool to be accessed as a standalone resource. This is 
