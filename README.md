@@ -18,11 +18,30 @@ Visualisations are created as .mp4 videos, and can be found inside the
 
 Sample CFGs are available in the `.\samples\example_cfgs` folder.
 
+## Example Visualisations
+### Follow Set calculation
+![follow](https://user-images.githubusercontent.com/77244149/189752729-0e51d1dd-742d-4774-99d0-36c392bc5db9.png)
+### Parsing Table calculation
+![parse_table2](https://user-images.githubusercontent.com/77244149/189752702-e5bf107f-73cd-4559-ab38-97fceed93cec.png)
+
+### LL1(Parsing)
+#### Dark Theme
+![matching](https://user-images.githubusercontent.com/77244149/189752748-8bb6cb44-1189-4315-87a8-ba6a3661342e.png)
+#### Light Theme
+![light_1](https://user-images.githubusercontent.com/77244149/189753376-e248e159-0530-4b07-8c27-6c3eaf725d89.png)
+### Semantic Analysis
+![semantic](https://user-images.githubusercontent.com/77244149/189752534-89258b52-a816-4a64-9c3b-94a71eddffea.png)
+![semantic 2](https://user-images.githubusercontent.com/77244149/189752817-ca53b906-66da-4c45-b9f2-881bac0e6216.png)
+
 ## Installation
+These instructions assume that a Windows system is used. Kitchen is compatible with Linux, but issues installing LaTeX for Manim may be experienced. This is because some style packages may be absent. It is recommended to install the complete LaTeX suite in this case, or install [MikTeX for Linux](https://miktex.org/howto/install-miktex-unx) to manage this.
 
-### Windows
-To run Kitchen on Windows, you will need to install several packages.
+For detailed instructions to install Manim for Linux, please see below:
+https://docs.manim.community/en/v0.3.0/installation.html
 
+In brief, to begin using Kitchen, you will need to install several packages.
+
+### Setting up 
 **Requirements:**
 - Python3
 - Pip
@@ -30,10 +49,10 @@ To run Kitchen on Windows, you will need to install several packages.
 
 **0. Make sure your package managers are up to date.**
 
-In this installation, we will use pip and Chocolatey. Ensure Pip is upgraded by running:
+In this installation, we will use Pip and Chocolatey. Ensure Pip is upgraded by running:
 ```python -m pip install -–upgrade pip```
 
-**2. Install manim and other dependencies; remembering to use Powershell as admin. **
+**2. Install `manim` and other dependencies; remembering to use Powershell as admin. **
   ```choco install manimce```  
   Alternatively:   ```python3 -m pip install manim```
   
@@ -42,11 +61,11 @@ In this installation, we will use pip and Chocolatey. Ensure Pip is upgraded by 
   
   Some packages may require a reboot, so please do this :)
   
-3. Install LaTeX on Windows
+**3. Install LaTeX**
   MikTeX is recommended: https://miktex.org/m.DOWNload
   It will also assist with installing extra style packages when you run the code for the first time.
   
-
+### Getting going
 **1. Set up virtual environment:**
 Since Kitchen requires several dependencies, it is recommended to make use of a 
 virtual environment. 
@@ -62,7 +81,6 @@ Activate this environment.
 Then, install the requirements:
 ```python3 -m pip install -r requirements.txt```
 
-
 **2. Exporting parse trees**
 Exporting the parse trees to PNG files requires an additonal package called `graphviz`.
 
@@ -76,6 +94,7 @@ From an elevated command prompt, install `graphviz` via `choco install graphviz`
  by inserting the following command at Kitchen's prompt.
 
  `Input: \c -n n`
+ 
 ## Compiling and Executing
   
   To run the program, the Context-Free Grammar file needs to be specified.
@@ -83,14 +102,14 @@ From an elevated command prompt, install `graphviz` via `choco install graphviz`
   use the following command to do this (A CFG is provided for your 
   convience, but you can replace the last argument with your choice of path).
   
-```python
+```
 python3 -m kitchen init -cfg ".\samples\example_cfgs\cfg_12.txt" 
 ```
 
   If you would like to also include a language specification, please include it
   as an additional path. For example:
 
-```python
+```
 python3 -m kitchen init -cfg ".\samples\example_cfgs\cfg_12.txt" ".\samples\test_spec.txt"
 ```
   
@@ -103,10 +122,10 @@ python3 -m kitchen run
   From here, `\m` will display the menu, and `\tut' will take you through
   a quick tutorial.
 
-  For your convenience, here is this menu! It contains all the commands which
-  kitchen supports. 
+  For your convenience, here is this menu. It contains all the commands which
+  Kitchen supports :)
 
-```python
+```
 Use these commands to see what files are loaded
  and adjust the animation settings.
 | Detail                         | Command    | Shortcut   |
@@ -149,7 +168,11 @@ commands.
 ```python3 -m kitchen -v ```
 
 ## Documentation
-To view the complete documentation online, simply run the following in the 
+To view the complete documentation online, `pdoc` needs to be installed:
+
+`pip install pdoc`
+
+Once it is, simply run the following in the 
 command-line at the root of the directory:
 ``` python3 -m pdoc --http localhost:8080 kitchen```
   
