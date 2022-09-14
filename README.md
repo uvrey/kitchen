@@ -1,3 +1,4 @@
+![Kitchen Cover](https://user-images.githubusercontent.com/77244149/190196872-aa2d75d1-f765-4dcc-890a-aa47393b8315.png)
 # Kitchen: A Compiler Visualiser and Teaching Tool
 Kitchen supports the learning and teaching of Compiler Theory :woman_cook:.
 
