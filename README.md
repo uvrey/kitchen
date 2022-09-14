@@ -26,6 +26,11 @@ python3 -m kitchen run
 ## Domain-Specific Language Tool and General-Compiler Compiler
 Kitchen helps educators design and use Domain-Specific Languages in assignments, and allows students to verify the correctness of the compilers they build in class. 
 
+Once a Language Specification has been initialised, only the DSL tool may started using the following command:
+```
+python3 -m kitchen dsl-tool
+```
+
 ## Visualisation Engine
 Kitchen's Visualisation Engine calculates, visualises and explains five algorithms in Compiler
 Theory:
@@ -124,7 +129,7 @@ The parse trees will be exported to the `.\samples\tree_pngs` directory.
  by inserting the following command at Kitchen's prompt.
 
  `Input: \c -n n`
- 
+
 ## Compiling and Executing
   ### Running Kitchen
   To run the program, the Context-Free Grammar file needs to be specified.
