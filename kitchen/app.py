@@ -143,11 +143,18 @@ def run() -> None:
         input = typer.prompt("Input")
         cli_helper.handle_input(input, cfg, spec)
 
-# TODO python3 -m kitchen dsl-tool
+# This starts the tool using `python3 -m kitchen dsl-tool`
 @app.command(name="dsl-tool")
 def init_dsl() -> None:
-    # dsl.dsl_tool.main()
-    pass
+
+    cfg = get_cfg()
+    spec = lang_spec.get_spec(cfg)
+    if spec == None:
+        display.fail_secho("No Language Specification provided.\n"+
+        "Please re-initialise Kitchen with this file to use the DSL Tool.")
+    else:
+        # TODO start DSL app
+        pass
 
 @app.command(name="show-cfg")
 def show_cfg() -> None:

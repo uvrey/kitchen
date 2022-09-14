@@ -291,8 +291,13 @@ def _process_command(inp, cfg, spec) -> None:
         display.display_tutorial()
 
     elif inp == "\\dsl" or inp == "\\dsl tool":
-       #dsl.dsl_tool.main()
-        pass
+        spec = lang_spec.get_spec(cfg)
+        if spec == None:
+            display.fail_secho("No Language Specification provided.\n"+
+            "Please re-initialise Kitchen with this file to use the DSL Tool.")
+        else:
+            pass
+            # TODO dsl.dsl_tool.main()
 
     elif inp == "\\show first" or inp == "\\fs":
         cfg.show_first_set()
@@ -334,10 +339,6 @@ def _process_command(inp, cfg, spec) -> None:
         code = _show_parsetable(cfg)
         if code == AMBIGUOUS_ERROR:
             error.ERR_ambiguous_grammar()
-
-    elif inp == "\\gt":
-        new_cfg = ""
-        nc = cfg.cfg_contents.replace("->", "::=")
 
     elif inp == "\\vis parsetable" or inp == "\\vpt":
         if not cfg.first_set_calculated:
