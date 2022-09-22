@@ -430,7 +430,7 @@ def _process_command(inp, cfg, spec) -> None:
             display.fail_secho("No Language Specification file provided.")
 
     elif inp.strip()[0:2] == "\\c" or inp == "\\config":
-        if inp == "\\c":
+        if inp.strip()[0:2] == "\\c" and inp.strip()[0:7] != "\\config":
             config.edit_config(inp.strip()[2:].strip())
         else:
             config.edit_config(inp.strip()[7:].strip())
